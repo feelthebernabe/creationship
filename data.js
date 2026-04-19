@@ -1,5 +1,5 @@
 // ============================================================
-// CHURCH OF CREATIONSHIP — DATA LAYER (Supabase)
+// THE CREATIONSHIP — DATA LAYER (Supabase)
 // ============================================================
 
 var SUPABASE_URL = 'https://cxsbqptqgreywutbfbtx.supabase.co';
@@ -217,11 +217,12 @@ window.DB = {
   // --- Export ---
 
   async exportAll() {
-    const [people, signups, sundays, invitations] = await Promise.all([
+    const [people, signups, sundays, invitations, ideas] = await Promise.all([
       _supabaseClient.from('people').select('*'),
       _supabaseClient.from('role_signups').select('*'),
       _supabaseClient.from('sundays').select('*'),
-      _supabaseClient.from('invitations').select('*')
+      _supabaseClient.from('invitations').select('*'),
+      _supabaseClient.from('ideas').select('*')
     ]);
     
     return {
@@ -229,7 +230,105 @@ window.DB = {
       signups: signups.data || [],
       sundays: sundays.data || [],
       invitations: invitations.data || [],
+      ideas: ideas.data || [],
       exported_at: new Date().toISOString()
     };
+  },
+
+  // --- Authentication (Magic Link) ---
+
+  async signInWithMagicLink(email) {
+    const { error } = await _supabaseClient.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: window.location.origin + '/ideas.html'
+      }
+    });
+    if (error) throw error;
+    return true;
+  },
+
+  async getSession() {
+    const { data: { session } } = await _supabaseClient.auth.getSession();
+    return session;
+  },
+
+  async getUser() {
+    const { data: { user } } = await _supabaseClient.auth.getUser();
+    return user;
+  },
+
+  async signOut() {
+    await _supabaseClient.auth.signOut();
+  },
+
+  onAuthStateChange(callback) {
+    return _supabaseClient.auth.onAuthStateChange(callback);
+  },
+
+  async updateUserName(name) {
+    const { data, error } = await _supabaseClient.auth.updateUser({
+      data: { display_name: name }
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  // --- Ideas ---
+
+  async getIdeas() {
+    const { data, error } = await _supabaseClient
+      .from('ideas')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async addIdea({ title, description, github_url, website_url, demo_url, team_members, stage, company_name }) {
+    const user = await this.getUser();
+    if (!user) throw new Error('Not authenticated');
+    
+    const displayName = user.user_metadata?.display_name || user.email.split('@')[0];
+    
+    const { data, error } = await _supabaseClient
+      .from('ideas')
+      .insert({
+        user_id: user.id,
+        author_name: displayName,
+        author_email: user.email,
+        title: title,
+        description: description || '',
+        github_url: github_url || '',
+        website_url: website_url || '',
+        demo_url: demo_url || '',
+        team_members: team_members || [],
+        stage: stage || 'seed',
+        company_name: company_name || '',
+        status: 'active'
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async updateIdea(id, updates) {
+    const { data, error } = await _supabaseClient
+      .from('ideas')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteIdea(id) {
+    const { error } = await _supabaseClient
+      .from('ideas')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   }
 };
