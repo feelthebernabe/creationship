@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>church of creationship</title>
+  <meta name="description" content="sign up to hold the space, teach, or join the brain trust.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+  </style>
+</head>
+<body>
+
+  <main class="container">
+
+    <!-- ============================
+         STATE 1: LANDING — role picker
+         ============================ -->
+    <section id="view-landing" class="view active">
+
+      <header class="hero">
+        <div class="hero__symbol">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#C4693D" stroke-width="1.2">
+            <circle cx="24" cy="24" r="20"/>
+            <circle cx="24" cy="24" r="10"/>
+            <circle cx="24" cy="24" r="3"/>
+          </svg>
+        </div>
+        <h1>church of creationship</h1>
+        <p class="hero__subtitle">
+          a weekly sunday practice for people who want to make things that matter — together.
+          there are three ways to be part of it.
+        </p>
+      </header>
+
+      <div class="roles" id="role-cards">
+
+        <!-- Hold the Space -->
+        <div class="role-card" data-role="hold_space" id="card-hold-space">
+          <div class="role-card__icon">
+            <svg viewBox="0 0 28 28">
+              <circle cx="14" cy="14" r="11"/>
+              <path d="M14 7v14M7 14h14" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>hold the space</h3>
+          <p>arrive early, stay present, hold the container so others can create inside it.</p>
+        </div>
+
+        <!-- Teach -->
+        <div class="role-card" data-role="teach" id="card-teach">
+          <div class="role-card__icon">
+            <svg viewBox="0 0 28 28">
+              <path d="M14 3c0 0-5 5-5 11s5 11 5 11c0 0 5-5 5-11S14 3 14 3z"/>
+              <path d="M14 10v8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>teach</h3>
+          <p>bring an offering — a skill, a framework, a practice — and share it with the room.</p>
+        </div>
+
+        <!-- Brain Trust -->
+        <div class="role-card" data-role="brain_trust" id="card-brain-trust">
+          <div class="role-card__icon">
+            <svg viewBox="0 0 28 28">
+              <circle cx="8" cy="8" r="3"/>
+              <circle cx="20" cy="8" r="3"/>
+              <circle cx="14" cy="20" r="3"/>
+              <path d="M10.5 9.5L12.5 18M17.5 9.5L15.5 18M11 8h6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>brain trust</h3>
+          <p>lend your thinking, your questions, your honesty — be part of the collective intelligence.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================
+         STATE 2: SIGNUP FORM
+         ============================ -->
+    <section id="view-form" class="view form-view">
+
+      <button class="back-link" id="btn-back">
+        <svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        back to roles
+      </button>
+
+      <div class="form-header">
+        <h2 id="form-title"></h2>
+        <p id="form-subtitle"></p>
+      </div>
+
+      <div class="form-card">
+        <form id="signup-form" novalidate>
+
+          <!-- Common Fields -->
+          <div class="form-section-label">about you</div>
+
+          <div class="form-group">
+            <label for="field-name">your name</label>
+            <input type="text" id="field-name" name="name" placeholder="first and last" required>
+          </div>
+
+          <div class="form-group">
+            <label for="field-email">email</label>
+            <input type="email" id="field-email" name="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="field-phone">phone <small>(optional)</small></label>
+            <input type="tel" id="field-phone" name="phone" placeholder="if you prefer a call or text">
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Role-Specific Fields (injected by JS) -->
+          <div id="role-fields"></div>
+
+          <button type="submit" class="btn btn--primary btn--full" id="btn-submit">
+            send it
+          </button>
+
+        </form>
+      </div>
+
+    </section>
+
+    <!-- ============================
+         STATE 3: THANK YOU
+         ============================ -->
+    <section id="view-thanks" class="view thanks">
+
+      <div class="thanks__checkmark">
+        <svg viewBox="0 0 36 36"><path d="M8 18l8 8L28 10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <h2>got you.</h2>
+      <p>we received your info and someone from the core team will be in touch within the week.</p>
+      <p style="margin-top: var(--space-lg); color: var(--text-muted); font-size: 0.9rem;">
+        in the meantime — thank you for wanting to be part of this.
+      </p>
+
+      <button class="btn btn--ghost mt-xl" id="btn-another" style="margin: var(--space-xl) auto 0;">
+        sign up for another role
+      </button>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>church of creationship · sundays</p>
+  </footer>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Supabase + Data layer -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="data.js"></script>
+
+  <script>
+    // ============================================================
+    // SIGNUP PAGE LOGIC
+    // ============================================================
+
+    const views = {
+      landing: document.getElementById('view-landing'),
+      form: document.getElementById('view-form'),
+      thanks: document.getElementById('view-thanks')
+    };
+
+    let currentRole = null;
+
+    // --- Role definitions ---
+    const ROLES = {
+      hold_space: {
+        title: 'hold the space',
+        subtitle: 'tell us about you and how you want to show up.',
+        fields: `
+          <div class="form-section-label">the role</div>
+          <div class="form-group">
+            <label for="field-availability">your availability</label>
+            <textarea id="field-availability" name="availability" 
+              placeholder="which sundays work for you? are there months you're away? any recurring conflicts?"></textarea>
+            <span class="hint">we'll try to schedule you in a rhythm that works</span>
+          </div>
+          <div class="form-group">
+            <label for="field-why">what draws you to holding the space?</label>
+            <textarea id="field-why" name="why" 
+              placeholder="a sentence or a paragraph — whatever feels right"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-experience">any relevant experience</label>
+            <textarea id="field-experience" name="experience" 
+              placeholder="facilitation, hosting, pastoral work, or just being the person who sets up the chairs — all counts"></textarea>
+            <span class="hint">optional, but helpful</span>
+          </div>
+        `
+      },
+      teach: {
+        title: 'teach',
+        subtitle: 'pitch us your offering. what do you want to bring to the room?',
+        fields: `
+          <div class="form-section-label">your offering</div>
+          <div class="form-group">
+            <label for="field-pitch">what would you teach?</label>
+            <textarea id="field-pitch" name="pitch" required
+              placeholder="the topic, the shape of it, what people would walk away with. doesn't need to be polished — we want the honest version."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-preferred-dates">preferred date(s)</label>
+            <input type="text" id="field-preferred-dates" name="preferred_dates" 
+              placeholder="e.g. 'any sunday in june' or 'may 4th ideally'">
+            <span class="hint">we'll do our best — flexibility helps</span>
+          </div>
+          <div class="form-group">
+            <label for="field-needs">what do you need from the space?</label>
+            <textarea id="field-needs" name="needs" 
+              placeholder="projector? whiteboard? specific setup? let us know"></textarea>
+            <span class="hint">optional</span>
+          </div>
+          <div class="form-group">
+            <label for="field-bio">a line or two about you</label>
+            <textarea id="field-bio" name="bio" 
+              placeholder="so we can introduce you. not a linkedin bio — more like how a friend would describe what you do."></textarea>
+          </div>
+        `
+      },
+      brain_trust: {
+        title: 'brain trust',
+        subtitle: 'tell us what you bring and what you want.',
+        fields: `
+          <div class="form-section-label">your application</div>
+          <div class="form-group">
+            <label for="field-bring">what do you bring?</label>
+            <textarea id="field-bring" name="what_you_bring" required
+              placeholder="skills, perspectives, industries, life experience — what makes your thinking useful in a room?"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-want">what do you want from this?</label>
+            <textarea id="field-want" name="what_you_want" 
+              placeholder="what are you hoping to get out of being part of the brain trust?"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-capacity">time capacity</label>
+            <input type="text" id="field-capacity" name="time_capacity" 
+              placeholder="e.g. '2 sundays a month' or 'available ad hoc'">
+            <span class="hint">honest is better than aspirational</span>
+          </div>
+          <div class="form-group">
+            <label for="field-anything-else">anything else we should know?</label>
+            <textarea id="field-anything-else" name="anything_else" 
+              placeholder="optional — but if there's something that doesn't fit the boxes above, put it here"></textarea>
+          </div>
+        `
+      }
+    };
+
+    // --- Navigation ---
+
+    function showView(name) {
+      Object.values(views).forEach(v => v.classList.remove('active'));
+      views[name].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Role card clicks
+    document.getElementById('role-cards').addEventListener('click', (e) => {
+      const card = e.target.closest('.role-card');
+      if (!card) return;
+      
+      currentRole = card.dataset.role;
+      const role = ROLES[currentRole];
+      
+      document.getElementById('form-title').textContent = role.title;
+      document.getElementById('form-subtitle').textContent = role.subtitle;
+      document.getElementById('role-fields').innerHTML = role.fields;
+      document.getElementById('signup-form').reset();
+      
+      showView('form');
+    });
+
+    // Back button
+    document.getElementById('btn-back').addEventListener('click', () => {
+      showView('landing');
+      currentRole = null;
+    });
+
+    // Another role button
+    document.getElementById('btn-another').addEventListener('click', () => {
+      showView('landing');
+      currentRole = null;
+    });
+
+    // --- Form Submission ---
+
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const form = e.target;
+      const submitBtn = document.getElementById('btn-submit');
+      const formData = new FormData(form);
+      
+      // Validate required
+      const name = formData.get('name')?.trim();
+      const email = formData.get('email')?.trim();
+      
+      if (!name || !email) {
+        showToast('please fill in your name and email');
+        return;
+      }
+
+      if (!email.includes('@') || !email.includes('.')) {
+        showToast('that email doesn\'t look right — double check?');
+        return;
+      }
+
+      // Disable button while submitting
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'sending...';
+      
+      try {
+        // Check for existing person or create new
+        let person = await DB.findPersonByEmail(email);
+        if (!person) {
+          person = await DB.addPerson({
+            name: name,
+            email: email,
+            phone: formData.get('phone')?.trim() || ''
+          });
+        }
+        
+        // Build intake data (everything except common fields)
+        const intake = {};
+        for (const [key, value] of formData.entries()) {
+          if (!['name', 'email', 'phone'].includes(key) && value.trim()) {
+            intake[key] = value.trim();
+          }
+        }
+        
+        // Create the signup
+        await DB.addSignup({
+          person_id: person.id,
+          role_type: currentRole,
+          intake_data: intake
+        });
+        
+        showView('thanks');
+        showToast('signup received ✓');
+      } catch (err) {
+        console.error('Signup error:', err);
+        showToast('something went wrong — try again?');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'send it';
+      }
+    });
+
+    // --- Toast ---
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+  </script>
+
+</body>
+</html>

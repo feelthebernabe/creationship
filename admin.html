@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>core team — church of creationship</title>
+  <meta name="description" content="admin dashboard for the church of creationship core team.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .admin-content { flex: 1; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp 0.4s var(--ease) forwards; }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- ============================
+       GATE — password entry
+       ============================ -->
+  <div id="gate" class="gate">
+    <div class="gate__card">
+      <h1>core team</h1>
+      <p>church of creationship</p>
+      <input type="password" id="gate-password" placeholder="password" autocomplete="off">
+      <p class="gate__error" id="gate-error">that's not it — try again</p>
+      <button class="btn btn--primary btn--full" id="gate-submit">enter</button>
+    </div>
+  </div>
+
+  <!-- ============================
+       DASHBOARD
+       ============================ -->
+  <div id="dashboard" style="display:none;">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-header__inner">
+        <h1>church of creationship <span>— dashboard</span></h1>
+        <nav class="admin-nav" id="admin-nav">
+          <button data-tab="signups" class="active">signups</button>
+          <button data-tab="calendar">calendar</button>
+          <button data-tab="people">people</button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Stats -->
+      <div class="stats-bar" id="stats-bar"></div>
+
+      <!-- Tools -->
+      <div class="admin-tools">
+        <button class="btn btn--ghost btn--small" id="btn-export" title="export all data as JSON">
+          ↓ export data
+        </button>
+      </div>
+
+      <!-- ========================
+           TAB: SIGNUPS
+           ======================== -->
+      <div id="tab-signups" class="tab-panel active">
+
+        <!-- Role filter -->
+        <div class="filter-bar" id="filter-role">
+          <button class="filter-btn active" data-filter="all">all</button>
+          <button class="filter-btn" data-filter="hold_space">hold the space</button>
+          <button class="filter-btn" data-filter="teach">teach</button>
+          <button class="filter-btn" data-filter="brain_trust">brain trust</button>
+        </div>
+
+        <!-- Status filter -->
+        <div class="filter-bar" id="filter-status" style="margin-top: -8px;">
+          <button class="filter-btn active" data-filter="all">all statuses</button>
+          <button class="filter-btn" data-filter="pending">pending</button>
+          <button class="filter-btn" data-filter="approved">approved</button>
+          <button class="filter-btn" data-filter="declined">declined</button>
+        </div>
+
+        <div class="signup-list" id="signup-list"></div>
+      </div>
+
+      <!-- ========================
+           TAB: CALENDAR
+           ======================== -->
+      <div id="tab-calendar" class="tab-panel">
+        <div class="calendar-header">
+          <div class="calendar-nav">
+            <button id="cal-prev">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <h3 id="cal-title"></h3>
+          <div class="calendar-nav">
+            <button id="cal-next">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+
+      <!-- ========================
+           TAB: PEOPLE
+           ======================== -->
+      <div id="tab-people" class="tab-panel">
+        <div class="people-grid" id="people-grid"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sunday Detail Modal -->
+  <div class="modal-overlay" id="sunday-modal">
+    <div class="modal">
+      <h3 id="modal-sunday-title">sunday details</h3>
+      <form id="sunday-form">
+        <div class="form-group">
+          <label for="modal-title">title / offering name</label>
+          <input type="text" id="modal-title" name="title" placeholder="what's happening this sunday?">
+        </div>
+        <div class="form-group">
+          <label for="modal-description">description</label>
+          <textarea id="modal-description" name="description" placeholder="a line about what's planned" style="min-height:80px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="modal-status">status</label>
+          <select id="modal-status" name="status">
+            <option value="open">open</option>
+            <option value="booked">booked</option>
+            <option value="completed">completed</option>
+            <option value="cancelled">cancelled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="modal-notes">notes (core team only)</label>
+          <textarea id="modal-notes" name="notes" placeholder="internal notes" style="min-height:60px;"></textarea>
+        </div>
+        <input type="hidden" id="modal-date" name="date">
+        <div class="modal-actions">
+          <button type="button" class="btn btn--ghost" id="modal-cancel">cancel</button>
+          <button type="submit" class="btn btn--primary">save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Supabase + Data layer -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="data.js"></script>
+
+  <script>
+    // ============================================================
+    // ADMIN DASHBOARD LOGIC
+    // ============================================================
+
+    // --- Password Gate ---
+    const ADMIN_PASSWORD = 'creationship';
+
+    const gateEl = document.getElementById('gate');
+    const dashEl = document.getElementById('dashboard');
+    const gateInput = document.getElementById('gate-password');
+    const gateError = document.getElementById('gate-error');
+
+    if (sessionStorage.getItem('coc_admin') === 'true') {
+      gateEl.style.display = 'none';
+      dashEl.style.display = 'block';
+      renderDashboard();
+    }
+
+    document.getElementById('gate-submit').addEventListener('click', tryLogin);
+    gateInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryLogin();
+    });
+
+    function tryLogin() {
+      if (gateInput.value === ADMIN_PASSWORD) {
+        sessionStorage.setItem('coc_admin', 'true');
+        gateEl.style.display = 'none';
+        dashEl.style.display = 'block';
+        renderDashboard();
+      } else {
+        gateError.style.display = 'block';
+        gateInput.value = '';
+        gateInput.focus();
+      }
+    }
+
+    // --- Tab Navigation ---
+
+    let activeTab = 'signups';
+
+    document.getElementById('admin-nav').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      
+      activeTab = btn.dataset.tab;
+      document.querySelectorAll('.admin-nav button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`tab-${activeTab}`).classList.add('active');
+      
+      if (activeTab === 'calendar') renderCalendar();
+      if (activeTab === 'people') renderPeople();
+      if (activeTab === 'signups') renderSignups();
+    });
+
+    // --- Filters ---
+
+    let filterRole = 'all';
+    let filterStatus = 'all';
+
+    document.getElementById('filter-role').addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      filterRole = btn.dataset.filter;
+      document.querySelectorAll('#filter-role .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSignups();
+    });
+
+    document.getElementById('filter-status').addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      filterStatus = btn.dataset.filter;
+      document.querySelectorAll('#filter-status .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSignups();
+    });
+
+    // --- Render Functions ---
+
+    async function renderDashboard() {
+      await renderStats();
+      await renderSignups();
+    }
+
+    async function renderStats() {
+      try {
+        const stats = await DB.getStats();
+        document.getElementById('stats-bar').innerHTML = `
+          <div class="stat-card">
+            <div class="stat-card__number">${stats.total_signups}</div>
+            <div class="stat-card__label">total signups</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__number">${stats.pending}</div>
+            <div class="stat-card__label">pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__number">${stats.by_role.hold_space}</div>
+            <div class="stat-card__label">hold space</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__number">${stats.by_role.teach}</div>
+            <div class="stat-card__label">teach</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__number">${stats.by_role.brain_trust}</div>
+            <div class="stat-card__label">brain trust</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__number">${stats.total_people}</div>
+            <div class="stat-card__label">people</div>
+          </div>
+        `;
+      } catch (err) {
+        console.error('Stats error:', err);
+      }
+    }
+
+    // Cache people for lookup
+    let peopleCache = {};
+
+    async function renderSignups() {
+      const filters = {};
+      if (filterRole !== 'all') filters.role_type = filterRole;
+      if (filterStatus !== 'all') filters.status = filterStatus;
+      
+      try {
+        const [signups, people] = await Promise.all([
+          DB.getSignups(filters),
+          DB.getPeople()
+        ]);
+        
+        // Build people lookup
+        peopleCache = {};
+        people.forEach(p => { peopleCache[p.id] = p; });
+        
+        const list = document.getElementById('signup-list');
+        
+        if (signups.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state__icon">○</div>
+              <p>no signups yet${filterRole !== 'all' || filterStatus !== 'all' ? ' matching these filters' : ''}. share the signup link to get started.</p>
+            </div>
+          `;
+          return;
+        }
+        
+        list.innerHTML = signups.map(signup => {
+          const person = peopleCache[signup.person_id] || { name: 'unknown', email: '' };
+          const roleLabel = formatRole(signup.role_type);
+          const date = new Date(signup.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const intake = signup.intake_data || {};
+          
+          return `
+            <div class="signup-item" data-id="${signup.id}" onclick="toggleExpand(this)">
+              <div class="signup-item__header">
+                <span class="signup-item__name">${escHtml(person.name)}</span>
+                <div class="signup-item__badges">
+                  <span class="badge badge--role">${roleLabel}</span>
+                  <span class="badge badge--${signup.status}">${signup.status}</span>
+                </div>
+              </div>
+              <div class="signup-item__meta">
+                ${escHtml(person.email)} · signed up ${date}
+              </div>
+              
+              <div class="signup-item__detail">
+                <div class="detail-grid">
+                  ${Object.entries(intake).map(([key, val]) => `
+                    <div class="detail-field">
+                      <div class="detail-field__label">${formatFieldLabel(key)}</div>
+                      <div class="detail-field__value">${escHtml(val)}</div>
+                    </div>
+                  `).join('')}
+                </div>
+                
+                ${person.phone ? `<div class="detail-field mb-md"><div class="detail-field__label">phone</div><div class="detail-field__value">${escHtml(person.phone)}</div></div>` : ''}
+                
+                <textarea class="admin-notes" 
+                  placeholder="add notes for the core team..." 
+                  data-signup-id="${signup.id}"
+                  onchange="saveNote(this)">${escHtml(signup.review_notes || '')}</textarea>
+                
+                <div class="detail-actions">
+                  ${signup.status !== 'approved' ? `<button class="btn btn--sage btn--small" onclick="event.stopPropagation(); setStatus('${signup.id}', 'approved')">✓ approve</button>` : ''}
+                  ${signup.status !== 'in_review' ? `<button class="btn btn--gold btn--small" onclick="event.stopPropagation(); setStatus('${signup.id}', 'in_review')">⟳ in review</button>` : ''}
+                  ${signup.status !== 'declined' ? `<button class="btn btn--ghost btn--small" onclick="event.stopPropagation(); setStatus('${signup.id}', 'declined')" style="color:#C62828;">✕ decline</button>` : ''}
+                  ${signup.status !== 'pending' ? `<button class="btn btn--ghost btn--small" onclick="event.stopPropagation(); setStatus('${signup.id}', 'pending')">↩ back to pending</button>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Signups error:', err);
+      }
+    }
+
+    function toggleExpand(el) {
+      el.classList.toggle('expanded');
+    }
+
+    async function setStatus(id, status) {
+      await DB.updateSignup(id, { 
+        status: status,
+        reviewed_at: new Date().toISOString()
+      });
+      await renderStats();
+      await renderSignups();
+      showToast(`marked as ${status}`);
+    }
+
+    async function saveNote(textarea) {
+      const id = textarea.dataset.signupId;
+      await DB.updateSignup(id, { review_notes: textarea.value });
+      showToast('note saved');
+    }
+
+    // --- Calendar ---
+
+    let calYear, calMonth;
+    {
+      const now = new Date();
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+    }
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+
+    async function renderCalendar() {
+      const months = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+      document.getElementById('cal-title').textContent = `${months[calMonth]} ${calYear}`;
+      
+      const grid = document.getElementById('calendar-grid');
+      const days = ['sun','mon','tue','wed','thu','fri','sat'];
+      
+      let html = days.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+      
+      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      // Get sundays data from Supabase
+      let sundayMap = {};
+      try {
+        const sundays = await DB.getSundays(calYear, calMonth);
+        sundays.forEach(s => { sundayMap[s.date] = s; });
+      } catch (err) {
+        console.error('Calendar error:', err);
+      }
+      
+      for (let i = 0; i < firstDay; i++) {
+        html += '<div class="calendar-day calendar-day--empty"></div>';
+      }
+      
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(calYear, calMonth, d);
+        const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isSunday = date.getDay() === 0;
+        const isToday = dateStr === todayStr;
+        const sundayData = sundayMap[dateStr];
+        
+        let classes = 'calendar-day';
+        if (isSunday) classes += ' calendar-day--sunday';
+        if (isToday) classes += ' calendar-day--today';
+        
+        let tag = '';
+        if (isSunday && sundayData) {
+          tag = `<div class="calendar-day__tag">${escHtml(sundayData.title || sundayData.status)}</div>`;
+        } else if (isSunday) {
+          tag = '<div class="calendar-day__tag calendar-day__tag--open">open</div>';
+        }
+        
+        const onclick = isSunday ? `onclick="openSundayModal('${dateStr}')"` : '';
+        
+        html += `
+          <div class="${classes}" ${onclick}>
+            <div class="calendar-day__number">${d}</div>
+            ${tag}
+          </div>
+        `;
+      }
+      
+      const totalCells = firstDay + daysInMonth;
+      const remainder = totalCells % 7;
+      if (remainder > 0) {
+        for (let i = 0; i < 7 - remainder; i++) {
+          html += '<div class="calendar-day calendar-day--empty"></div>';
+        }
+      }
+      
+      grid.innerHTML = html;
+    }
+
+    // --- Sunday Modal ---
+
+    const sundayModal = document.getElementById('sunday-modal');
+
+    async function openSundayModal(dateStr) {
+      const existing = await DB.getSundayByDate(dateStr);
+      const dateObj = new Date(dateStr + 'T12:00:00');
+      const formatted = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      
+      document.getElementById('modal-sunday-title').textContent = `sunday, ${formatted}`;
+      document.getElementById('modal-date').value = dateStr;
+      document.getElementById('modal-title').value = existing?.title || '';
+      document.getElementById('modal-description').value = existing?.description || '';
+      document.getElementById('modal-status').value = existing?.status || 'open';
+      document.getElementById('modal-notes').value = existing?.notes || '';
+      
+      sundayModal.classList.add('active');
+    }
+
+    document.getElementById('modal-cancel').addEventListener('click', () => {
+      sundayModal.classList.remove('active');
+    });
+
+    sundayModal.addEventListener('click', (e) => {
+      if (e.target === sundayModal) sundayModal.classList.remove('active');
+    });
+
+    document.getElementById('sunday-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+      
+      try {
+        await DB.upsertSunday({
+          date: data.get('date'),
+          title: data.get('title'),
+          description: data.get('description'),
+          status: data.get('status'),
+          notes: data.get('notes')
+        });
+        
+        sundayModal.classList.remove('active');
+        await renderCalendar();
+        showToast('sunday updated');
+      } catch (err) {
+        console.error('Sunday save error:', err);
+        showToast('something went wrong');
+      }
+    });
+
+    // --- People ---
+
+    async function renderPeople() {
+      try {
+        const [people, allSignups] = await Promise.all([
+          DB.getPeople(),
+          DB.getSignups()
+        ]);
+        
+        const grid = document.getElementById('people-grid');
+        
+        if (people.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <div class="empty-state__icon">○</div>
+              <p>no one has signed up yet.</p>
+            </div>
+          `;
+          return;
+        }
+        
+        grid.innerHTML = people.map(person => {
+          const personSignups = allSignups.filter(s => s.person_id === person.id);
+          const roles = personSignups.map(s => `<span class="badge badge--role">${formatRole(s.role_type)}</span>`).join('');
+          const statuses = personSignups.map(s => `<span class="badge badge--${s.status}">${s.status}</span>`).join(' ');
+          
+          return `
+            <div class="person-card">
+              <div class="person-card__name">${escHtml(person.name)}</div>
+              <div class="person-card__email">${escHtml(person.email)}</div>
+              <div class="person-card__roles">${roles} ${statuses}</div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('People error:', err);
+      }
+    }
+
+    // --- Export ---
+
+    document.getElementById('btn-export').addEventListener('click', async () => {
+      try {
+        const data = await DB.exportAll();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `creationship-data-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('data exported');
+      } catch (err) {
+        console.error('Export error:', err);
+        showToast('export failed');
+      }
+    });
+
+    // --- Helpers ---
+
+    function formatRole(role) {
+      const labels = {
+        hold_space: 'hold the space',
+        teach: 'teach',
+        brain_trust: 'brain trust'
+      };
+      return labels[role] || role;
+    }
+
+    function formatFieldLabel(key) {
+      return key.replace(/_/g, ' ');
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+  </script>
+
+</body>
+</html>
