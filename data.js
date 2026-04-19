@@ -12,7 +12,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // PUBLIC API
 // ============================================================
 
-const DB = {
+window.DB = {
 
   // --- People ---
 
