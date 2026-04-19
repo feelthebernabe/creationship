@@ -150,10 +150,11 @@
   <div class="toast" id="toast"></div>
 
   <!-- Supabase + Data layer -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="data.js"></script>
 
   <script>
+    var DB = window.DB;
     // ============================================================
     // ADMIN DASHBOARD LOGIC
     // ============================================================
