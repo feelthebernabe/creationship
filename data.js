@@ -6,13 +6,15 @@ var SUPABASE_URL = 'https://cxsbqptqgreywutbfbtx.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4c2JxcHRxZ3JleXd1dGJmYnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDgyNjUsImV4cCI6MjA5MjE4NDI2NX0.bCle-Yg_fYj8V5HeZtHiXYxEqzufeS5KFWBssSeGKOM';
 
 // Initialize Supabase client
-var supabase;
+// Note: The UMD CDN bundle creates a global `supabase` variable.
+// We use `_supabaseClient` to avoid shadowing.
+var _supabaseClient;
 try {
-  var _sb = window.supabase;
+  var _sb = window.supabase || supabase;
   if (_sb && _sb.createClient) {
-    supabase = _sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    _supabaseClient = _sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } else {
-    console.error('Supabase CDN not loaded. window.supabase:', _sb);
+    console.error('Supabase CDN not loaded. window.supabase:', window.supabase);
   }
 } catch (e) {
   console.error('Supabase init error:', e);
@@ -27,7 +29,7 @@ window.DB = {
   // --- People ---
 
   async addPerson(person) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('people')
       .insert({
         name: person.name,
@@ -41,7 +43,7 @@ window.DB = {
   },
 
   async getPeople() {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('people')
       .select('*')
       .order('created_at', { ascending: false });
@@ -50,7 +52,7 @@ window.DB = {
   },
 
   async getPersonById(id) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('people')
       .select('*')
       .eq('id', id)
@@ -60,7 +62,7 @@ window.DB = {
   },
 
   async findPersonByEmail(email) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('people')
       .select('*')
       .ilike('email', email)
@@ -70,7 +72,7 @@ window.DB = {
   },
 
   async updatePerson(id, updates) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('people')
       .update(updates)
       .eq('id', id)
@@ -83,7 +85,7 @@ window.DB = {
   // --- Role Signups ---
 
   async addSignup(signup) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('role_signups')
       .insert({
         person_id: signup.person_id,
@@ -98,7 +100,7 @@ window.DB = {
   },
 
   async getSignups(filters = {}) {
-    let query = supabase
+    let query = _supabaseClient
       .from('role_signups')
       .select('*')
       .order('created_at', { ascending: false });
@@ -116,7 +118,7 @@ window.DB = {
   },
 
   async getSignupById(id) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('role_signups')
       .select('*')
       .eq('id', id)
@@ -126,7 +128,7 @@ window.DB = {
   },
 
   async updateSignup(id, updates) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('role_signups')
       .update(updates)
       .eq('id', id)
@@ -139,7 +141,7 @@ window.DB = {
   // --- Sundays ---
 
   async getSundays(year, month) {
-    let query = supabase
+    let query = _supabaseClient
       .from('sundays')
       .select('*')
       .order('date', { ascending: true });
@@ -158,7 +160,7 @@ window.DB = {
   },
 
   async getSundayByDate(dateStr) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('sundays')
       .select('*')
       .eq('date', dateStr)
@@ -168,7 +170,7 @@ window.DB = {
   },
 
   async upsertSunday(sunday) {
-    const { data, error } = await supabase
+    const { data, error } = await _supabaseClient
       .from('sundays')
       .upsert({
         date: sunday.date,
@@ -191,8 +193,8 @@ window.DB = {
 
   async getStats() {
     const [signupsRes, peopleRes] = await Promise.all([
-      supabase.from('role_signups').select('id, role_type, status'),
-      supabase.from('people').select('id')
+      _supabaseClient.from('role_signups').select('id, role_type, status'),
+      _supabaseClient.from('people').select('id')
     ]);
     
     const signups = signupsRes.data || [];
@@ -216,10 +218,10 @@ window.DB = {
 
   async exportAll() {
     const [people, signups, sundays, invitations] = await Promise.all([
-      supabase.from('people').select('*'),
-      supabase.from('role_signups').select('*'),
-      supabase.from('sundays').select('*'),
-      supabase.from('invitations').select('*')
+      _supabaseClient.from('people').select('*'),
+      _supabaseClient.from('role_signups').select('*'),
+      _supabaseClient.from('sundays').select('*'),
+      _supabaseClient.from('invitations').select('*')
     ]);
     
     return {
