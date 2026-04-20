@@ -1,5 +1,5 @@
 -- ============================================================
--- CHURCH OF CREATIONSHIPS — IDEAS TABLE V2
+-- THE CREATIONSHIP — IDEAS TABLE V2
 -- Adds: github_url, website_url, demo_url, team_members
 -- Run this in Supabase SQL Editor
 -- ============================================================

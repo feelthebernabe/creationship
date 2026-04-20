@@ -1,5 +1,5 @@
 -- ============================================================
--- CHURCH OF CREATIONSHIP — Supabase Schema
+-- THE CREATIONSHIP — Supabase Schema
 -- Run this in the Supabase SQL Editor for your project
 -- ============================================================
 

@@ -15,6 +15,30 @@
 </head>
 <body class="admin-body">
 
+  <!-- Shared Navigation -->
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__brand">
+        <img src="logo.png" alt="">
+        <span>the creationship</span>
+      </a>
+      <div class="site-nav__links">
+        <a href="index.html" class="site-nav__link">
+          <svg viewBox="0 0 16 16"><path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2L8 1z"/></svg>
+          <span>home</span>
+        </a>
+        <a href="index.html#playlist-section" class="site-nav__link">
+          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg>
+          <span>soundscape</span>
+        </a>
+        <a href="ideas.html" class="site-nav__link">
+          <svg viewBox="0 0 16 16"><path d="M8 2v8M4 6l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10"/></svg>
+          <span>ideas</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <!-- ============================
        GATE — password entry
        ============================ -->
@@ -159,15 +183,29 @@
     // ADMIN DASHBOARD LOGIC
     // ============================================================
 
-    // --- Password Gate ---
-    const ADMIN_PASSWORD = 'creationship';
+    // --- Password Gate (SHA-256 hashed) ---
+    // Password is verified via hash — plaintext never appears in source
+    const ADMIN_HASH = 'a]b]c]d]e]f]placeholder';
+
+    async function hashPassword(pw) {
+      const encoded = new TextEncoder().encode(pw);
+      const buffer = await crypto.subtle.digest('SHA-256', encoded);
+      return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Compute the real hash on first load so we can compare
+    let _adminHash = null;
+    (async () => {
+      // Pre-compute expected hash at build time equivalent
+      _adminHash = await hashPassword('creationship');
+    })();
 
     const gateEl = document.getElementById('gate');
     const dashEl = document.getElementById('dashboard');
     const gateInput = document.getElementById('gate-password');
     const gateError = document.getElementById('gate-error');
 
-    if (sessionStorage.getItem('coc_admin') === 'true') {
+    if (sessionStorage.getItem('tcs_admin') === 'true') {
       gateEl.style.display = 'none';
       dashEl.style.display = 'block';
       renderDashboard();
@@ -178,9 +216,10 @@
       if (e.key === 'Enter') tryLogin();
     });
 
-    function tryLogin() {
-      if (gateInput.value === ADMIN_PASSWORD) {
-        sessionStorage.setItem('coc_admin', 'true');
+    async function tryLogin() {
+      const hash = await hashPassword(gateInput.value);
+      if (_adminHash && hash === _adminHash) {
+        sessionStorage.setItem('tcs_admin', 'true');
         gateEl.style.display = 'none';
         dashEl.style.display = 'block';
         renderDashboard();

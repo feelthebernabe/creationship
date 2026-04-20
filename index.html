@@ -13,6 +13,33 @@
 </head>
 <body>
 
+  <!-- Shared Navigation -->
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__brand">
+        <img src="logo.png" alt="">
+        <span>the creationship</span>
+      </a>
+      <div class="site-nav__links">
+        <a href="index.html" class="site-nav__link active">
+          <svg viewBox="0 0 16 16"><path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2L8 1z"/></svg>
+          <span>home</span>
+        </a>
+        <a href="#playlist-section" class="site-nav__link">
+          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg>
+          <span>soundscape</span>
+        </a>
+        <a href="ideas.html" class="site-nav__link">
+          <svg viewBox="0 0 16 16"><path d="M8 2v8M4 6l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10"/></svg>
+          <span>ideas</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Connection error banner -->
+  <div class="connection-error" id="connection-error">unable to connect — check your internet and refresh</div>
+
   <main class="container">
 
     <!-- ============================
@@ -141,16 +168,179 @@
         in the meantime — thank you for wanting to be part of this.
       </p>
 
-      <button class="btn btn--ghost mt-xl" id="btn-another" style="margin: var(--space-xl) auto 0;">
-        sign up for another role
-      </button>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:var(--space-sm); margin-top:var(--space-xl);">
+        <button class="btn btn--ghost" id="btn-another" style="width:100%;max-width:280px;">
+          sign up for another role
+        </button>
+        <a href="#playlist-section" class="btn btn--ghost" style="width:100%;max-width:280px;text-decoration:none;">
+          🎵 add a song to the soundscape
+        </a>
+        <a href="ideas.html" class="btn btn--ghost" style="width:100%;max-width:280px;text-decoration:none;">
+          💡 explore the idea repository
+        </a>
+      </div>
 
     </section>
 
   </main>
 
+  <!-- ============================
+       COLLABORATIVE PLAYLIST
+       ============================ -->
+  <section class="playlist-section" id="playlist-section">
+    <div class="container">
+
+      <div class="playlist-header">
+        <div class="playlist-header__icon">
+          <svg viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+            <path d="M16 2v4M16 26v4M2 16h4M26 16h4" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+          </svg>
+        </div>
+        <h2>the soundscape</h2>
+        <p class="playlist-header__subtitle">
+          every sunday runs on a collaborative playlist — songs that inspire creativity, 
+          unlock flow, and set the tone for building.
+        </p>
+      </div>
+
+      <!-- Spotify Embed -->
+      <div class="playlist-embed" id="playlist-embed">
+        <iframe 
+          style="border-radius:12px" 
+          src="https://open.spotify.com/embed/playlist/2RwtWDiCIea2wapOiKiCS8?utm_source=generator&theme=0" 
+          width="100%" 
+          height="352" 
+          frameBorder="0" 
+          allowfullscreen="" 
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+          loading="lazy"
+          title="The Creationship Playlist">
+        </iframe>
+      </div>
+
+      <!-- Two-Path Add Section -->
+      <div class="playlist-paths">
+        <h3 class="playlist-paths__title">add a song</h3>
+        <p class="playlist-paths__subtitle">two ways to contribute — pick whichever works for you.</p>
+
+        <!-- Path Toggle -->
+        <div class="path-toggle" id="path-toggle">
+          <button class="path-toggle__btn active" data-path="spotify" id="toggle-spotify">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            </svg>
+            i have spotify
+          </button>
+          <button class="path-toggle__btn" data-path="manual" id="toggle-manual">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+            no spotify
+          </button>
+        </div>
+
+        <!-- Path A: Spotify Users -->
+        <div class="path-panel active" id="path-spotify">
+          <div class="spotify-path-card">
+            <div class="spotify-path-card__icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#1ed760">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+            </div>
+            <h4>add directly on spotify</h4>
+            <p>open the playlist in your Spotify app, search for your song, and add it. it'll show up for everyone instantly.</p>
+            <a href="https://open.spotify.com/playlist/2RwtWDiCIea2wapOiKiCS8?si=8df0a7c1c33347f3&pt=d1bb9fb27620818409127e0a4786dad7" 
+               target="_blank" rel="noopener" class="btn btn--spotify" id="btn-open-spotify">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+              open playlist in spotify
+            </a>
+            <span class="spotify-path-card__hint">the playlist is collaborative — just search and add ✓</span>
+          </div>
+        </div>
+
+        <!-- Path B: No Spotify / Manual Suggestion -->
+        <div class="path-panel" id="path-manual">
+          <div class="playlist-suggest" id="playlist-suggest">
+            <div class="playlist-suggest__header">
+              <h4>suggest a song</h4>
+              <p>tell us what to add and we'll put it on the playlist for you.</p>
+            </div>
+
+            <form id="song-form" class="song-form" novalidate>
+              <div class="song-form__row">
+                <div class="form-group">
+                  <label for="song-title">song title</label>
+                  <input type="text" id="song-title" name="song_title" placeholder="the track that unlocks you" required>
+                </div>
+                <div class="form-group">
+                  <label for="song-artist">artist</label>
+                  <input type="text" id="song-artist" name="artist" placeholder="who made it" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="song-link">link <small>(youtube, soundcloud, apple music — anything helps)</small></label>
+                <input type="url" id="song-link" name="spotify_link" placeholder="paste a link so we can find it">
+              </div>
+
+              <div class="form-group">
+                <label for="song-reason">why this song? <small>(optional)</small></label>
+                <textarea id="song-reason" name="reason" rows="2" placeholder="does it give focus? energy? calm? tell us what it does for you"></textarea>
+              </div>
+
+              <div class="song-form__footer">
+                <div class="form-group" style="flex:1;margin-bottom:0;">
+                  <label for="song-name">your name</label>
+                  <input type="text" id="song-name" name="suggested_by" placeholder="so we know who to credit" required>
+                </div>
+                <button type="submit" class="btn btn--primary" id="btn-suggest">
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 4v12M4 10h12" stroke-linecap="round"/>
+                  </svg>
+                  suggest song
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community Suggestions Feed -->
+      <div class="playlist-feed" id="playlist-feed">
+        <div class="playlist-feed__header">
+          <h3>recent suggestions</h3>
+          <span class="playlist-feed__count" id="suggestion-count"></span>
+        </div>
+        <div class="playlist-feed__list" id="suggestions-list">
+          <div class="playlist-feed__loading">
+            <div class="pulse-dot"></div>
+            loading suggestions...
+          </div>
+        </div>
+      </div>
+
+      <!-- Open in Spotify CTA -->
+      <div class="playlist-cta">
+        <a href="https://open.spotify.com/playlist/2RwtWDiCIea2wapOiKiCS8?si=8df0a7c1c33347f3" 
+           target="_blank" rel="noopener" class="btn btn--ghost playlist-cta__btn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+          </svg>
+          follow on spotify
+        </a>
+      </div>
+
+    </div>
+  </section>
+
   <footer class="site-footer">
-    <a href="ideas.html" style="display:inline-block;color:var(--gold);font-family:var(--font-display);font-size:0.9rem;letter-spacing:0.06em;text-transform:lowercase;margin-bottom:var(--space-md);text-decoration:none;border:1px solid var(--gold-border);padding:0.6rem 1.5rem;border-radius:6px;transition:all 0.3s;">→ enter the idea repository</a>
     <p>the creationship · the infinite hackathon</p>
   </footer>
 
@@ -369,7 +559,155 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
+    // ============================================================
+    // COLLABORATIVE PLAYLIST LOGIC
+    // ============================================================
+
+    // --- Path Toggle (Spotify vs Manual) ---
+    function switchPath(path) {
+      // Toggle active button
+      document.querySelectorAll('.path-toggle__btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-path="' + path + '"]').classList.add('active');
+      
+      // Toggle active panel
+      document.querySelectorAll('.path-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('path-' + path).classList.add('active');
+    }
+
+    document.getElementById('toggle-spotify').addEventListener('click', () => switchPath('spotify'));
+    document.getElementById('toggle-manual').addEventListener('click', () => switchPath('manual'));
+
+    function timeAgo(dateStr) {
+      const now = new Date();
+      const date = new Date(dateStr);
+      const seconds = Math.floor((now - date) / 1000);
+      
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+      if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+      if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function renderSuggestionCard(s) {
+      const spotifyBtn = s.spotify_link 
+        ? `<a href="${s.spotify_link}" target="_blank" rel="noopener" class="suggestion-card__spotify" title="Open in Spotify">
+             <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+               <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+             </svg>
+           </a>` 
+        : '';
+      
+      const reasonHtml = s.reason 
+        ? `<p class="suggestion-card__reason">"${s.reason}"</p>` 
+        : '';
+
+      return `
+        <div class="suggestion-card">
+          <div class="suggestion-card__music-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+          </div>
+          <div class="suggestion-card__content">
+            <div class="suggestion-card__top">
+              <div>
+                <span class="suggestion-card__title">${s.song_title}</span>
+                <span class="suggestion-card__artist">${s.artist}</span>
+              </div>
+              ${spotifyBtn}
+            </div>
+            ${reasonHtml}
+            <div class="suggestion-card__meta">
+              <span>suggested by <strong>${s.suggested_by}</strong></span>
+              <span>${timeAgo(s.created_at)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadSuggestions() {
+      try {
+        const suggestions = await DB.getPlaylistSuggestions();
+        const list = document.getElementById('suggestions-list');
+        const countEl = document.getElementById('suggestion-count');
+        
+        if (suggestions.length === 0) {
+          list.innerHTML = `
+            <div class="playlist-feed__empty">
+              <p>no suggestions yet — be the first to add a song.</p>
+            </div>
+          `;
+          countEl.textContent = '';
+          return;
+        }
+
+        countEl.textContent = suggestions.length + ' song' + (suggestions.length !== 1 ? 's' : '');
+        list.innerHTML = suggestions.map(renderSuggestionCard).join('');
+      } catch (err) {
+        console.error('Error loading suggestions:', err);
+        document.getElementById('suggestions-list').innerHTML = `
+          <div class="playlist-feed__empty">
+            <p>couldn't load suggestions right now.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Song suggestion form
+    document.getElementById('song-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const form = e.target;
+      const btn = document.getElementById('btn-suggest');
+      const formData = new FormData(form);
+      
+      const songTitle = formData.get('song_title')?.trim();
+      const artist = formData.get('artist')?.trim();
+      const suggestedBy = formData.get('suggested_by')?.trim();
+      
+      if (!songTitle || !artist || !suggestedBy) {
+        showToast('fill in the song, artist, and your name');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = 'adding...';
+
+      try {
+        await DB.addPlaylistSuggestion({
+          song_title: songTitle,
+          artist: artist,
+          suggested_by: suggestedBy,
+          reason: formData.get('reason')?.trim() || '',
+          spotify_link: formData.get('spotify_link')?.trim() || ''
+        });
+
+        form.reset();
+        showToast('song added ✓ nice taste.');
+        await loadSuggestions();
+      } catch (err) {
+        console.error('Suggestion error:', err);
+        showToast('something went wrong — try again?');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 4v12M4 10h12" stroke-linecap="round"/>
+          </svg>
+          suggest song
+        `;
+      }
+    });
+
+    // Load suggestions on page load
+    loadSuggestions();
+
   </script>
 
 </body>
 </html>
+

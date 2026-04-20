@@ -9,15 +9,28 @@ var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 // Note: The UMD CDN bundle creates a global `supabase` variable.
 // We use `_supabaseClient` to avoid shadowing.
 var _supabaseClient;
+var _dbConnected = false;
+
 try {
   var _sb = window.supabase || supabase;
   if (_sb && _sb.createClient) {
     _supabaseClient = _sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    _dbConnected = true;
   } else {
     console.error('Supabase CDN not loaded. window.supabase:', window.supabase);
+    _showConnectionError();
   }
 } catch (e) {
   console.error('Supabase init error:', e);
+  _showConnectionError();
+}
+
+function _showConnectionError() {
+  // Show error banner if the DOM element exists
+  setTimeout(function() {
+    var errEl = document.getElementById('connection-error');
+    if (errEl) errEl.classList.add('show');
+  }, 100);
 }
 
 // ============================================================
@@ -327,6 +340,59 @@ window.DB = {
   async deleteIdea(id) {
     const { error } = await _supabaseClient
       .from('ideas')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  // --- Playlist Suggestions ---
+
+  async getPlaylistSuggestions(status) {
+    let query = _supabaseClient
+      .from('playlist_suggestions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  },
+
+  async addPlaylistSuggestion({ song_title, artist, suggested_by, reason, spotify_link }) {
+    const { data, error } = await _supabaseClient
+      .from('playlist_suggestions')
+      .insert({
+        song_title: song_title,
+        artist: artist,
+        suggested_by: suggested_by,
+        reason: reason || '',
+        spotify_link: spotify_link || '',
+        status: 'pending'
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async updatePlaylistSuggestion(id, updates) {
+    const { data, error } = await _supabaseClient
+      .from('playlist_suggestions')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deletePlaylistSuggestion(id) {
+    const { error } = await _supabaseClient
+      .from('playlist_suggestions')
       .delete()
       .eq('id', id);
     if (error) throw error;

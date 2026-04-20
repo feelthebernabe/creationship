@@ -1,5 +1,5 @@
 -- ============================================================
--- CHURCH OF CREATIONSHIPS — IDEAS TABLE
+-- THE CREATIONSHIP — IDEAS TABLE
 -- Run this in Supabase SQL Editor
 -- ============================================================
 
