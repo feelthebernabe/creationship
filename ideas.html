@@ -21,18 +21,9 @@
         <span>the creationship</span>
       </a>
       <div class="site-nav__links">
-        <a href="index.html" class="site-nav__link">
-          <svg viewBox="0 0 16 16"><path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2L8 1z"/></svg>
-          <span>home</span>
-        </a>
-        <a href="index.html#playlist-section" class="site-nav__link">
-          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg>
-          <span>soundscape</span>
-        </a>
-        <a href="ideas.html" class="site-nav__link active">
-          <svg viewBox="0 0 16 16"><path d="M8 2v8M4 6l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10"/></svg>
-          <span>ideas</span>
-        </a>
+        <a href="index.html" class="site-nav__link">home</a>
+        <a href="index.html#playlist-section" class="site-nav__link">soundscape</a>
+        <a href="ideas.html" class="site-nav__link active">ideas</a>
       </div>
     </div>
   </nav>
@@ -42,31 +33,9 @@
     <!-- STATE 1: LOGIN -->
     <section id="view-login" class="view active">
       <div class="login-view">
-        <img src="logo.png" alt="the Creationship" class="hero__logo" style="width:120px;height:120px;margin-bottom:var(--space-lg);">
         <div class="login-card">
-          <h2>idea repository</h2>
-          <p class="subtitle">where ideas become projects become companies.<br>the creationship's collective brain.</p>
-
-          <div class="login-features">
-            <div class="login-features__item">
-              <div class="login-features__icon">
-                <svg viewBox="0 0 16 16"><path d="M8 14V8" stroke-linecap="round"/><path d="M8 8c0-2.5 2-4.5 4.5-5-.5 2.5-2 4.5-4.5 5z"/></svg>
-              </div>
-              <span>drop an idea — from a napkin sketch to a full pitch</span>
-            </div>
-            <div class="login-features__item">
-              <div class="login-features__icon">
-                <svg viewBox="0 0 16 16"><path d="M8 2c-2 2.5-2.5 5.5-2 9l2.5-2 2.5 2c.5-3.5 0-6.5-2-9z"/></svg>
-              </div>
-              <span>track what's growing — seeds, projects, companies</span>
-            </div>
-            <div class="login-features__item">
-              <div class="login-features__icon">
-                <svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="12" r="2"/><path d="M7 5h2M6.2 6.5L7 11M9.8 6.5L9 11" stroke-linecap="round"/></svg>
-              </div>
-              <span>build teams — find the people who make it real</span>
-            </div>
-          </div>
+          <h2>the vault</h2>
+          <p class="subtitle">where ideas become projects become companies.</p>
 
           <form id="login-form" novalidate>
             <div class="form-group">
@@ -85,8 +54,8 @@
           <svg viewBox="0 0 28 28"><path d="M4 8l10 7 10-7" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="6" width="22" height="16" rx="2"/></svg>
         </div>
         <h2>check your email</h2>
-        <p style="color:var(--text-secondary); max-width:340px; margin:var(--space-sm) auto 0;">
-          we sent a magic link to <strong id="sent-email" style="color:var(--gold-light);"></strong>.<br>
+        <p style="color:var(--text-dim); max-width:340px; margin:var(--space-sm) auto 0;">
+          we sent a magic link to <strong id="sent-email" style="color:var(--accent);"></strong>.<br>
           click it to get in — no password needed.
         </p>
         <button class="btn btn--ghost mt-xl" id="btn-try-again" style="margin:var(--space-xl) auto 0;">try a different email</button>
@@ -157,7 +126,7 @@
       <!-- NEW IDEA FORM -->
       <div class="new-idea" id="new-idea-section">
         <div class="new-idea__header" id="new-idea-toggle">
-          <h3>+ drop an idea</h3>
+          <h3>+ new idea</h3>
           <span class="new-idea__toggle">
             <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
@@ -256,7 +225,7 @@
 
             <div class="form-section-divider" style="margin-top:var(--space-lg);"></div>
 
-            <button type="submit" class="btn btn--primary btn--full" id="btn-submit-idea">drop it</button>
+            <button type="submit" class="btn btn--primary btn--full" id="btn-submit-idea">ship it</button>
 
           </form>
         </div>
@@ -672,7 +641,7 @@
       const team = teamMembers.map(name => ({ name }));
 
       const btn = document.getElementById('btn-submit-idea');
-      btn.disabled = true; btn.textContent = 'dropping...';
+      btn.disabled = true; btn.textContent = 'shipping...';
 
       try {
         await DB.addIdea({
@@ -692,13 +661,13 @@
         document.querySelector('.stage-option--seed input').checked = true;
         document.getElementById('company-name-field').classList.remove('visible');
 
-        showToast('idea dropped ✓');
+        showToast('shipped ✓');
         await loadIdeas();
       } catch (err) {
         console.error('Add idea error:', err);
         showToast('couldn\'t save — try again?');
       } finally {
-        btn.disabled = false; btn.textContent = 'drop it';
+        btn.disabled = false; btn.textContent = 'ship it';
       }
     });
 

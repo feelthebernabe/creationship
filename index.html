@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>the creationship</title>
-  <meta name="description" content="sign up to hold the space, teach, or join the brain trust.">
+  <meta name="description" content="a weekly create-a-thon for moral imagination — creationships for a world in transition. sundays at caravan of dreams, east village.">
   <link rel="stylesheet" href="styles.css">
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  <!-- Shared Navigation -->
+  <!-- Navigation — quiet, text-only -->
   <nav class="site-nav">
     <div class="site-nav__inner">
       <a href="index.html" class="site-nav__brand">
@@ -21,18 +21,9 @@
         <span>the creationship</span>
       </a>
       <div class="site-nav__links">
-        <a href="index.html" class="site-nav__link active">
-          <svg viewBox="0 0 16 16"><path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2L8 1z"/></svg>
-          <span>home</span>
-        </a>
-        <a href="#playlist-section" class="site-nav__link">
-          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg>
-          <span>soundscape</span>
-        </a>
-        <a href="ideas.html" class="site-nav__link">
-          <svg viewBox="0 0 16 16"><path d="M8 2v8M4 6l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10"/></svg>
-          <span>ideas</span>
-        </a>
+        <a href="index.html" class="site-nav__link active">home</a>
+        <a href="#playlist-section" class="site-nav__link">soundscape</a>
+        <a href="ideas.html" class="site-nav__link">ideas</a>
       </div>
     </div>
   </nav>
@@ -43,60 +34,261 @@
   <main class="container">
 
     <!-- ============================
-         STATE 1: LANDING — role picker
+         STATE 1: LANDING
          ============================ -->
     <section id="view-landing" class="view active">
 
       <header class="hero">
-        <div class="hero__logo-wrap">
-          <img src="logo.png" alt="the Creationship" class="hero__logo">
-        </div>
-        <h1>the creationship</h1>
+        <h1>the infinite<br>hackathon</h1>
         <p class="hero__subtitle">
-          a weekly sunday gathering for people with <strong style="color: var(--gold-light);">moral ambition</strong>.
-          an infinite hackathon — a place to build things that matter, together.
-          there are three ways to be part of it.
+          a weekly create-a-thon for <strong>moral imagination</strong>.
+          part church, part build session — creationships for a world in transition.
         </p>
+        <span class="hero__scroll"></span>
       </header>
 
+      <!-- Manifesto Marquee -->
+      <div class="marquee">
+        <div class="marquee__track">
+          <span class="marquee__item">build things that matter</span>
+          <span class="marquee__item">moral ambition</span>
+          <span class="marquee__item">never stop shipping</span>
+          <span class="marquee__item">creation over consumption</span>
+          <span class="marquee__item">the room is the product</span>
+          <span class="marquee__item">collective intelligence</span>
+          <span class="marquee__item">build things that matter</span>
+          <span class="marquee__item">moral ambition</span>
+          <span class="marquee__item">never stop shipping</span>
+          <span class="marquee__item">creation over consumption</span>
+          <span class="marquee__item">the room is the product</span>
+          <span class="marquee__item">collective intelligence</span>
+        </div>
+      </div>
+
+      <!-- ============================
+           THE PREMISE
+           ============================ -->
+      <div class="landing-section reveal" id="premise">
+        <div class="landing-section__label">the premise</div>
+        <h2 class="landing-section__heading">creationships compound</h2>
+        <div class="landing-section__body">
+          <p>
+            once a week, the back room of a vegan restaurant on east 6th fills with people 
+            who'd never otherwise share a table — a founder, a blacksmith, a prompt engineer, 
+            a doula, a jazz pianist, whoever showed up. a few hours later, something exists 
+            to make this world better that none of them could've made alone.
+          </p>
+          <p>
+            we call what happens between them a <strong>creationship</strong> — the relationship 
+            that forms when you make something together. and creationships compound. the person 
+            you prototyped with becomes the person you call next month to pick their brain about 
+            work, the person you text when you're stuck on the real creative problem, and the 
+            person you text at 9am because you're out of eggs.
+          </p>
+          <p>
+            the world building ahead won't come from solo builders or siloed disciplines. 
+            it'll come from <strong>networks of people who've already made things together</strong>, 
+            who share a language, who know how each other builds.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================
+           THREE CURRENTS
+           ============================ -->
+      <div class="landing-section reveal" id="currents">
+        <div class="landing-section__label">three currents, one practice</div>
+        <h2 class="landing-section__heading">holding all three at once is the whole discipline</h2>
+
+        <div class="currents">
+          <div class="current reveal">
+            <div class="current__number">01</div>
+            <div class="current__name">new tech</div>
+            <div class="current__desc">
+              the tools reshaping how we build, think, and create together.
+            </div>
+            <div class="current__tags">
+              <span class="current__tag">ai agents</span>
+              <span class="current__tag">vibe coding</span>
+              <span class="current__tag">prompt craft</span>
+              <span class="current__tag">embodied ai</span>
+              <span class="current__tag">synthetic reality</span>
+              <span class="current__tag">the intention economy</span>
+            </div>
+          </div>
+
+          <div class="current reveal">
+            <div class="current__number">02</div>
+            <div class="current__name">forever human</div>
+            <div class="current__desc">
+              the practices that keep us grounded while everything accelerates.
+            </div>
+            <div class="current__tags">
+              <span class="current__tag">indigenous wisdom</span>
+              <span class="current__tag">earth kinship</span>
+              <span class="current__tag">embodiment</span>
+              <span class="current__tag">everyday mysticism</span>
+              <span class="current__tag">friendship</span>
+              <span class="current__tag">craftsmanship</span>
+              <span class="current__tag">storytelling</span>
+            </div>
+          </div>
+
+          <div class="current reveal">
+            <div class="current__number">03</div>
+            <div class="current__name">the bridge</div>
+            <div class="current__desc">
+              the interesting work is where the first two cross.
+            </div>
+            <div class="current__tags">
+              <span class="current__tag">sensemaking</span>
+              <span class="current__tag">trust &amp; consent</span>
+              <span class="current__tag">data sovereignty</span>
+              <span class="current__tag">ethics</span>
+              <span class="current__tag">stewardship</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================
+           HOW SUNDAYS GO
+           ============================ -->
+      <div class="landing-section reveal" id="schedule">
+        <div class="landing-section__label">how sundays go</div>
+        <h2 class="landing-section__heading">no experience required. no finished product required.</h2>
+
+        <div class="schedule">
+          <div class="schedule__item reveal">
+            <div class="schedule__time">11:50</div>
+            <div class="schedule__content">
+              <div class="schedule__title">doors open</div>
+              <div class="schedule__desc">grab food, meet people, get oriented.</div>
+            </div>
+          </div>
+
+          <div class="schedule__item reveal">
+            <div class="schedule__time">12:00</div>
+            <div class="schedule__content">
+              <div class="schedule__title">community pulse</div>
+              <div class="schedule__desc">a knowledge share from someone in the group — how we stay on top of what's shifting in new tech and get to know each other.</div>
+            </div>
+          </div>
+
+          <div class="schedule__item reveal">
+            <div class="schedule__time">12:30</div>
+            <div class="schedule__content">
+              <div class="schedule__title">vision casting</div>
+              <div class="schedule__desc">everyone shares what they're working on, what they're curious about, or what they'd help with. two minutes each. half-baked is welcome. teams form around what's interesting.</div>
+            </div>
+          </div>
+
+          <div class="schedule__item reveal">
+            <div class="schedule__time">1:00</div>
+            <div class="schedule__content">
+              <div class="schedule__title">the build</div>
+              <div class="schedule__desc">a few hours of deep, collaborative work. bring your laptop, your sketchbook, your ai tools, your napkin ideas. you are the toolkit.</div>
+            </div>
+          </div>
+
+          <div class="schedule__item reveal">
+            <div class="schedule__time">3:00</div>
+            <div class="schedule__content">
+              <div class="schedule__title">show &amp; tell</div>
+              <div class="schedule__desc">we share what we made and witness each other. something is alive now that wasn't at noon.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================
+           PAST WORK / PROOF
+           ============================ -->
+      <div class="landing-section reveal" id="proof">
+        <div class="landing-section__label">what's come out of this room</div>
+        <h2 class="landing-section__heading">prototypes that became companies. collaborations that became friendships.</h2>
+
+        <div class="proof">
+          <div class="proof__item reveal">
+            <div class="proof__name">kitty</div>
+            <div class="proof__desc">a dating app born from a sunday build session. from napkin sketch to working prototype in one afternoon.</div>
+          </div>
+          <div class="proof__item reveal">
+            <div class="proof__name">kula</div>
+            <div class="proof__desc">a gift economy marketplace. what happens when you build from generosity instead of transaction.</div>
+          </div>
+          <div class="proof__item reveal">
+            <div class="proof__name">+ more shipping</div>
+            <div class="proof__desc">friendships that became the thing you didn't know you needed. the room keeps producing.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================
+           WHERE
+           ============================ -->
+      <div class="landing-section reveal" id="where">
+        <div class="landing-section__label">where</div>
+
+        <div class="location-card">
+          <div class="location-card__info">
+            <div class="location-card__name">caravan of dreams</div>
+            <div class="location-card__address">405 e 6th st, new york — east village</div>
+            <div class="location-card__note">
+              a family-owned vegan spot that's been feeding the east village for decades. 
+              food and drinks available. sundays at noon.
+            </div>
+          </div>
+        </div>
+
+        <div class="new-here">
+          <div class="new-here__heading">new here?</div>
+          <div class="new-here__body">
+            come as you are. no dogma, no vibe to match, no scene to break into. 
+            every week someone walks in not knowing anyone and walks out with people 
+            they'll keep building with.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================
+           JOIN CTA
+           ============================ -->
+      <div class="join-cta reveal" id="join">
+        <h2 class="join-cta__heading">come make something with people<br>you haven't met yet</h2>
+        <p class="join-cta__sub">there are three ways to be part of it. pick the one that fits.</p>
+        <p class="join-cta__tagline">creativity · community · creationship</p>
+      </div>
+
+      <!-- Role Cards — editorial blocks -->
       <div class="roles" id="role-cards">
 
         <!-- Hold the Space -->
         <div class="role-card" data-role="hold_space" id="card-hold-space">
-          <div class="role-card__icon">
-            <svg viewBox="0 0 28 28">
-              <circle cx="14" cy="14" r="11"/>
-              <path d="M14 7v14M7 14h14" stroke-linecap="round"/>
-            </svg>
+          <div class="role-card__icon"></div>
+          <div>
+            <h3>hold the space</h3>
+            <p>arrive early, stay present, hold the container so others can build inside it. every hackathon needs someone keeping the room alive.</p>
           </div>
-          <h3>hold the space</h3>
-          <p>arrive early, stay present, hold the container so others can build inside it. every hackathon needs someone keeping the room alive.</p>
         </div>
 
         <!-- Teach -->
         <div class="role-card" data-role="teach" id="card-teach">
-          <div class="role-card__icon">
-            <svg viewBox="0 0 28 28">
-              <path d="M14 3c0 0-5 5-5 11s5 11 5 11c0 0 5-5 5-11S14 3 14 3z"/>
-              <path d="M14 10v8" stroke-linecap="round"/>
-            </svg>
+          <div class="role-card__icon"></div>
+          <div>
+            <h3>teach</h3>
+            <p>bring an offering — a skill, a framework, a practice — and share it with the room. this is the sprint briefing.</p>
           </div>
-          <h3>teach</h3>
-          <p>bring an offering — a skill, a framework, a practice — and share it with the room. this is the sprint briefing.</p>
         </div>
 
         <!-- Brain Trust -->
         <div class="role-card" data-role="brain_trust" id="card-brain-trust">
-          <div class="role-card__icon">
-            <svg viewBox="0 0 28 28">
-              <circle cx="8" cy="8" r="3"/>
-              <circle cx="20" cy="8" r="3"/>
-              <circle cx="14" cy="20" r="3"/>
-              <path d="M10.5 9.5L12.5 18M17.5 9.5L15.5 18M11 8h6" stroke-linecap="round"/>
-            </svg>
+          <div class="role-card__icon"></div>
+          <div>
+            <h3>brain trust</h3>
+            <p>lend your thinking, your questions, your honesty — be part of the collective intelligence that never stops shipping.</p>
           </div>
-          <h3>brain trust</h3>
-          <p>lend your thinking, your questions, your honesty — be part of the collective intelligence that never stops shipping.</p>
         </div>
 
       </div>
@@ -110,7 +302,7 @@
 
       <button class="back-link" id="btn-back">
         <svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        back to roles
+        back
       </button>
 
       <div class="form-header">
@@ -121,7 +313,6 @@
       <div class="form-card">
         <form id="signup-form" novalidate>
 
-          <!-- Common Fields -->
           <div class="form-section-label">about you</div>
 
           <div class="form-group">
@@ -145,7 +336,7 @@
           <div id="role-fields"></div>
 
           <button type="submit" class="btn btn--primary btn--full" id="btn-submit">
-            send it
+            i'm in
           </button>
 
         </form>
@@ -162,21 +353,21 @@
         <svg viewBox="0 0 36 36"><path d="M8 18l8 8L28 10" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
 
-      <h2>got you.</h2>
-      <p>we received your info and someone from the core team will be in touch within the week.</p>
-      <p style="margin-top: var(--space-lg); color: var(--text-muted); font-size: 0.9rem;">
+      <h2>you're in.</h2>
+      <p>we see you. someone from the core team will reach out this week.</p>
+      <p style="margin-top: var(--space-lg); color: var(--text-muted); font-size: 0.88rem;">
         in the meantime — thank you for wanting to be part of this.
       </p>
 
       <div style="display:flex; flex-direction:column; align-items:center; gap:var(--space-sm); margin-top:var(--space-xl);">
         <button class="btn btn--ghost" id="btn-another" style="width:100%;max-width:280px;">
-          sign up for another role
+          choose another way in
         </button>
         <a href="#playlist-section" class="btn btn--ghost" style="width:100%;max-width:280px;text-decoration:none;">
-          🎵 add a song to the soundscape
+          add a song to the soundscape
         </a>
         <a href="ideas.html" class="btn btn--ghost" style="width:100%;max-width:280px;text-decoration:none;">
-          💡 explore the idea repository
+          enter the vault
         </a>
       </div>
 
@@ -193,10 +384,9 @@
       <div class="playlist-header">
         <div class="playlist-header__icon">
           <svg viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.2"/>
-            <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1"/>
+            <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1"/>
             <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
-            <path d="M16 2v4M16 26v4M2 16h4M26 16h4" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
           </svg>
         </div>
         <h2>the soundscape</h2>
@@ -209,7 +399,7 @@
       <!-- Spotify Embed -->
       <div class="playlist-embed" id="playlist-embed">
         <iframe 
-          style="border-radius:12px" 
+          style="border-radius:8px" 
           src="https://open.spotify.com/embed/playlist/2RwtWDiCIea2wapOiKiCS8?utm_source=generator&theme=0" 
           width="100%" 
           height="352" 
@@ -229,13 +419,13 @@
         <!-- Path Toggle -->
         <div class="path-toggle" id="path-toggle">
           <button class="path-toggle__btn active" data-path="spotify" id="toggle-spotify">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
               <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
             </svg>
             i have spotify
           </button>
           <button class="path-toggle__btn" data-path="manual" id="toggle-manual">
-            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="6" cy="18" r="3"/>
               <circle cx="18" cy="16" r="3"/>
@@ -248,7 +438,7 @@
         <div class="path-panel active" id="path-spotify">
           <div class="spotify-path-card">
             <div class="spotify-path-card__icon">
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="#1ed760">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="#1ed760">
                 <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
               </svg>
             </div>
@@ -256,12 +446,12 @@
             <p>open the playlist in your Spotify app, search for your song, and add it. it'll show up for everyone instantly.</p>
             <a href="https://open.spotify.com/playlist/2RwtWDiCIea2wapOiKiCS8?si=8df0a7c1c33347f3&pt=d1bb9fb27620818409127e0a4786dad7" 
                target="_blank" rel="noopener" class="btn btn--spotify" id="btn-open-spotify">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                 <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
               </svg>
               open playlist in spotify
             </a>
-            <span class="spotify-path-card__hint">the playlist is collaborative — just search and add ✓</span>
+            <span class="spotify-path-card__hint">the playlist is collaborative — just search and add</span>
           </div>
         </div>
 
@@ -301,9 +491,6 @@
                   <input type="text" id="song-name" name="suggested_by" placeholder="so we know who to credit" required>
                 </div>
                 <button type="submit" class="btn btn--primary" id="btn-suggest">
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10 4v12M4 10h12" stroke-linecap="round"/>
-                  </svg>
                   suggest song
                 </button>
               </div>
@@ -330,19 +517,17 @@
       <div class="playlist-cta">
         <a href="https://open.spotify.com/playlist/2RwtWDiCIea2wapOiKiCS8?si=8df0a7c1c33347f3" 
            target="_blank" rel="noopener" class="btn btn--ghost playlist-cta__btn">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)">
-            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-          </svg>
-          follow on spotify
+          follow on spotify →
         </a>
       </div>
 
     </div>
   </section>
 
-  <footer class="site-footer">
-    <p>the creationship · the infinite hackathon</p>
-  </footer>
+    <footer class="site-footer">
+      <p>the creationship · the infinite hackathon</p>
+      <p style="margin-top:var(--space-sm);font-size:0.72rem;color:var(--text-muted);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:underline;">dear crisis</a></p>
+    </footer>
 
   <!-- Toast notification -->
   <div class="toast" id="toast"></div>
@@ -540,13 +725,13 @@
         });
         
         showView('thanks');
-        showToast('signup received ✓');
+        showToast('you\'re in ✓');
       } catch (err) {
         console.error('Signup error:', err);
         showToast('something went wrong — try again?');
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'send it';
+        submitBtn.textContent = 'i\'m in';
       }
     });
 
@@ -565,11 +750,8 @@
 
     // --- Path Toggle (Spotify vs Manual) ---
     function switchPath(path) {
-      // Toggle active button
       document.querySelectorAll('.path-toggle__btn').forEach(b => b.classList.remove('active'));
       document.querySelector('[data-path="' + path + '"]').classList.add('active');
-      
-      // Toggle active panel
       document.querySelectorAll('.path-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('path-' + path).classList.add('active');
     }
@@ -592,7 +774,7 @@
     function renderSuggestionCard(s) {
       const spotifyBtn = s.spotify_link 
         ? `<a href="${s.spotify_link}" target="_blank" rel="noopener" class="suggestion-card__spotify" title="Open in Spotify">
-             <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+             <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
              </svg>
            </a>` 
@@ -605,7 +787,7 @@
       return `
         <div class="suggestion-card">
           <div class="suggestion-card__music-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="6" cy="18" r="3"/>
               <circle cx="18" cy="16" r="3"/>
@@ -636,11 +818,7 @@
         const countEl = document.getElementById('suggestion-count');
         
         if (suggestions.length === 0) {
-          list.innerHTML = `
-            <div class="playlist-feed__empty">
-              <p>no suggestions yet — be the first to add a song.</p>
-            </div>
-          `;
+          list.innerHTML = `<div class="playlist-feed__empty"><p>no suggestions yet — be the first to add a song.</p></div>`;
           countEl.textContent = '';
           return;
         }
@@ -649,11 +827,7 @@
         list.innerHTML = suggestions.map(renderSuggestionCard).join('');
       } catch (err) {
         console.error('Error loading suggestions:', err);
-        document.getElementById('suggestions-list').innerHTML = `
-          <div class="playlist-feed__empty">
-            <p>couldn't load suggestions right now.</p>
-          </div>
-        `;
+        document.getElementById('suggestions-list').innerHTML = `<div class="playlist-feed__empty"><p>couldn't load suggestions right now.</p></div>`;
       }
     }
 
@@ -687,27 +861,43 @@
         });
 
         form.reset();
-        showToast('song added ✓ nice taste.');
+        showToast('song added ✓');
         await loadSuggestions();
       } catch (err) {
         console.error('Suggestion error:', err);
         showToast('something went wrong — try again?');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10 4v12M4 10h12" stroke-linecap="round"/>
-          </svg>
-          suggest song
-        `;
+        btn.innerHTML = 'suggest song';
       }
     });
 
     // Load suggestions on page load
     loadSuggestions();
 
+    // ============================================================
+    // VIEWPORT REVEAL ANIMATION
+    // ============================================================
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.role-card, .playlist-header, .playlist-embed, .playlist-paths, .playlist-feed').forEach(el => {
+      el.classList.add('reveal');
+      revealObserver.observe(el);
+    });
+
+    // Also observe elements that already have .reveal in the HTML
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+      revealObserver.observe(el);
+    });
+
   </script>
 
 </body>
 </html>
-
