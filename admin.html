@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>core team — the creationship</title>
   <meta name="description" content="admin dashboard for the creationship core team.">
+  <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="styles.css">
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
@@ -184,12 +185,8 @@
       return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // Compute the real hash on first load so we can compare
-    let _adminHash = null;
-    (async () => {
-      // Pre-compute expected hash at build time equivalent
-      _adminHash = await hashPassword('creationship');
-    })();
+    // Pre-computed SHA-256 hash — password never appears in source
+    const _adminHash = '119beec054e90de802bd5226d3afee7103a9c409d2d58a3af2ece6ccd1384f67';
 
     const gateEl = document.getElementById('gate');
     const dashEl = document.getElementById('dashboard');

@@ -666,30 +666,21 @@ h4 {
   box-shadow: none;
 }
 
-/* Role card number */
-.role-card__icon {
-  width: 60px;
-  height: auto;
-  margin-bottom: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding-top: 4px;
-}
-
-.role-card__icon svg { display: none; }
-
-.role-card__icon::before {
+/* Role card number — rendered via ::before on the card itself */
+.role-card::before {
   font-family: var(--font);
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   color: var(--text-muted);
+  flex-shrink: 0;
+  padding-top: 6px;
+  width: 40px;
 }
 
-.role-card:nth-child(1) .role-card__icon::before { content: '01'; }
-.role-card:nth-child(2) .role-card__icon::before { content: '02'; }
-.role-card:nth-child(3) .role-card__icon::before { content: '03'; }
+.role-card:nth-child(1)::before { content: '01'; }
+.role-card:nth-child(2)::before { content: '02'; }
+.role-card:nth-child(3)::before { content: '03'; }
 
 .role-card h3 {
   font-size: clamp(1.3rem, 3vw, 1.8rem);
