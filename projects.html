@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>projects — the creationship</title>
+  <meta name="description" content="what the creationship is making. seeds, projects, and companies from the weekly create-a-thon.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="og-image.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="projects — the creationship">
+  <meta property="og:description" content="what the creationship is making. seeds, projects, and companies from the weekly create-a-thon.">
+  <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://creationship.vercel.app/og-image.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__brand">
+        <span>the creationship</span>
+      </a>
+      <div class="site-nav__links">
+        <a href="index.html" class="site-nav__link">home</a>
+        <a href="index.html#playlist-section" class="site-nav__link">soundscape</a>
+        <a href="projects.html" class="site-nav__link active">projects</a>
+        <a href="ideas.html" class="site-nav__link">ideas</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="connection-error" id="connection-error">unable to connect — check your internet and refresh</div>
+
+  <main class="container">
+
+    <header class="projects-hero reveal">
+      <div class="landing-section__label">what we're making</div>
+      <h1 class="projects-hero__title">seeds, projects, and companies</h1>
+      <p class="projects-hero__subtitle">
+        the room keeps producing. half-baked ideas, working prototypes, and real companies —
+        all born from sunday create-a-thons.
+      </p>
+    </header>
+
+    <section class="projects-stage reveal" id="stage-companies" hidden>
+      <div class="projects-stage__header">
+        <div class="landing-section__label">companies</div>
+        <h2 class="projects-stage__heading">shipped into the world</h2>
+      </div>
+      <div class="projects-grid" id="grid-companies"></div>
+    </section>
+
+    <section class="projects-stage reveal" id="stage-projects" hidden>
+      <div class="projects-stage__header">
+        <div class="landing-section__label">projects</div>
+        <h2 class="projects-stage__heading">actively building</h2>
+      </div>
+      <div class="projects-grid" id="grid-projects"></div>
+    </section>
+
+    <section class="projects-stage reveal" id="stage-seeds" hidden>
+      <div class="projects-stage__header">
+        <div class="landing-section__label">seeds</div>
+        <h2 class="projects-stage__heading">half-baked ideas looking for people</h2>
+      </div>
+      <div class="projects-grid" id="grid-seeds"></div>
+    </section>
+
+    <section class="projects-loading" id="projects-loading">
+      <p>loading…</p>
+    </section>
+
+    <section class="projects-empty-all" id="projects-empty-all" hidden>
+      <p>no projects yet — come to a sunday and make one.</p>
+    </section>
+
+    <section class="projects-cta reveal">
+      <h3>have something to add?</h3>
+      <p>
+        members can drop projects into <a href="ideas.html">the vault</a> —
+        paste a whatsapp message or fill the form, we'll do the rest.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>the creationship · the infinite create-a-thon</p>
+    <p style="margin-top:var(--space-sm);font-size:0.72rem;color:var(--text-muted);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:underline;">dear crisis</a> · © <span id="year"></span></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="data.js"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function safeUrl(url) {
+      if (!url) return '';
+      const trimmed = String(url).trim();
+      if (!/^https?:\/\//i.test(trimmed)) return '';
+      return trimmed;
+    }
+
+    function el(tag, className, text) {
+      const n = document.createElement(tag);
+      if (className) n.className = className;
+      if (text !== undefined && text !== null) n.textContent = String(text);
+      return n;
+    }
+
+    function renderCard(idea) {
+      const card = el('article', 'project-card reveal');
+
+      const header = el('div', 'project-card__header');
+      header.appendChild(el('h3', 'project-card__title', idea.title || 'untitled'));
+      if (idea.company_name) {
+        header.appendChild(el('div', 'project-card__company', idea.company_name));
+      }
+      card.appendChild(header);
+
+      if (idea.author_name) {
+        card.appendChild(el('div', 'project-card__author', 'by ' + idea.author_name));
+      }
+
+      if (idea.description) {
+        card.appendChild(el('p', 'project-card__desc', idea.description));
+      }
+
+      const team = Array.isArray(idea.team_members) ? idea.team_members : [];
+      const teamNames = team.filter(m => m && m.name).map(m => m.name);
+      if (teamNames.length) {
+        const teamWrap = el('div', 'project-card__team');
+        teamNames.forEach(name => teamWrap.appendChild(el('span', 'project-chip', name)));
+        card.appendChild(teamWrap);
+      }
+
+      const linksWrap = el('div', 'project-card__links');
+      const addLink = (url, iconText, label) => {
+        const safe = safeUrl(url);
+        if (!safe) return;
+        const a = document.createElement('a');
+        a.className = 'project-link';
+        a.href = safe;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        const icon = el('span', 'project-link__icon', iconText);
+        icon.setAttribute('aria-hidden', 'true');
+        a.appendChild(icon);
+        a.appendChild(el('span', null, label));
+        linksWrap.appendChild(a);
+      };
+      addLink(idea.website_url, '🌐', 'site');
+      addLink(idea.github_url, '</>', 'code');
+      addLink(idea.demo_url, '▶', 'demo');
+      if (linksWrap.childNodes.length) card.appendChild(linksWrap);
+
+      return card;
+    }
+
+    function applyReveal() {
+      const els = document.querySelectorAll('.reveal:not(.visible)');
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      els.forEach(el => obs.observe(el));
+    }
+
+    async function loadProjects() {
+      const loading = document.getElementById('projects-loading');
+      const emptyAll = document.getElementById('projects-empty-all');
+
+      try {
+        const ideas = await DB.getIdeas();
+        const active = (ideas || []).filter(i => i.status === 'active');
+
+        const buckets = { seed: [], project: [], company: [] };
+        active.forEach(i => {
+          const stage = (i.stage || 'seed').toLowerCase();
+          if (buckets[stage]) buckets[stage].push(i);
+          else buckets.seed.push(i);
+        });
+
+        const render = (key, gridId, sectionId) => {
+          const grid = document.getElementById(gridId);
+          const section = document.getElementById(sectionId);
+          grid.replaceChildren();
+          if (!buckets[key].length) {
+            section.hidden = true;
+            return;
+          }
+          buckets[key].forEach(idea => grid.appendChild(renderCard(idea)));
+          section.hidden = false;
+        };
+
+        render('company', 'grid-companies', 'stage-companies');
+        render('project', 'grid-projects', 'stage-projects');
+        render('seed', 'grid-seeds', 'stage-seeds');
+
+        loading.hidden = true;
+        if (active.length === 0) emptyAll.hidden = false;
+
+        applyReveal();
+      } catch (err) {
+        console.error('loadProjects error:', err);
+        loading.hidden = true;
+        document.getElementById('connection-error').classList.add('show');
+      }
+    }
+
+    loadProjects();
+  </script>
+
+  <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>
