@@ -239,10 +239,10 @@
       </div>
 
       <!-- ============================
-           WHERE
+           EVENTS
            ============================ -->
       <div class="landing-section reveal" id="where">
-        <div class="landing-section__label">where</div>
+        <div class="landing-section__label">events</div>
 
         <div class="location-card">
           <div class="location-card__info">
@@ -252,7 +252,6 @@
               a family-owned vegan spot that's been feeding the east village for decades. 
               food and drinks available. sundays at noon.
             </div>
-            <div class="next-sunday" id="next-sunday"></div>
           </div>
         </div>
 
@@ -1127,7 +1126,6 @@
 
     async function loadLumaEvents() {
       const listEl = document.getElementById('luma-events-list');
-      const nextSundayEl = document.getElementById('next-sunday');
 
       try {
         const res = await fetch('/api/luma-events');
@@ -1136,8 +1134,6 @@
         const { events } = await res.json();
 
         if (!events || events.length === 0) {
-          // No events — fall back to calculated next Sunday
-          showFallbackSunday(nextSundayEl);
           listEl.innerHTML = `<div class="luma-events__empty"><p>no upcoming events right now — check back soon.</p></div>`;
           return;
         }
@@ -1145,38 +1141,14 @@
         // Render events list
         listEl.innerHTML = events.map((evt, i) => renderLumaEvent(evt, i === 0)).join('');
 
-        // Update the next-sunday badge with the actual next event
-        const next = events[0];
-        const { relLabel, dateStr } = formatEventDate(next.start_at);
-        if (nextSundayEl) {
-          const label = relLabel || dateStr;
-          nextSundayEl.innerHTML = `<span class="next-sunday__label">next session</span><span class="next-sunday__date">${label} · ${dateStr}</span>`;
-        }
-
       } catch (err) {
         console.warn('Luma events unavailable, using fallback:', err.message);
-        // Graceful fallback — show calculated next Sunday
-        showFallbackSunday(nextSundayEl);
         listEl.innerHTML = `
           <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="luma-events__fallback">
             <span>view upcoming sessions on luma →</span>
           </a>
         `;
       }
-    }
-
-    function showFallbackSunday(el) {
-      if (!el) return;
-      const now = new Date();
-      const day = now.getDay();
-      const daysUntil = day === 0 && now.getHours() < 15 ? 0 : (7 - day) % 7 || 7;
-      const next = new Date(now);
-      next.setDate(now.getDate() + daysUntil);
-      const label = daysUntil === 0 ? 'today' 
-                  : daysUntil === 1 ? 'tomorrow'
-                  : 'this ' + next.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-      const dateStr = next.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-      el.innerHTML = `<span class="next-sunday__label">next session</span><span class="next-sunday__date">${label} · ${dateStr}</span>`;
     }
 
     // Load Luma events on page load
