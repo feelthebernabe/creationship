@@ -567,6 +567,60 @@ h4 {
   line-height: 1.5;
 }
 
+/* --- Next Sunday badge --- */
+.next-sunday {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding: 10px 16px;
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+}
+
+.next-sunday__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.next-sunday__date {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-on-dark);
+}
+
+/* --- Skeleton Loader --- */
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.skeleton-card {
+  padding: var(--space-md);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-hover) 25%, var(--bg-elevated) 50%, var(--bg-hover) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-line--title { width: 60%; margin-bottom: 8px; }
+.skeleton-line--sub { width: 40%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* --- New Here callout --- */
 .new-here {
   margin-top: var(--space-xl);

@@ -250,6 +250,7 @@
               a family-owned vegan spot that's been feeding the east village for decades. 
               food and drinks available. sundays at noon.
             </div>
+            <div class="next-sunday" id="next-sunday"></div>
           </div>
         </div>
 
@@ -514,9 +515,9 @@
           <span class="playlist-feed__count" id="suggestion-count"></span>
         </div>
         <div class="playlist-feed__list" id="suggestions-list">
-          <div class="playlist-feed__loading">
-            <div class="pulse-dot"></div>
-            loading suggestions...
+          <div class="skeleton-loader">
+            <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
           </div>
         </div>
       </div>
@@ -856,6 +857,13 @@
         return;
       }
 
+      // Validate URL if provided
+      const link = formData.get('spotify_link')?.trim();
+      if (link && !/^https?:\/\/.+/i.test(link)) {
+        showToast('that link doesn\'t look right — paste the full URL');
+        return;
+      }
+
       btn.disabled = true;
       btn.innerHTML = 'adding...';
 
@@ -882,6 +890,25 @@
 
     // Load suggestions on page load
     loadSuggestions();
+
+    // ============================================================
+    // NEXT SUNDAY DATE
+    // ============================================================
+
+    (function showNextSunday() {
+      const el = document.getElementById('next-sunday');
+      if (!el) return;
+      const now = new Date();
+      const day = now.getDay(); // 0=Sun
+      const daysUntil = day === 0 && now.getHours() < 15 ? 0 : (7 - day) % 7 || 7;
+      const next = new Date(now);
+      next.setDate(now.getDate() + daysUntil);
+      const label = daysUntil === 0 ? 'today' 
+                  : daysUntil === 1 ? 'tomorrow'
+                  : 'this ' + next.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+      const dateStr = next.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+      el.innerHTML = `<span class="next-sunday__label">next session</span><span class="next-sunday__date">${label} · ${dateStr}</span>`;
+    })();
 
     // ============================================================
     // VIEWPORT REVEAL ANIMATION
