@@ -630,7 +630,206 @@ h4 {
   color: var(--text-on-dark);
 }
 
-/* --- Skeleton Loader --- */
+/* --- Luma Events --- */
+.luma-events {
+  margin-top: var(--space-xl);
+}
+
+.luma-events__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.luma-events__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.luma-events__cal-link {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.luma-events__cal-link:hover {
+  color: var(--bg-accent);
+}
+
+.luma-events__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.luma-event {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none;
+  color: var(--text-on-dark);
+  transition: all var(--transition);
+}
+
+.luma-event:first-child {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.luma-event:last-child {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-bottom: none;
+}
+
+.luma-event:only-child {
+  border-radius: var(--radius-lg);
+}
+
+.luma-event:hover {
+  background: rgba(0,0,0,0.85);
+  transform: translateX(4px);
+}
+
+.luma-event--next {
+  background: var(--bg-dark);
+  border-left: 3px solid var(--accent);
+}
+
+.luma-event__date-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 42px;
+}
+
+.luma-event__month {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.luma-event__day {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.luma-event__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.luma-event__name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.luma-event__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.luma-event__rel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(184, 255, 114, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.luma-event__datestr {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.luma-event__rsvp {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg-dark);
+  background: var(--accent);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.luma-event:hover .luma-event__rsvp {
+  background: var(--accent-hover);
+  transform: scale(1.04);
+}
+
+.luma-events__empty {
+  padding: var(--space-lg);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.luma-events__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background: var(--bg-dark);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all var(--transition);
+}
+
+.luma-events__fallback:hover {
+  background: rgba(0,0,0,0.85);
+  color: var(--accent-hover);
+}
+
+@media (max-width: 640px) {
+  .luma-event {
+    grid-template-columns: 42px 1fr;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .luma-event__rsvp {
+    display: none;
+  }
+
+  .luma-events__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+}
+
 .skeleton-loader {
   display: flex;
   flex-direction: column;

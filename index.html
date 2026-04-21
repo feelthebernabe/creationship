@@ -284,6 +284,23 @@
           </div>
         </div>
 
+        <!-- Upcoming Events from Luma -->
+        <div class="luma-events" id="luma-events">
+          <div class="luma-events__header">
+            <div class="luma-events__label">upcoming sessions</div>
+            <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="luma-events__cal-link" id="luma-cal-link">
+              view full calendar →
+            </a>
+          </div>
+          <div class="luma-events__list" id="luma-events-list">
+            <!-- Skeleton loader while fetching -->
+            <div class="skeleton-loader">
+              <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
+              <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
+            </div>
+          </div>
+        </div>
+
         <div class="new-here">
           <div class="new-here__heading">new here?</div>
           <div class="new-here__body">
@@ -922,14 +939,96 @@
     loadSuggestions();
 
     // ============================================================
-    // NEXT SUNDAY DATE
+    // LUMA CALENDAR INTEGRATION
     // ============================================================
 
-    (function showNextSunday() {
-      const el = document.getElementById('next-sunday');
+    function formatEventDate(isoStr) {
+      const d = new Date(isoStr);
+      const now = new Date();
+      const diffMs = d - now;
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+      const dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+      const weekday = d.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+
+      let relLabel = '';
+      if (diffDays < 0) relLabel = '';
+      else if (diffDays === 0) relLabel = 'today';
+      else if (diffDays === 1) relLabel = 'tomorrow';
+      else if (diffDays < 7) relLabel = 'this ' + weekday;
+      else relLabel = weekday;
+
+      return { relLabel, dateStr, timeStr };
+    }
+
+    function renderLumaEvent(evt, isNext) {
+      const { relLabel, dateStr, timeStr } = formatEventDate(evt.start_at);
+      const labelHtml = relLabel ? `<span class="luma-event__rel">${relLabel}</span>` : '';
+      const eventUrl = evt.url || 'https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM';
+
+      return `
+        <a href="${eventUrl}" target="_blank" rel="noopener" class="luma-event${isNext ? ' luma-event--next' : ''}" id="luma-event-${dateStr.replace(/\s/g, '-').toLowerCase()}">
+          <div class="luma-event__date-col">
+            <span class="luma-event__month">${new Date(evt.start_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+            <span class="luma-event__day">${new Date(evt.start_at).getDate()}</span>
+          </div>
+          <div class="luma-event__info">
+            <div class="luma-event__name">${evt.name}</div>
+            <div class="luma-event__meta">
+              ${labelHtml}
+              <span class="luma-event__datestr">${dateStr} · ${timeStr}</span>
+            </div>
+          </div>
+          <div class="luma-event__rsvp">rsvp</div>
+        </a>
+      `;
+    }
+
+    async function loadLumaEvents() {
+      const listEl = document.getElementById('luma-events-list');
+      const nextSundayEl = document.getElementById('next-sunday');
+
+      try {
+        const res = await fetch('/api/luma-events');
+        if (!res.ok) throw new Error('API ' + res.status);
+
+        const { events } = await res.json();
+
+        if (!events || events.length === 0) {
+          // No events — fall back to calculated next Sunday
+          showFallbackSunday(nextSundayEl);
+          listEl.innerHTML = `<div class="luma-events__empty"><p>no upcoming events right now — check back soon.</p></div>`;
+          return;
+        }
+
+        // Render events list
+        listEl.innerHTML = events.map((evt, i) => renderLumaEvent(evt, i === 0)).join('');
+
+        // Update the next-sunday badge with the actual next event
+        const next = events[0];
+        const { relLabel, dateStr } = formatEventDate(next.start_at);
+        if (nextSundayEl) {
+          const label = relLabel || dateStr;
+          nextSundayEl.innerHTML = `<span class="next-sunday__label">next session</span><span class="next-sunday__date">${label} · ${dateStr}</span>`;
+        }
+
+      } catch (err) {
+        console.warn('Luma events unavailable, using fallback:', err.message);
+        // Graceful fallback — show calculated next Sunday
+        showFallbackSunday(nextSundayEl);
+        listEl.innerHTML = `
+          <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="luma-events__fallback">
+            <span>view upcoming sessions on luma →</span>
+          </a>
+        `;
+      }
+    }
+
+    function showFallbackSunday(el) {
       if (!el) return;
       const now = new Date();
-      const day = now.getDay(); // 0=Sun
+      const day = now.getDay();
       const daysUntil = day === 0 && now.getHours() < 15 ? 0 : (7 - day) % 7 || 7;
       const next = new Date(now);
       next.setDate(now.getDate() + daysUntil);
@@ -938,7 +1037,10 @@
                   : 'this ' + next.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
       const dateStr = next.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
       el.innerHTML = `<span class="next-sunday__label">next session</span><span class="next-sunday__date">${label} · ${dateStr}</span>`;
-    })();
+    }
+
+    // Load Luma events on page load
+    loadLumaEvents();
 
     // ============================================================
     // VIEWPORT REVEAL ANIMATION
@@ -952,7 +1054,7 @@
       });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.role-card, .playlist-header, .playlist-embed, .playlist-paths, .playlist-feed').forEach(el => {
+    document.querySelectorAll('.role-card, .playlist-header, .playlist-embed, .playlist-paths, .playlist-feed, .luma-events').forEach(el => {
       el.classList.add('reveal');
       revealObserver.observe(el);
     });
