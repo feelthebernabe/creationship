@@ -2221,6 +2221,21 @@ h4 {
    RESPONSIVE
    ============================================================ */
 
+@media (max-width: 768px) {
+  h1 { font-size: clamp(2rem, 6vw, 3rem); }
+  h2 { font-size: clamp(1.5rem, 4.5vw, 2rem); }
+  
+  .hero__headline { font-size: clamp(2.2rem, 7vw, 3.6rem); }
+  .hero__sub { font-size: 1rem; max-width: 100%; }
+
+  .proof { flex-direction: column; }
+  .showreel__grid { grid-template-columns: 1fr; }
+  
+  .join-cta__heading { font-size: clamp(1.3rem, 5vw, 2rem); }
+  
+  .stat-cards { grid-template-columns: repeat(3, 1fr); }
+}
+
 @media (max-width: 640px) {
   .role-card {
     grid-template-columns: 1fr;
@@ -2243,10 +2258,25 @@ h4 {
   .admin-header__inner { flex-direction: column; text-align: center; }
 
   .idea-card__top { flex-direction: column; }
+  
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
+  
+  .location-card { padding: var(--space-lg); }
+  .path-toggle { flex-direction: column; }
+  .path-toggle__btn { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {
   .container { padding: 0 var(--space-md); }
-  .site-nav__brand span { display: none; }
+  
+  /* Shorter brand on tiny screens */
+  .site-nav__brand { font-size: 0.85rem; }
+  .site-nav__link { font-size: 0.65rem; padding: 5px 8px; }
+  
   .hero { padding: var(--space-2xl) 0 var(--space-xl); }
+  
+  .marquee__text { font-size: 0.6rem; }
+  .login-card { padding: var(--space-lg); }
+  
+  .stat-cards { grid-template-columns: 1fr 1fr; }
 }
