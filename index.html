@@ -535,7 +535,7 @@
 
     <footer class="site-footer">
       <p>the creationship · the infinite hackathon</p>
-      <p style="margin-top:var(--space-sm);font-size:0.72rem;color:var(--text-muted);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:underline;">dear crisis</a></p>
+      <p style="margin-top:var(--space-sm);font-size:0.72rem;color:var(--text-muted);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:underline;">dear crisis</a> · © <span id="year"></span></p>
     </footer>
 
   <!-- Toast notification -->
@@ -930,6 +930,23 @@
     // Also observe elements that already have .reveal in the HTML
     document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
       revealObserver.observe(el);
+    });
+
+    // Dynamic year
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Smooth scroll offset for sticky nav
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          const navHeight = document.querySelector('.site-nav')?.offsetHeight || 56;
+          const y = target.getBoundingClientRect().top + window.scrollY - navHeight - 16;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      });
     });
 
   </script>

@@ -1053,7 +1053,11 @@ h4 {
   position: relative;
   padding: var(--space-3xl) 0;
   border-top: 1px solid var(--border);
+  scroll-margin-top: 72px;
 }
+
+/* Ensure anchor targets clear sticky nav */
+[id] { scroll-margin-top: 72px; }
 
 .playlist-header {
   margin-bottom: var(--space-xl);
