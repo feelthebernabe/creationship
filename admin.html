@@ -56,6 +56,7 @@
           <button data-tab="signups" class="active">signups</button>
           <button data-tab="calendar">calendar</button>
           <button data-tab="people">people</button>
+          <button data-tab="ideas">ideas</button>
         </nav>
       </div>
     </header>
@@ -121,6 +122,37 @@
            ======================== -->
       <div id="tab-people" class="tab-panel">
         <div class="people-grid" id="people-grid"></div>
+      </div>
+
+      <!-- ========================
+           TAB: IDEAS (bulk paste)
+           ======================== -->
+      <div id="tab-ideas" class="tab-panel">
+        <div class="bulk-import">
+          <div class="bulk-import__intro">
+            <h3>bulk-extract projects from text</h3>
+            <p>paste a whatsapp chunk or drop a <code>_chat.txt</code> export. we'll parse it into draft project records you can edit, then import selected ones to the vault.</p>
+          </div>
+
+          <textarea id="bulk-text" class="bulk-import__textarea" placeholder="paste a whatsapp chunk here…" rows="10"></textarea>
+
+          <div class="bulk-import__controls">
+            <label class="bulk-import__file-label">
+              <input type="file" id="bulk-file" accept=".txt">
+              <span>or drop a .txt file</span>
+            </label>
+            <button type="button" class="btn btn--primary btn--sm" id="bulk-extract-btn">extract</button>
+            <span id="bulk-status" class="bulk-import__status"></span>
+          </div>
+
+          <div id="bulk-results" class="bulk-import__results"></div>
+
+          <div id="bulk-actions" class="bulk-import__actions" hidden>
+            <button type="button" class="btn btn--ghost btn--sm" id="bulk-select-all">select all</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="bulk-clear">clear</button>
+            <button type="button" class="btn btn--primary btn--sm" id="bulk-import-btn">import selected</button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -203,9 +235,15 @@
       if (e.key === 'Enter') tryLogin();
     });
 
+    // Plaintext password held in memory only while tab is open — used as
+    // bearer token for /api/admin-* calls. Lost on refresh; ideas tab
+    // will re-prompt if needed.
+    let adminSecret = null;
+
     async function tryLogin() {
       const hash = await hashPassword(gateInput.value);
       if (_adminHash && hash === _adminHash) {
+        adminSecret = gateInput.value;
         sessionStorage.setItem('tcs_admin', 'true');
         gateEl.style.display = 'none';
         dashEl.style.display = 'block';
@@ -215,6 +253,19 @@
         gateInput.value = '';
         gateInput.focus();
       }
+    }
+
+    async function ensureAdminSecret() {
+      if (adminSecret) return adminSecret;
+      const pw = prompt('admin password (needed for server calls after refresh):');
+      if (!pw) return null;
+      const hash = await hashPassword(pw);
+      if (hash !== _adminHash) {
+        showToast('wrong password');
+        return null;
+      }
+      adminSecret = pw;
+      return adminSecret;
     }
 
     // --- Tab Navigation ---
@@ -625,6 +676,243 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
+
+    // ============================================================
+    // BULK IMPORT — paste WhatsApp chunk → extract → review → import
+    // ============================================================
+
+    let bulkDrafts = []; // array of { selected, title, author_name, description, stage, github_url, website_url, demo_url, team_members }
+
+    function el(tag, className, text) {
+      const n = document.createElement(tag);
+      if (className) n.className = className;
+      if (text !== undefined && text !== null) n.textContent = String(text);
+      return n;
+    }
+
+    function bulkSetStatus(msg) {
+      document.getElementById('bulk-status').textContent = msg || '';
+    }
+
+    function renderBulkResults() {
+      const wrap = document.getElementById('bulk-results');
+      const actions = document.getElementById('bulk-actions');
+      wrap.replaceChildren();
+
+      if (!bulkDrafts.length) {
+        actions.hidden = true;
+        return;
+      }
+
+      bulkDrafts.forEach((draft, i) => {
+        const row = el('div', 'bulk-row');
+
+        const head = el('div', 'bulk-row__head');
+        const check = document.createElement('input');
+        check.type = 'checkbox';
+        check.checked = !!draft.selected;
+        check.addEventListener('change', () => { draft.selected = check.checked; });
+        head.appendChild(check);
+
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.className = 'bulk-row__title';
+        titleInput.value = draft.title || '';
+        titleInput.placeholder = 'title';
+        titleInput.addEventListener('input', () => { draft.title = titleInput.value; });
+        head.appendChild(titleInput);
+
+        const del = el('button', 'bulk-row__del', '×');
+        del.type = 'button';
+        del.title = 'remove from list';
+        del.addEventListener('click', () => {
+          bulkDrafts.splice(i, 1);
+          renderBulkResults();
+        });
+        head.appendChild(del);
+
+        row.appendChild(head);
+
+        const meta = el('div', 'bulk-row__meta');
+
+        const authorInput = document.createElement('input');
+        authorInput.type = 'text';
+        authorInput.placeholder = 'author name';
+        authorInput.value = draft.author_name || '';
+        authorInput.addEventListener('input', () => { draft.author_name = authorInput.value; });
+        meta.appendChild(authorInput);
+
+        const stageSel = document.createElement('select');
+        ['seed', 'project', 'company'].forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = s;
+          if ((draft.stage || 'seed') === s) opt.selected = true;
+          stageSel.appendChild(opt);
+        });
+        stageSel.addEventListener('change', () => { draft.stage = stageSel.value; });
+        meta.appendChild(stageSel);
+
+        row.appendChild(meta);
+
+        const descArea = document.createElement('textarea');
+        descArea.className = 'bulk-row__desc';
+        descArea.rows = 2;
+        descArea.placeholder = 'description';
+        descArea.value = draft.description || '';
+        descArea.addEventListener('input', () => { draft.description = descArea.value; });
+        row.appendChild(descArea);
+
+        const links = el('div', 'bulk-row__links');
+        const linkInputs = [
+          ['github_url', 'github repo (optional)', 'https://github.com/…'],
+          ['website_url', 'website (optional)', 'https://…'],
+          ['demo_url', 'demo (optional)', 'https://…'],
+        ];
+        linkInputs.forEach(([key, label, placeholder]) => {
+          const wrap2 = el('label', 'bulk-row__link');
+          wrap2.appendChild(el('span', null, label));
+          const inp = document.createElement('input');
+          inp.type = 'url';
+          inp.placeholder = placeholder;
+          inp.value = draft[key] || '';
+          inp.addEventListener('input', () => { draft[key] = inp.value; });
+          wrap2.appendChild(inp);
+          links.appendChild(wrap2);
+        });
+        row.appendChild(links);
+
+        const team = Array.isArray(draft.team_members) ? draft.team_members : [];
+        if (team.length) {
+          const chips = el('div', 'bulk-row__team');
+          chips.appendChild(el('span', 'bulk-row__team-label', 'team:'));
+          team.forEach(m => {
+            if (m && m.name) chips.appendChild(el('span', 'team-chip', m.name));
+          });
+          row.appendChild(chips);
+        }
+
+        wrap.appendChild(row);
+      });
+
+      actions.hidden = false;
+    }
+
+    async function runBulkExtract() {
+      const text = document.getElementById('bulk-text').value.trim();
+      if (!text) { bulkSetStatus('paste or drop a file first'); return; }
+
+      const secret = await ensureAdminSecret();
+      if (!secret) { bulkSetStatus('admin password required'); return; }
+
+      const btn = document.getElementById('bulk-extract-btn');
+      btn.disabled = true;
+      bulkSetStatus('extracting…');
+
+      try {
+        const res = await fetch('/api/extract-projects-bulk', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text, adminSecret: secret }),
+        });
+        if (!res.ok) {
+          const msg = await res.json().catch(() => ({ error: 'extraction failed' }));
+          throw new Error(msg.error || 'extraction failed');
+        }
+        const data = await res.json();
+        const projects = Array.isArray(data.projects) ? data.projects : [];
+
+        bulkDrafts = projects.map(p => ({
+          selected: true,
+          title: p.title || '',
+          author_name: p.author_name || '',
+          description: p.description || '',
+          stage: p.stage || 'seed',
+          github_url: p.github_url || '',
+          website_url: p.website_url || '',
+          demo_url: p.demo_url || '',
+          team_members: Array.isArray(p.team_members) ? p.team_members.filter(m => m && m.name) : [],
+        }));
+
+        renderBulkResults();
+        bulkSetStatus(`found ${bulkDrafts.length} project${bulkDrafts.length === 1 ? '' : 's'} — review and import`);
+      } catch (err) {
+        console.error(err);
+        bulkSetStatus(err.message || 'extraction failed');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function runBulkImport() {
+      const selected = bulkDrafts.filter(d => d.selected && d.title && d.title.trim());
+      if (!selected.length) { bulkSetStatus('select at least one row with a title'); return; }
+
+      const secret = await ensureAdminSecret();
+      if (!secret) { bulkSetStatus('admin password required'); return; }
+
+      const btn = document.getElementById('bulk-import-btn');
+      btn.disabled = true;
+      bulkSetStatus('importing…');
+
+      try {
+        const res = await fetch('/api/admin-import-projects', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            adminSecret: secret,
+            projects: selected.map(d => ({
+              title: d.title.trim(),
+              author_name: d.author_name,
+              description: d.description,
+              stage: d.stage,
+              github_url: d.github_url,
+              website_url: d.website_url,
+              demo_url: d.demo_url,
+              team_members: d.team_members,
+            })),
+          }),
+        });
+        if (!res.ok) {
+          const msg = await res.json().catch(() => ({ error: 'import failed' }));
+          throw new Error(msg.error || 'import failed');
+        }
+        const data = await res.json();
+        bulkSetStatus(`imported ${data.inserted}. check projects.html to see them.`);
+        showToast(`imported ${data.inserted} ✓`);
+        bulkDrafts = [];
+        renderBulkResults();
+        document.getElementById('bulk-text').value = '';
+      } catch (err) {
+        console.error(err);
+        bulkSetStatus(err.message || 'import failed');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('bulk-extract-btn').addEventListener('click', runBulkExtract);
+    document.getElementById('bulk-import-btn').addEventListener('click', runBulkImport);
+
+    document.getElementById('bulk-select-all').addEventListener('click', () => {
+      const allSelected = bulkDrafts.every(d => d.selected);
+      bulkDrafts.forEach(d => { d.selected = !allSelected; });
+      renderBulkResults();
+    });
+
+    document.getElementById('bulk-clear').addEventListener('click', () => {
+      bulkDrafts = [];
+      renderBulkResults();
+      bulkSetStatus('');
+    });
+
+    document.getElementById('bulk-file').addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => { document.getElementById('bulk-text').value = String(reader.result || ''); };
+      reader.readAsText(f);
+    });
 
   </script>
 

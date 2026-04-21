@@ -1,7 +1,8 @@
 // POST /api/admin-import-projects
-// Body: { adminSecret: string, importUserId: string, projects: [...] }
+// Body: { adminSecret: string, projects: [...] }
 // Returns: { inserted: number }
 // Uses SUPABASE_SERVICE_ROLE_KEY to bypass RLS for admin bulk insertion.
+// Ownership of imported rows: process.env.IMPORT_USER_ID (set once on Vercel).
 
 const { createClient } = require('@supabase/supabase-js');
 const { readJsonBody } = require('./_shared.js');
@@ -16,7 +17,7 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.ADMIN_SECRET) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.ADMIN_SECRET || !process.env.IMPORT_USER_ID) {
     res.status(500).json({ error: 'server not configured' });
     return;
   }
@@ -30,8 +31,7 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const importUserId = typeof body?.importUserId === 'string' ? body.importUserId.trim() : '';
-  if (!importUserId) { res.status(400).json({ error: 'missing importUserId' }); return; }
+  const importUserId = process.env.IMPORT_USER_ID;
 
   const projects = Array.isArray(body?.projects) ? body.projects : null;
   if (!projects || !projects.length) { res.status(400).json({ error: 'projects must be a non-empty array' }); return; }

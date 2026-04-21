@@ -2573,3 +2573,201 @@ h4 {
   .projects-grid { grid-template-columns: 1fr; }
   .projects-stage { padding: var(--space-lg) var(--space-md); }
 }
+
+/* ============================================================
+   ADMIN — BULK IMPORT TAB
+   ============================================================ */
+
+.bulk-import {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.bulk-import__intro {
+  margin-bottom: var(--space-lg);
+}
+
+.bulk-import__intro h3 {
+  font-size: 1rem;
+  margin-bottom: var(--space-xs);
+}
+
+.bulk-import__intro p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.bulk-import__intro code {
+  background: var(--bg-hover);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+}
+
+.bulk-import__textarea {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  resize: vertical;
+  min-height: 160px;
+}
+
+.bulk-import__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.bulk-import__file-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.bulk-import__file-label input[type="file"] {
+  margin-right: 6px;
+}
+
+.bulk-import__status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.bulk-import__results {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.bulk-import__actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.bulk-row {
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.bulk-row__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bulk-row__head input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 18px; height: 18px;
+}
+
+.bulk-row__title {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.bulk-row__del {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0 8px;
+  line-height: 1;
+  transition: color var(--transition);
+}
+
+.bulk-row__del:hover { color: var(--bg-accent); }
+
+.bulk-row__meta {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.bulk-row__meta input[type="text"] {
+  flex: 1;
+  min-width: 160px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+}
+
+.bulk-row__meta select {
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+}
+
+.bulk-row__desc {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  resize: vertical;
+}
+
+.bulk-row__links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-sm);
+}
+
+.bulk-row__link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.bulk-row__link input {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+}
+
+.bulk-row__team {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.bulk-row__team-label {
+  color: var(--text-muted);
+  margin-right: 4px;
+}
