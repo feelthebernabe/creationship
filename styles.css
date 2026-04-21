@@ -205,17 +205,26 @@ h4 {
 }
 
 /* ============================================================
-   HERO — bold, dark, full-width
+   HERO — bold, dark, full-width with Matrix rain background
    ============================================================ */
 
 .hero {
+  position: relative;
   text-align: left;
-  padding: var(--space-3xl) 0 var(--space-2xl);
+  padding: 0;
   background: var(--bg-dark);
   color: var(--text-on-dark);
+  overflow: hidden;
   /* Full-bleed break out of container */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
+}
+
+/* Hero content sits above the canvas rain */
+.hero__content {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-3xl) 0 var(--space-2xl);
   padding-left: max(var(--space-lg), calc(50vw - 450px + var(--space-lg)));
   padding-right: max(var(--space-lg), calc(50vw - 450px + var(--space-lg)));
 }
@@ -236,6 +245,9 @@ h4 {
   max-width: 520px;
   line-height: 1.7;
   font-weight: 400;
+  background: rgba(10, 10, 10, 0.85);
+  padding: 12px 16px;
+  border-radius: 6px;
 }
 
 .hero__subtitle strong {
@@ -259,45 +271,17 @@ h4 {
 }
 
 /* ============================================================
-   MARQUEE — bold accent strip
+   MATRIX RAIN CANVAS — absolute background layer in hero
    ============================================================ */
 
-.marquee {
-  overflow: hidden;
-  background: var(--bg-dark);
-  padding: var(--space-md) 0;
-  white-space: nowrap;
-  border: none;
-  /* Full-bleed */
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-}
-
-.marquee__track {
-  display: flex;
-  animation: marqueeScroll 30s linear infinite;
-  width: max-content;
-}
-
-.marquee__item {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--bg-accent);
-  padding: 0 var(--space-xl);
-  flex-shrink: 0;
-}
-
-.marquee__item::after {
-  content: '·';
-  margin-left: var(--space-xl);
-  color: rgba(255,255,255,0.2);
-}
-
-@keyframes marqueeScroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+#matrix-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: block;
 }
 
 /* ============================================================
@@ -2524,7 +2508,7 @@ h4 {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-  .marquee__track { animation: none; }
+  #matrix-canvas { display: none; }
   .reveal { opacity: 1; transform: none; }
 }
 
@@ -2586,7 +2570,7 @@ h4 {
   
   .hero { padding: var(--space-2xl) 0 var(--space-xl); }
   
-  .marquee__text { font-size: 0.6rem; }
+
   .login-card { padding: var(--space-lg); }
 
   .stat-cards { grid-template-columns: 1fr 1fr; }

@@ -51,46 +51,17 @@
          ============================ -->
     <section id="view-landing" class="view active">
 
-      <header class="hero">
-        <h1>the infinite<br>create-a-thon</h1>
-        <p class="hero__subtitle">
-          a weekly create-a-thon for <strong>moral imagination</strong>.
-          part weekly ritual, part build session — a place to create things that matter, together.
-        </p>
-        <span class="hero__scroll"></span>
-      </header>
-
-      <!-- Manifesto Marquee -->
-      <div class="marquee">
-        <div class="marquee__track">
-          <span class="marquee__item">build things that matter</span>
-          <span class="marquee__item">moral ambition</span>
-          <span class="marquee__item">never stop human'ing</span>
-          <span class="marquee__item">creation over consumption</span>
-          <span class="marquee__item">the relationships are the point</span>
-          <span class="marquee__item">collective intelligence</span>
-          <span class="marquee__item">move at the speed of trust</span>
-          <span class="marquee__item">small is all</span>
-          <span class="marquee__item">what you pay attention to grows</span>
-          <span class="marquee__item">creationship</span>
-          <span class="marquee__item">if you can describe it, you can build it</span>
-          <span class="marquee__item">stealth education</span>
-          <span class="marquee__item">no rest for the wicked</span>
-          <span class="marquee__item">build things that matter</span>
-          <span class="marquee__item">moral ambition</span>
-          <span class="marquee__item">never stop human'ing</span>
-          <span class="marquee__item">creation over consumption</span>
-          <span class="marquee__item">the relationships are the point</span>
-          <span class="marquee__item">collective intelligence</span>
-          <span class="marquee__item">move at the speed of trust</span>
-          <span class="marquee__item">small is all</span>
-          <span class="marquee__item">what you pay attention to grows</span>
-          <span class="marquee__item">creationship</span>
-          <span class="marquee__item">if you can describe it, you can build it</span>
-          <span class="marquee__item">stealth education</span>
-          <span class="marquee__item">no rest for the wicked</span>
+      <header class="hero" id="matrix-rain">
+        <canvas id="matrix-canvas"></canvas>
+        <div class="hero__content">
+          <h1>the infinite<br>create-a-thon</h1>
+          <p class="hero__subtitle">
+            a weekly create-a-thon for <strong>moral imagination</strong>.
+            part weekly ritual, part build session — a place to create things that matter, together.
+          </p>
+          <span class="hero__scroll"></span>
         </div>
-      </div>
+      </header>
 
       <!-- ============================
            THE PREMISE
@@ -595,6 +566,174 @@
 
   <script>
     var DB = window.DB;
+
+    // ============================================================
+    // MATRIX RAIN EFFECT
+    // ============================================================
+
+    (function initMatrixRain() {
+      const canvas = document.getElementById('matrix-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const container = document.getElementById('matrix-rain');
+
+      const PHRASES = [
+        'build things that matter',
+        'moral ambition',
+        "never stop human'ing",
+        'creation over consumption',
+        'the relationships are the point',
+        'collective intelligence',
+        'move at the speed of trust',
+        'small is all',
+        'what you pay attention to grows',
+        'creationship',
+        'if you can describe it you can build it',
+        'stealth education',
+        'no rest for the wicked',
+        'moral imagination',
+        'the infinite create-a-thon',
+        'creationships compound',
+        'half-baked is welcome',
+        'you are the toolkit',
+        'come as you are',
+        'prototypes that became new worlds',
+        'ship it sunday',
+        'dream in public',
+        'trust the room',
+        'ideas want to be built',
+        'show your work',
+        'make something real',
+        'critical connections over critical mass',
+        'transform yourself to transform the world',
+        'the pattern is the path',
+        'another world is possible',
+        'change is constant and can be shaped',
+        'interdependence is the goal',
+        'prefigure the future',
+        'less prep more presence',
+        'the room remembers what you built',
+        'the world is not yet finished',
+        'we are the ones',
+        'fractal responsibility',
+      ];
+
+      const FONT_SIZE = 13;
+      let drops = [];
+      let animFrameId = null;
+      let lastTime = 0;
+      const MAX_DROPS = 22;
+
+      function resize() {
+        const rect = container.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        // Re-seed drops on resize
+        drops = [];
+        for (let i = 0; i < MAX_DROPS; i++) {
+          drops.push(createDrop(true));
+        }
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function createDrop(isInit) {
+        const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+        const speed = 10 + Math.random() * 20; // pixels per second — very slow drift
+        const opacity = 0.06 + Math.random() * 0.22;
+        return {
+          text: phrase.toUpperCase(),
+          x: Math.random() * canvas.width,
+          y: isInit
+            ? Math.random() * canvas.height  // spread across screen initially
+            : -20 - Math.random() * 200,     // start above screen
+          speed: speed,
+          opacity: opacity,
+          fontSize: FONT_SIZE + Math.floor(Math.random() * 4) - 1,
+        };
+      }
+
+      function draw(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = Math.min((timestamp - lastTime) / 1000, 0.1); // seconds, capped
+        lastTime = timestamp;
+
+        // Very slow fade — phrases leave a ghostly trail
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.14)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < drops.length; i++) {
+          const drop = drops[i];
+
+          // Move downward slowly
+          drop.y += drop.speed * dt;
+
+          // Edge fade — dimmer near top and bottom for seamless blend
+          let edgeFade = 1;
+          if (drop.y < 60) {
+            edgeFade = Math.max(0, drop.y / 60);
+          } else if (drop.y > canvas.height - 60) {
+            edgeFade = Math.max(0, (canvas.height - drop.y) / 60);
+          }
+
+          const alpha = drop.opacity * edgeFade;
+          if (alpha <= 0.01) {
+            // Reset if fully faded at bottom
+            if (drop.y > canvas.height) {
+              drops[i] = createDrop(false);
+            }
+            continue;
+          }
+
+          // Draw the phrase horizontally — READABLE
+          ctx.font = `700 ${drop.fontSize}px 'Inter', sans-serif`;
+          ctx.textAlign = 'left';
+          ctx.letterSpacing = '0.12em';
+
+          // Orange glow for bright drops
+          if (drop.opacity > 0.2) {
+            ctx.shadowColor = `rgba(255, 75, 31, ${alpha * 0.5})`;
+            ctx.shadowBlur = 6;
+          } else {
+            ctx.shadowBlur = 0;
+          }
+
+          // Orange-red color matching --bg-accent (#ff4b1f)
+          ctx.fillStyle = `rgba(255, 75, 31, ${alpha})`;
+          ctx.fillText(drop.text, drop.x, drop.y);
+
+          ctx.shadowBlur = 0;
+
+          // Reset when off screen
+          if (drop.y > canvas.height + 30) {
+            drops[i] = createDrop(false);
+          }
+        }
+
+        animFrameId = requestAnimationFrame(draw);
+      }
+
+      // Only animate when visible
+      let isVisible = false;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !isVisible) {
+            isVisible = true;
+            lastTime = 0;
+            animFrameId = requestAnimationFrame(draw);
+          } else if (!entry.isIntersecting && isVisible) {
+            isVisible = false;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+          }
+        });
+      }, { threshold: 0.05 });
+
+      observer.observe(container);
+
+      window.addEventListener('resize', resize);
+      resize();
+    })();
+
     // ============================================================
     // SIGNUP PAGE LOGIC
     // ============================================================
