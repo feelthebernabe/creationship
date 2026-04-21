@@ -125,23 +125,16 @@ img { max-width: 100%; display: block; }
 .site-nav__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
-  color: var(--text-on-dark);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
 }
 
-.site-nav__brand:hover { opacity: 1; }
-
-.site-nav__brand img {
-  width: 26px;
-  height: 26px;
-  border-radius: var(--radius-full);
-  opacity: 0.9;
-}
+.site-nav__brand:hover { opacity: 0.8; }
 
 .site-nav__links {
   display: flex;
@@ -1445,6 +1438,37 @@ h4 {
   margin-bottom: var(--space-lg);
 }
 
+/* Vault features — context bullets on login */
+.vault-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--space-lg);
+  text-align: left;
+}
+
+.vault-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.vault-feature__icon {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.vault-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--space-sm);
+}
+
 .login-features {
   display: flex;
   flex-direction: column;
@@ -2202,10 +2226,8 @@ h4 {
     grid-template-columns: 1fr;
     gap: var(--space-sm);
   }
-  .role-card__icon {
-    justify-content: flex-start;
-  }
   .role-card::after { display: none; }
+  .next-sunday { flex-direction: column; align-items: flex-start; gap: 4px; }
 
   .song-form__row { grid-template-columns: 1fr; }
   .song-form__footer { flex-direction: column; align-items: stretch; }
