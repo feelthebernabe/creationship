@@ -438,6 +438,45 @@ h4 {
   font-style: italic;
 }
 
+/* Accordion header — always show on desktop, interactive on mobile */
+.current__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.current__header .current__number {
+  margin-bottom: 0;
+}
+
+.current__header .current__name {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.current__chevron {
+  display: none; /* hidden on desktop */
+  font-size: 1.4rem;
+  color: var(--accent);
+  font-weight: 700;
+  transition: transform 0.3s ease;
+}
+
+.current.open .current__chevron {
+  transform: rotate(90deg);
+}
+
+/* On desktop: body always visible, header is non-interactive */
+.current__body {
+  margin-top: var(--space-sm);
+}
+
+@media (max-width: 640px) {
+  .current__chevron { display: block; }
+  .current__header { cursor: pointer; }
+  .current__body { margin-top: 0; }
+}
+
 /* --- Schedule Timeline --- */
 .schedule {
   display: flex;

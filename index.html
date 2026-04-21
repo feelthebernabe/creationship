@@ -112,51 +112,66 @@
         <h2 class="landing-section__heading">holding all three at once is the whole discipline</h2>
 
         <div class="currents">
-          <div class="current reveal">
-            <div class="current__number">01</div>
-            <div class="current__name">new tech</div>
-            <div class="current__desc">
-              the tools reshaping how we build, think, and create together.
+          <div class="current reveal" data-accordion>
+            <div class="current__header">
+              <div class="current__number">01</div>
+              <div class="current__name">new tech</div>
+              <span class="current__chevron">›</span>
             </div>
-            <div class="current__tags">
-              <span class="current__tag">ai agents</span>
-              <span class="current__tag">vibe coding</span>
-              <span class="current__tag">prompt craft</span>
-              <span class="current__tag">embodied ai</span>
-              <span class="current__tag">synthetic reality</span>
-              <span class="current__tag">the intention economy</span>
-            </div>
-          </div>
-
-          <div class="current reveal">
-            <div class="current__number">02</div>
-            <div class="current__name">forever human</div>
-            <div class="current__desc">
-              the practices that keep us grounded while everything accelerates.
-            </div>
-            <div class="current__tags">
-              <span class="current__tag">indigenous wisdom</span>
-              <span class="current__tag">earth kinship</span>
-              <span class="current__tag">embodiment</span>
-              <span class="current__tag">everyday mysticism</span>
-              <span class="current__tag">friendship</span>
-              <span class="current__tag">craftsmanship</span>
-              <span class="current__tag">storytelling</span>
+            <div class="current__body">
+              <div class="current__desc">
+                the tools reshaping how we build, think, and create together.
+              </div>
+              <div class="current__tags">
+                <span class="current__tag">ai agents</span>
+                <span class="current__tag">vibe coding</span>
+                <span class="current__tag">prompt craft</span>
+                <span class="current__tag">embodied ai</span>
+                <span class="current__tag">synthetic reality</span>
+                <span class="current__tag">the intention economy</span>
+              </div>
             </div>
           </div>
 
-          <div class="current reveal">
-            <div class="current__number">03</div>
-            <div class="current__name">the bridge</div>
-            <div class="current__desc">
-              the interesting work is where the first two cross.
+          <div class="current reveal" data-accordion>
+            <div class="current__header">
+              <div class="current__number">02</div>
+              <div class="current__name">forever human</div>
+              <span class="current__chevron">›</span>
             </div>
-            <div class="current__tags">
-              <span class="current__tag">sensemaking</span>
-              <span class="current__tag">trust &amp; consent</span>
-              <span class="current__tag">data sovereignty</span>
-              <span class="current__tag">ethics</span>
-              <span class="current__tag">stewardship</span>
+            <div class="current__body">
+              <div class="current__desc">
+                the practices that keep us grounded while everything accelerates.
+              </div>
+              <div class="current__tags">
+                <span class="current__tag">indigenous wisdom</span>
+                <span class="current__tag">earth kinship</span>
+                <span class="current__tag">embodiment</span>
+                <span class="current__tag">everyday mysticism</span>
+                <span class="current__tag">friendship</span>
+                <span class="current__tag">craftsmanship</span>
+                <span class="current__tag">storytelling</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="current reveal" data-accordion>
+            <div class="current__header">
+              <div class="current__number">03</div>
+              <div class="current__name">the bridge</div>
+              <span class="current__chevron">›</span>
+            </div>
+            <div class="current__body">
+              <div class="current__desc">
+                the interesting work is where the first two cross.
+              </div>
+              <div class="current__tags">
+                <span class="current__tag">sensemaking</span>
+                <span class="current__tag">trust &amp; consent</span>
+                <span class="current__tag">data sovereignty</span>
+                <span class="current__tag">ethics</span>
+                <span class="current__tag">stewardship</span>
+              </div>
             </div>
           </div>
         </div>
@@ -949,7 +964,27 @@
       });
     });
 
+    // Mobile accordion for currents
+    if (window.innerWidth <= 640) {
+      document.querySelectorAll('[data-accordion]').forEach(card => {
+        const header = card.querySelector('.current__header');
+        const body = card.querySelector('.current__body');
+        if (!header || !body) return;
+        body.style.maxHeight = '0';
+        body.style.overflow = 'hidden';
+        body.style.transition = 'max-height 0.4s ease';
+        header.style.cursor = 'pointer';
+        header.addEventListener('click', () => {
+          const isOpen = card.classList.toggle('open');
+          body.style.maxHeight = isOpen ? body.scrollHeight + 'px' : '0';
+        });
+      });
+    }
+
   </script>
+
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 
 </body>
 </html>
