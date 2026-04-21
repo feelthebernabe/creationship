@@ -5,6 +5,8 @@ node_modules/
 .vercel
 .claude/
 WhatsApp Chat - Church of Creationship*/
+luma-exports/
+.superpowers/
 .env
 .env.local
 .env.*.local

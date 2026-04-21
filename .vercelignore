@@ -1,9 +1,11 @@
 # Community data / private exports — never ship these
 WhatsApp Chat*/
+luma-exports/
 
 # Local tooling — not needed in deploys
 .git/
 .claude/
+.superpowers/
 .vercel/
 node_modules/
 

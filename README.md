@@ -3,7 +3,8 @@
 a weekly create-a-thon for moral imagination.  
 part weekly ritual, part infinite create-a-thon — sundays at caravan of dreams, east village.
 
-**live:** [creationship.vercel.app](https://creationship.vercel.app)
+**live:** [creationship.vercel.app](https://creationship.vercel.app)  
+**source:** [github.com/feelthebernabe/creationship](https://github.com/feelthebernabe/creationship)
 
 ---
 
@@ -125,7 +126,8 @@ vercel --prod
 ├── ideas-v2-migration.sql  # ideas v2
 ├── ideas-v3-migration.sql  # ideas v3
 ├── playlist-migration.sql  # playlist suggestions
-└── rls-tighten-migration.sql # security policies
+├── rls-tighten-migration.sql # security policies
+└── .vercelignore           # excludes private data + dev tooling from deploys
 ```
 
 ## design system
