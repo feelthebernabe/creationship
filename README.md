@@ -1,7 +1,7 @@
 # the creationship
 
 a weekly create-a-thon for moral imagination.  
-part weekly ritual, part infinite hackathon — sundays at caravan of dreams, east village.
+part weekly ritual, part infinite create-a-thon — sundays at caravan of dreams, east village.
 
 **live:** [creationship.vercel.app](https://creationship.vercel.app)
 
