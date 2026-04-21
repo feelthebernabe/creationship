@@ -155,6 +155,21 @@
           </span>
         </div>
         <div class="new-idea__form">
+
+          <details class="extract-panel" id="extract-panel">
+            <summary class="extract-panel__summary">
+              <span>paste anything — we'll extract it</span>
+              <span class="extract-panel__hint">whatsapp message · tweet · rough notes</span>
+            </summary>
+            <div class="extract-panel__body">
+              <textarea id="extract-text" class="extract-panel__textarea" placeholder="paste the raw text here…" rows="5"></textarea>
+              <div class="extract-panel__row">
+                <button type="button" id="extract-btn" class="btn btn--ghost btn--sm">extract</button>
+                <span id="extract-status" class="extract-panel__status"></span>
+              </div>
+            </div>
+          </details>
+
           <form id="idea-form" novalidate>
 
             <div class="form-section-label">what stage is this?</div>
@@ -211,7 +226,7 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="idea-github">github</label>
+                <label for="idea-github">github repo <small>(optional)</small></label>
                 <div class="link-input-group">
                   <svg class="link-icon" viewBox="0 0 16 16"><path d="M8 1C4.13 1 1 4.13 1 8c0 3.09 2 5.71 4.79 6.64.35.06.48-.15.48-.34 0-.17-.01-.73-.01-1.33-1.95.42-2.36-.84-2.36-.84-.32-.81-.78-1.02-.78-1.02-.64-.44.05-.43.05-.43.7.05 1.07.72 1.07.72.63 1.07 1.64.76 2.04.58.06-.45.24-.76.44-.94-1.56-.18-3.19-.78-3.19-3.46 0-.76.27-1.39.72-1.88-.07-.18-.31-.89.07-1.85 0 0 .59-.19 1.93.72a6.7 6.7 0 0 1 3.5 0C9.4 4.28 9.99 4.47 9.99 4.47c.38.96.14 1.67.07 1.85.45.49.72 1.11.72 1.88 0 2.69-1.64 3.28-3.2 3.45.25.22.47.64.47 1.29 0 .94-.01 1.69-.01 1.92 0 .19.13.41.48.34A7 7 0 0 0 15 8c0-3.87-3.13-7-7-7z" fill="currentColor" stroke="none"/></svg>
                   <input type="url" id="idea-github" name="github_url" placeholder="https://github.com/...">
@@ -473,6 +488,69 @@
     document.getElementById('team-member-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-add-member').click(); }
     });
+
+    // ============================================================
+    // PASTE-AND-PREFILL (extract a project from free-form text)
+    // ============================================================
+
+    function selectStage(stage) {
+      const valid = ['seed', 'project', 'company'];
+      if (!valid.includes(stage)) return;
+      const option = document.querySelector('.stage-option--' + stage);
+      if (option) option.click();
+    }
+
+    async function extractFromText() {
+      const btn = document.getElementById('extract-btn');
+      const status = document.getElementById('extract-status');
+      const textarea = document.getElementById('extract-text');
+      const text = textarea.value.trim();
+      if (!text) { status.textContent = 'paste something first'; return; }
+
+      btn.disabled = true;
+      const originalLabel = btn.textContent;
+      btn.textContent = 'thinking…';
+      status.textContent = '';
+
+      try {
+        const res = await fetch('/api/extract-project', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) {
+          const msg = await res.json().catch(() => ({ error: 'extraction failed' }));
+          throw new Error(msg.error || 'extraction failed');
+        }
+        const data = await res.json();
+
+        if (data.title) document.getElementById('idea-title').value = data.title;
+        if (data.description) document.getElementById('idea-desc').value = data.description;
+        if (data.github_url) document.getElementById('idea-github').value = data.github_url;
+        if (data.website_url) document.getElementById('idea-website').value = data.website_url;
+        if (data.demo_url) document.getElementById('idea-demo').value = data.demo_url;
+        if (data.stage) selectStage(data.stage);
+
+        if (Array.isArray(data.team_members)) {
+          data.team_members.forEach(m => {
+            const name = m && typeof m.name === 'string' ? m.name.trim() : '';
+            if (name && !teamMembers.includes(name)) teamMembers.push(name);
+          });
+          renderTeamChips();
+        }
+
+        status.textContent = 'prefilled ✓ — edit anything that looks off, then ship';
+        document.getElementById('extract-panel').open = false;
+      } catch (err) {
+        console.error('extract error:', err);
+        status.textContent = err.message || 'couldn\'t extract — try again';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    }
+
+    document.getElementById('extract-btn').addEventListener('click', extractFromText);
 
     // ============================================================
     // IDEAS LOADING & RENDERING
