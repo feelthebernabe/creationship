@@ -551,6 +551,12 @@ h4 {
   box-shadow: 0 8px 32px rgba(0,0,0,0.12);
 }
 
+.proof__item--link {
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+
 .proof__name {
   font-size: 0.95rem;
   font-weight: 700;
