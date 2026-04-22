@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>preview · basquiat hero</title>
+
+  <!-- Single font: Inter (matches the rest of the site). Basquiat vibe lives
+       in the composition — crown, scrawls, strikes, color blocks — not typography. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       BASQUIAT PREVIEW — site palette on clean gallery ground
+       (swapping cadmium/chrome/cobalt for the site's
+        orange-red / neon-lime / plasma-purple system)
+       ========================================================= */
+    :root {
+      /* Site palette — matches styles.css tokens */
+      --ink:       #0a0a0a;             /* --bg-dark */
+      --ink-soft:  #1a1a1a;
+      --orange:    #ff4b1f;             /* --bg-accent */
+      --lime:      #b8ff72;             /* --accent */
+      --plasma:    #7a2dff;             /* --accent-reflect */
+
+      /* Canvas — clean off-white gallery ground, subtly warmer where paint pools */
+      --canvas-0:  #f2f2f2;             /* --bg */
+      --canvas-1:  #ebebeb;
+      --canvas-2:  #e3e3e3;
+      --stain:     rgba(10, 10, 10, 0.05);
+
+      /* Typography — Inter everywhere, matching the live site */
+      --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-scrawl:  'Inter', sans-serif;
+      --font-type:    'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-type);
+      color: var(--ink);
+      background: var(--canvas-0);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* =========================================================
+       HERO — full-bleed painting canvas
+       ========================================================= */
+    .hero {
+      position: relative;
+      width: 100vw;
+      min-height: 100vh;
+      overflow: hidden;
+      isolation: isolate;
+
+      /* Layered texture: color-field blotches + grain (site palette) */
+      background:
+        radial-gradient(ellipse 70% 50% at 80% 20%, rgba(184, 255, 114, 0.28), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 15% 75%, rgba(122, 45, 255, 0.12), transparent 60%),
+        radial-gradient(circle at 60% 60%, var(--stain), transparent 40%),
+        linear-gradient(160deg, var(--canvas-0) 0%, var(--canvas-1) 50%, var(--canvas-2) 100%);
+    }
+
+    /* Paper grain — SVG noise overlay, very subtle (neutral on gallery ground) */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      opacity: 0.55;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Soft vignette bringing focus to center */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 10, 10, 0.14) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* =========================================================
+       PAINT BLOCKS — large color fields (Basquiat oil-stick blocks)
+       ========================================================= */
+    .block {
+      position: absolute;
+      z-index: 3;
+      opacity: 0.88;
+      mix-blend-mode: multiply;
+    }
+    .block--lime {
+      top: 8%; left: -4%;
+      width: 340px; height: 160px;
+      background: var(--lime);
+      transform: rotate(-4deg);
+      filter: url(#rough-edge);
+    }
+    .block--orange {
+      bottom: 12%; right: -2%;
+      width: 280px; height: 110px;
+      background: var(--orange);
+      transform: rotate(3deg);
+      filter: url(#rough-edge);
+    }
+    .block--plasma {
+      top: 62%; left: 38%;
+      width: 200px; height: 200px;
+      background: var(--plasma);
+      transform: rotate(-8deg);
+      opacity: 0.55;
+      filter: url(#rough-edge);
+      mix-blend-mode: multiply;
+    }
+
+    /* =========================================================
+       SCRAWLED WORDS — phrases in marker, some crossed out
+       ========================================================= */
+    .scrawl {
+      position: absolute;
+      z-index: 4;
+      font-family: var(--font-scrawl);
+      font-weight: 800;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    /* Crossed-out words: Inter 800 + a heavy ink bar rotated through the word */
+    .scrawl--xout {
+      position: relative;
+    }
+    .scrawl--xout::after {
+      content: '';
+      position: absolute;
+      left: -4%;
+      right: -4%;
+      top: 48%;
+      height: 0.22em;
+      background: var(--ink);
+      transform: rotate(-1.5deg);
+      border-radius: 2px;
+    }
+    .scrawl--orange { color: var(--orange); }
+    .scrawl--plasma { color: var(--plasma); }
+    .scrawl--lime   {
+      color: var(--ink);
+      background: var(--lime);
+      padding: 0 0.25em;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .scrawl--underline {
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 4px;
+    }
+
+    /* =========================================================
+       ICONOGRAPHY — crowns, arrows, ©, tally marks
+       ========================================================= */
+    .icon {
+      position: absolute;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .icon svg { display: block; }
+
+    /* crown floating above headline — the sacred object */
+    .icon--crown-main {
+      top: 12%; left: 50%;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 140px;
+    }
+
+    /* =========================================================
+       HEADLINE — the main event
+       ========================================================= */
+    .hero__content {
+      position: relative;
+      z-index: 10;
+      padding: clamp(4rem, 10vh, 9rem) clamp(1.5rem, 5vw, 5rem);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hero__headline {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 10vw, 8.5rem);
+      line-height: 0.88;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -0.035em;
+      max-width: 12ch;
+      margin-bottom: 2rem;
+      text-shadow:
+        3px 3px 0 rgba(255, 75, 31, 0.25),
+        6px 6px 0 rgba(122, 45, 255, 0.14);
+      transform: rotate(-1deg);
+      position: relative;
+      text-transform: uppercase;
+    }
+
+    /* The second word gets the red "underline overlay" — not underline, a hand-drawn bar */
+    .hero__headline .accent {
+      position: relative;
+      display: inline-block;
+      color: var(--ink);
+    }
+    .hero__headline .accent::before {
+      content: '';
+      position: absolute;
+      inset: 72% -4% -10% -2%;
+      background: var(--orange);
+      z-index: -1;
+      transform: skewY(-1.5deg);
+      filter: url(#rough-edge);
+    }
+
+    .hero__headline .strike {
+      position: relative;
+      color: var(--ink);
+    }
+    .hero__headline .strike::after {
+      content: '';
+      position: absolute;
+      left: -2%; right: -2%;
+      top: 50%;
+      height: 0.12em;
+      background: var(--ink);
+      transform: rotate(-1deg);
+    }
+
+    /* Subtitle as "torn paper taped to the canvas" */
+    .hero__subtitle {
+      font-family: var(--font-type);
+      font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+      line-height: 1.6;
+      color: var(--ink);
+      background: #ffffff;
+      padding: 1.25rem 1.5rem;
+      max-width: 460px;
+      position: relative;
+      transform: rotate(1deg);
+      box-shadow:
+        2px 3px 0 rgba(10, 10, 10, 0.08),
+        0 12px 30px rgba(10, 10, 10, 0.12);
+      clip-path: polygon(
+        0 6%, 3% 0, 20% 4%, 45% 0, 70% 3%, 95% 0, 100% 8%,
+        99% 40%, 100% 70%, 98% 95%, 85% 100%, 60% 97%,
+        30% 100%, 5% 96%, 0 88%
+      );
+    }
+    .hero__subtitle strong {
+      font-weight: 400;
+      background: var(--lime);
+      padding: 0 0.25em;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+
+    /* "TAPE" accents — two little masking-tape pieces on subtitle */
+    .hero__subtitle::before,
+    .hero__subtitle::after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 18px;
+      background: rgba(184, 255, 114, 0.65);
+      box-shadow: inset 0 0 12px rgba(10, 10, 10, 0.08);
+    }
+    .hero__subtitle::before { top: -8px; left: 16px; transform: rotate(-6deg); }
+    .hero__subtitle::after  { bottom: -8px; right: 24px; transform: rotate(4deg); }
+
+    /* byline meta — bottom-left typewritten tag */
+    .hero__meta {
+      font-family: var(--font-type);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .hero__meta .dot {
+      width: 8px; height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* copyright mark — Basquiat's © was ubiquitous */
+    .copyright {
+      position: absolute;
+      font-family: var(--font-scrawl);
+      font-size: 1.9rem;
+      color: var(--ink);
+      z-index: 6;
+    }
+
+    /* tally marks — drawn strokes, not typed pipes */
+    .tally {
+      position: absolute;
+      font-family: var(--font-scrawl);
+      font-size: 2rem;
+      color: var(--ink);
+      letter-spacing: 0;
+      z-index: 6;
+    }
+
+    /* Gentle drift animation on a few scrawls for ambient life */
+    @keyframes drift {
+      0%, 100% { transform: var(--base-rot, rotate(0)) translateY(0); }
+      50%      { transform: var(--base-rot, rotate(0)) translateY(-4px); }
+    }
+    .scrawl[data-drift] {
+      animation: drift 6s ease-in-out infinite;
+    }
+
+    /* =========================================================
+       PREVIEW BANNER — clearly labeled as preview
+       ========================================================= */
+    .preview-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--ink);
+      color: var(--canvas-0);
+      font-family: var(--font-type);
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+      text-align: center;
+    }
+    .preview-banner a { color: var(--lime); }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      .block--lime   { width: 180px; height: 100px; }
+      .block--orange { width: 160px; height: 70px; }
+      .block--plasma { width: 120px; height: 120px; top: 70%; left: 30%; }
+      .scrawl { font-size: 1rem !important; }
+      .icon--crown-main { width: 90px; top: 8%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="preview-banner">
+    preview · basquiat hero · not live · <a href="index.html">← back to site</a>
+  </div>
+
+  <!-- SVG filters used to give color blocks a rough, painted edge -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <filter id="rough-edge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" scale="8"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <header class="hero">
+
+    <!-- Paint blocks — color fields sitting under the text -->
+    <div class="block block--lime"></div>
+    <div class="block block--orange"></div>
+    <div class="block block--plasma"></div>
+
+    <!-- =============== SCRAWLED BACKGROUND WORDS =============== -->
+    <!-- Scattered at varied rotation, size, color. Some crossed out. -->
+
+    <div class="scrawl" style="top: 6%;  left: 42%; font-size: 1.1rem; --base-rot: rotate(-6deg); transform: var(--base-rot);" data-drift>MORAL AMBITION</div>
+    <div class="scrawl scrawl--xout" style="top: 9%; left: 12%; font-size: 1.4rem; transform: rotate(-2deg);">CONSUMPTION</div>
+    <div class="scrawl scrawl--orange" style="top: 16%; right: 8%; font-size: 1.6rem; transform: rotate(4deg);">BUILD THINGS THAT MATTER</div>
+    <div class="scrawl" style="top: 22%; left: 6%; font-size: 1rem; transform: rotate(3deg);">SMALL IS ALL</div>
+    <div class="scrawl scrawl--plasma scrawl--underline" style="top: 28%; right: 22%; font-size: 1.2rem; transform: rotate(-3deg);">COLLECTIVE&nbsp;INTELLIGENCE</div>
+    <div class="scrawl scrawl--xout" style="top: 36%; left: 4%; font-size: 1.3rem; transform: rotate(-1deg);">HUSTLE CULTURE</div>
+    <div class="scrawl" style="top: 44%; right: 4%; font-size: 0.95rem; transform: rotate(2deg);" data-drift>SHOW YOUR WORK</div>
+    <div class="scrawl scrawl--lime" style="top: 52%; left: 8%; font-size: 1.1rem; transform: rotate(-4deg);">MOVE&nbsp;AT&nbsp;THE&nbsp;SPEED&nbsp;OF&nbsp;TRUST</div>
+    <div class="scrawl scrawl--xout" style="top: 58%; right: 14%; font-size: 1.4rem; transform: rotate(3deg);">OPTIMIZE FOR SCALE</div>
+    <div class="scrawl scrawl--orange" style="top: 66%; left: 20%; font-size: 1rem; transform: rotate(1deg);">DREAM IN PUBLIC</div>
+    <div class="scrawl" style="top: 72%; right: 6%; font-size: 1.2rem; transform: rotate(-5deg);" data-drift>HALF-BAKED&nbsp;IS&nbsp;WELCOME</div>
+    <div class="scrawl scrawl--xout" style="top: 78%; left: 40%; font-size: 1.1rem; transform: rotate(2deg);">ENGAGEMENT METRICS</div>
+    <div class="scrawl scrawl--plasma" style="top: 84%; left: 6%; font-size: 1.5rem; transform: rotate(-2deg);">ANOTHER WORLD IS POSSIBLE</div>
+    <div class="scrawl scrawl--xout" style="top: 90%; right: 20%; font-size: 0.95rem; transform: rotate(4deg);">SHIP IT SUNDAY</div>
+    <div class="scrawl" style="top: 94%; left: 28%; font-size: 1rem; transform: rotate(-1deg);">TRUST&nbsp;THE&nbsp;ROOM</div>
+
+    <!-- =============== ICONOGRAPHY =============== -->
+
+    <!-- Main crown floating above headline -->
+    <div class="icon icon--crown-main">
+      <svg viewBox="0 0 140 70" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 10 60 L 30 12 L 50 45 L 70 8 L 90 45 L 110 12 L 130 60 Z"
+              fill="none" stroke="#0a0a0a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="30"  cy="10" r="3" fill="#ff4b1f"/>
+        <circle cx="70"  cy="6"  r="3" fill="#b8ff72"/>
+        <circle cx="110" cy="10" r="3" fill="#7a2dff"/>
+        <!-- horizontal base line with tick marks -->
+        <line x1="10"  y1="62" x2="130" y2="62" stroke="#0a0a0a" stroke-width="3"/>
+        <line x1="30"  y1="62" x2="30"  y2="68" stroke="#0a0a0a" stroke-width="2"/>
+        <line x1="70"  y1="62" x2="70"  y2="68" stroke="#0a0a0a" stroke-width="2"/>
+        <line x1="110" y1="62" x2="110" y2="68" stroke="#0a0a0a" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <!-- Small crown, top right -->
+    <div class="icon" style="top: 18%; right: 12%; width: 60px; transform: rotate(12deg);">
+      <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 8 42 L 24 10 L 40 32 L 56 6 L 72 32 L 88 10 L 96 42 Z"
+              fill="none" stroke="#0a0a0a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Arrow pointing across composition (orange) -->
+    <div class="icon" style="top: 50%; left: 58%; width: 80px; transform: rotate(-12deg);">
+      <svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 5 15 L 85 15 M 72 5 L 88 15 L 72 25"
+              fill="none" stroke="#ff4b1f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Asterisk / star -->
+    <div class="icon" style="top: 34%; left: 54%; width: 38px;">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#0a0a0a" stroke-width="3" stroke-linecap="round">
+          <line x1="20" y1="4"  x2="20" y2="36"/>
+          <line x1="4"  y1="20" x2="36" y2="20"/>
+          <line x1="8"  y1="8"  x2="32" y2="32"/>
+          <line x1="32" y1="8"  x2="8"  y2="32"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Copyright marks (Basquiat used © obsessively) -->
+    <span class="copyright" style="top: 13%; left: 72%; transform: rotate(-8deg);">©</span>
+    <span class="copyright" style="top: 80%; left: 34%; transform: rotate(5deg);">©</span>
+
+    <!-- Tally marks -->
+    <span class="tally" style="top: 26%; left: 18%;">|||||</span>
+    <span class="tally" style="top: 68%; right: 28%;">|||| ||</span>
+
+    <!-- =============== HEADLINE CONTENT =============== -->
+    <div class="hero__content">
+      <h1 class="hero__headline">
+        THE INFINITE<br>
+        <span class="accent">CREATE-A-THON</span>
+      </h1>
+
+      <p class="hero__subtitle">
+        a weekly create-a-thon for <strong>moral imagination</strong>.
+        part weekly ritual, part build session — a place to create things that matter, irl together.
+      </p>
+
+      <div class="hero__meta">
+        <span class="dot"></span>
+        <span>sundays · east village · come as you are</span>
+      </div>
+    </div>
+
+  </header>
+
+</body>
+</html>

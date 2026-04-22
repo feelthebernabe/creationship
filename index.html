@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>the creationship</title>
-  <meta name="description" content="a weekly create-a-thon for moral imagination. part weekly ritual, part build session. sundays at caravan of dreams, east village.">
+  <meta name="description" content="a weekly create-a-thon for moral imagination. part weekly ritual, part build session — a place to create things that matter, irl together. sundays at caravan of dreams, east village.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="og-image.png">
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="the creationship — the infinite create-a-thon">
-  <meta property="og:description" content="a weekly create-a-thon for moral imagination. part weekly ritual, part build session. sundays in the east village.">
+  <meta property="og:description" content="a weekly create-a-thon for moral imagination. part weekly ritual, part build session — a place to create things that matter, irl together. sundays in the east village.">
   <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
   <meta property="og:url" content="https://creationship.vercel.app">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="the creationship — the infinite create-a-thon">
-  <meta name="twitter:description" content="a weekly create-a-thon for moral imagination. sundays in the east village.">
+  <meta name="twitter:description" content="a weekly create-a-thon for moral imagination, irl together. sundays in the east village.">
   <meta name="twitter:image" content="https://creationship.vercel.app/og-image.png">
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -51,16 +51,113 @@
          ============================ -->
     <section id="view-landing" class="view active">
 
-      <header class="hero" id="matrix-rain">
-        <canvas id="matrix-canvas"></canvas>
+      <!-- SVG filter — gives paint blocks a rough, painted edge -->
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+          <filter id="rough-edge">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/>
+            <feDisplacementMap in="SourceGraphic" scale="8"/>
+          </filter>
+        </defs>
+      </svg>
+
+      <header class="hero">
+
+        <!-- Mood layers — chrome/disco/spotlight atmosphere -->
+        <div class="chrome-sweep" aria-hidden="true"></div>
+        <div class="spotlight-beam" aria-hidden="true"></div>
+
+        <!-- Paint blocks — color fields sitting under the text -->
+        <div class="block block--lime"></div>
+        <div class="block block--orange"></div>
+        <div class="block block--plasma"></div>
+
+        <!-- Scrawled background words — some crossed out -->
+        <div class="scrawl scrawl--cyan" style="top: 12%; left: 28%; font-size: 0.95rem; transform: rotate(2deg);">PORTAL</div>
+        <div class="scrawl scrawl--cyan" style="top: 40%; left: 50%; font-size: 1.1rem; transform: rotate(-4deg);">DREAM CHAMBER</div>
+        <div class="scrawl" style="top: 6%;  left: 42%; font-size: 1.1rem; transform: rotate(-6deg);">MORAL AMBITION</div>
+        <div class="scrawl scrawl--xout" style="top: 9%; left: 12%; font-size: 1.4rem; transform: rotate(-2deg);">CONSUMPTION</div>
+        <div class="scrawl scrawl--orange" style="top: 16%; right: 8%; font-size: 1.6rem; transform: rotate(4deg);">BUILD THINGS THAT MATTER</div>
+        <div class="scrawl" style="top: 22%; left: 6%; font-size: 1rem; transform: rotate(3deg);">SMALL IS ALL</div>
+        <div class="scrawl scrawl--plasma scrawl--underline" style="top: 28%; right: 22%; font-size: 1.2rem; transform: rotate(-3deg);">COLLECTIVE&nbsp;INTELLIGENCE</div>
+        <div class="scrawl scrawl--xout" style="top: 36%; left: 4%; font-size: 1.3rem; transform: rotate(-1deg);">HUSTLE CULTURE</div>
+        <div class="scrawl" style="top: 44%; right: 4%; font-size: 0.95rem; transform: rotate(2deg);">SHOW YOUR WORK</div>
+        <div class="scrawl scrawl--lime" style="top: 52%; left: 8%; font-size: 1.1rem; transform: rotate(-4deg);">MOVE&nbsp;AT&nbsp;THE&nbsp;SPEED&nbsp;OF&nbsp;TRUST</div>
+        <div class="scrawl scrawl--xout" style="top: 58%; right: 14%; font-size: 1.4rem; transform: rotate(3deg);">OPTIMIZE FOR SCALE</div>
+        <div class="scrawl scrawl--orange" style="top: 66%; left: 20%; font-size: 1rem; transform: rotate(1deg);">DREAM IN PUBLIC</div>
+        <div class="scrawl" style="top: 72%; right: 6%; font-size: 1.2rem; transform: rotate(-5deg);">HALF-BAKED&nbsp;IS&nbsp;WELCOME</div>
+        <div class="scrawl scrawl--xout" style="top: 78%; left: 40%; font-size: 1.1rem; transform: rotate(2deg);">ENGAGEMENT METRICS</div>
+        <div class="scrawl scrawl--plasma" style="top: 84%; left: 6%; font-size: 1.5rem; transform: rotate(-2deg);">ANOTHER WORLD IS POSSIBLE</div>
+        <div class="scrawl scrawl--xout" style="top: 90%; right: 20%; font-size: 0.95rem; transform: rotate(4deg);">SHIP IT SUNDAY</div>
+        <div class="scrawl" style="top: 94%; left: 28%; font-size: 1rem; transform: rotate(-1deg);">TRUST&nbsp;THE&nbsp;ROOM</div>
+
+        <!-- Main crown floating above headline -->
+        <div class="icon icon--crown-main">
+          <svg viewBox="0 0 140 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M 10 60 L 30 12 L 50 45 L 70 8 L 90 45 L 110 12 L 130 60 Z"
+                  fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="30"  cy="10" r="3" fill="var(--bg-accent)"/>
+            <circle cx="70"  cy="6"  r="3" fill="var(--accent)"/>
+            <circle cx="110" cy="10" r="3" fill="var(--accent-reflect)"/>
+            <line x1="10"  y1="62" x2="130" y2="62" stroke="currentColor" stroke-width="3"/>
+            <line x1="30"  y1="62" x2="30"  y2="68" stroke="currentColor" stroke-width="2"/>
+            <line x1="70"  y1="62" x2="70"  y2="68" stroke="currentColor" stroke-width="2"/>
+            <line x1="110" y1="62" x2="110" y2="68" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <!-- Small crown, top right -->
+        <div class="icon" style="top: 18%; right: 12%; width: 60px; transform: rotate(12deg);">
+          <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M 8 42 L 24 10 L 40 32 L 56 6 L 72 32 L 88 10 L 96 42 Z"
+                  fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Arrow pointing across composition -->
+        <div class="icon" style="top: 50%; left: 58%; width: 80px; transform: rotate(-12deg);">
+          <svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M 5 15 L 85 15 M 72 5 L 88 15 L 72 25"
+                  fill="none" stroke="var(--bg-accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Asterisk / star -->
+        <div class="icon" style="top: 34%; left: 54%; width: 38px;">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <line x1="20" y1="4"  x2="20" y2="36"/>
+              <line x1="4"  y1="20" x2="36" y2="20"/>
+              <line x1="8"  y1="8"  x2="32" y2="32"/>
+              <line x1="32" y1="8"  x2="8"  y2="32"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- © marks and tally -->
+        <span class="copyright" style="top: 13%; left: 72%; transform: rotate(-8deg);">©</span>
+        <span class="copyright" style="top: 80%; left: 34%; transform: rotate(5deg);">©</span>
+        <span class="tally" style="top: 26%; left: 18%;">|||||</span>
+        <span class="tally" style="top: 68%; right: 28%;">|||| ||</span>
+
+        <!-- Headline + subtitle -->
         <div class="hero__content">
-          <h1>the infinite<br>create-a-thon</h1>
+          <h1 class="hero__headline">
+            THE INFINITE<br>
+            <span class="accent">CREATE-A-THON</span>
+          </h1>
+
           <p class="hero__subtitle">
             a weekly create-a-thon for <strong>moral imagination</strong>.
-            part weekly ritual, part build session — a place to create things that matter, together.
+            part weekly ritual, part build session — a place to create things that matter, irl together.
           </p>
-          <span class="hero__scroll"></span>
+
+          <div class="hero__meta">
+            <span class="dot"></span>
+            <span>sundays · east village · come as you are</span>
+          </div>
         </div>
+
       </header>
 
       <!-- ============================
@@ -565,173 +662,6 @@
 
   <script>
     var DB = window.DB;
-
-    // ============================================================
-    // MATRIX RAIN EFFECT
-    // ============================================================
-
-    (function initMatrixRain() {
-      const canvas = document.getElementById('matrix-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const container = document.getElementById('matrix-rain');
-
-      const PHRASES = [
-        'build things that matter',
-        'moral ambition',
-        "never stop human'ing",
-        'creation over consumption',
-        'the relationships are the point',
-        'collective intelligence',
-        'move at the speed of trust',
-        'small is all',
-        'what you pay attention to grows',
-        'creationship',
-        'if you can describe it you can build it',
-        'stealth education',
-        'no rest for the wicked',
-        'moral imagination',
-        'the infinite create-a-thon',
-        'creationships compound',
-        'half-baked is welcome',
-        'you are the toolkit',
-        'come as you are',
-        'prototypes that became new worlds',
-        'ship it sunday',
-        'dream in public',
-        'trust the room',
-        'ideas want to be built',
-        'show your work',
-        'make something real',
-        'critical connections over critical mass',
-        'transform yourself to transform the world',
-        'the pattern is the path',
-        'another world is possible',
-        'change is constant and can be shaped',
-        'interdependence is the goal',
-        'prefigure the future',
-        'less prep more presence',
-        'the room remembers what you built',
-        'the world is not yet finished',
-        'we are the ones',
-        'fractal responsibility',
-      ];
-
-      const FONT_SIZE = 13;
-      let drops = [];
-      let animFrameId = null;
-      let lastTime = 0;
-      const MAX_DROPS = 22;
-
-      function resize() {
-        const rect = container.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        // Re-seed drops on resize
-        drops = [];
-        for (let i = 0; i < MAX_DROPS; i++) {
-          drops.push(createDrop(true));
-        }
-        ctx.fillStyle = '#0a0a0a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
-
-      function createDrop(isInit) {
-        const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-        const speed = 10 + Math.random() * 20; // pixels per second — very slow drift
-        const opacity = 0.06 + Math.random() * 0.22;
-        return {
-          text: phrase.toUpperCase(),
-          x: Math.random() * canvas.width,
-          y: isInit
-            ? Math.random() * canvas.height  // spread across screen initially
-            : -20 - Math.random() * 200,     // start above screen
-          speed: speed,
-          opacity: opacity,
-          fontSize: FONT_SIZE + Math.floor(Math.random() * 4) - 1,
-        };
-      }
-
-      function draw(timestamp) {
-        if (!lastTime) lastTime = timestamp;
-        const dt = Math.min((timestamp - lastTime) / 1000, 0.1); // seconds, capped
-        lastTime = timestamp;
-
-        // Very slow fade — phrases leave a ghostly trail
-        ctx.fillStyle = 'rgba(10, 10, 10, 0.14)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        for (let i = 0; i < drops.length; i++) {
-          const drop = drops[i];
-
-          // Move downward slowly
-          drop.y += drop.speed * dt;
-
-          // Edge fade — dimmer near top and bottom for seamless blend
-          let edgeFade = 1;
-          if (drop.y < 60) {
-            edgeFade = Math.max(0, drop.y / 60);
-          } else if (drop.y > canvas.height - 60) {
-            edgeFade = Math.max(0, (canvas.height - drop.y) / 60);
-          }
-
-          const alpha = drop.opacity * edgeFade;
-          if (alpha <= 0.01) {
-            // Reset if fully faded at bottom
-            if (drop.y > canvas.height) {
-              drops[i] = createDrop(false);
-            }
-            continue;
-          }
-
-          // Draw the phrase horizontally — READABLE
-          ctx.font = `700 ${drop.fontSize}px 'Inter', sans-serif`;
-          ctx.textAlign = 'left';
-          ctx.letterSpacing = '0.12em';
-
-          // Orange glow for bright drops
-          if (drop.opacity > 0.2) {
-            ctx.shadowColor = `rgba(255, 75, 31, ${alpha * 0.5})`;
-            ctx.shadowBlur = 6;
-          } else {
-            ctx.shadowBlur = 0;
-          }
-
-          // Orange-red color matching --bg-accent (#ff4b1f)
-          ctx.fillStyle = `rgba(255, 75, 31, ${alpha})`;
-          ctx.fillText(drop.text, drop.x, drop.y);
-
-          ctx.shadowBlur = 0;
-
-          // Reset when off screen
-          if (drop.y > canvas.height + 30) {
-            drops[i] = createDrop(false);
-          }
-        }
-
-        animFrameId = requestAnimationFrame(draw);
-      }
-
-      // Only animate when visible
-      let isVisible = false;
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !isVisible) {
-            isVisible = true;
-            lastTime = 0;
-            animFrameId = requestAnimationFrame(draw);
-          } else if (!entry.isIntersecting && isVisible) {
-            isVisible = false;
-            if (animFrameId) cancelAnimationFrame(animFrameId);
-          }
-        });
-      }, { threshold: 0.05 });
-
-      observer.observe(container);
-
-      window.addEventListener('resize', resize);
-      resize();
-    })();
 
     // ============================================================
     // SIGNUP PAGE LOGIC

@@ -22,6 +22,7 @@
   --text-on-dark:  #f2f2f2;
   --accent:        #b8ff72;       /* Neon lime — primary CTA color */
   --accent-hover:  #a8ef62;
+  --accent-reflect:#7a2dff;       /* Plasma purple — contemplative/reflection moments */
 
   /* Gold removed — replaced by lime/orange palette */
   --gold:          var(--accent);
@@ -205,83 +206,333 @@ h4 {
 }
 
 /* ============================================================
-   HERO — bold, dark, full-width with Matrix rain background
+   HERO — Basquiat-inspired composition
+   Full-bleed off-white canvas with color-field paint blocks,
+   scrawled phrases (some crossed out), crown iconography,
+   and a heavy Inter headline sitting on an orange swipe.
    ============================================================ */
 
 .hero {
+  /* Local aliases → site tokens. Lets this block read as its own
+     palette while inheriting any future token changes. */
+  --ink:       var(--bg-dark);
+  --orange:    var(--bg-accent);
+  --lime:      var(--accent);
+  --plasma:    var(--accent-reflect);
+  --canvas-0:  var(--bg);
+  --canvas-1:  #ebebeb;
+  --canvas-2:  #e3e3e3;
+  --stain:     rgba(10, 10, 10, 0.05);
+
+  /* Chrome/dream-chamber mood accents (from the Caravan photo) */
+  --cyan:      #30d5e8;
+  --violet:    #5b2dd9;
+
   position: relative;
-  text-align: left;
-  padding: 0;
-  background: var(--bg-dark);
-  color: var(--text-on-dark);
-  overflow: hidden;
-  /* Full-bleed break out of container */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
+  min-height: 82vh;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--ink);
+
+  /* Atmospheric layers, top to bottom:
+     1. cyan spotlight beam (upper-right, dream-chamber blue)
+     2. lime color-field wash
+     3. deep violet pool bottom-left (club ambient)
+     4. plasma blotch
+     5. canvas stain + base gradient */
+  background:
+    radial-gradient(ellipse 18% 60% at 88% 8%, rgba(48, 213, 232, 0.28), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 80% 20%, rgba(184, 255, 114, 0.22), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 10% 85%, rgba(91, 45, 217, 0.22), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 15% 75%, rgba(122, 45, 255, 0.12), transparent 60%),
+    radial-gradient(circle at 60% 60%, var(--stain), transparent 40%),
+    linear-gradient(160deg, var(--canvas-0) 0%, var(--canvas-1) 50%, var(--canvas-2) 100%);
 }
 
-/* Hero content sits above the canvas rain */
+/* Chrome iridescent sweep — molten-silver layer */
+.hero .chrome-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.32;
+  mix-blend-mode: screen;
+  background:
+    conic-gradient(from 220deg at 70% 40%,
+      transparent 0deg,
+      rgba(48, 213, 232, 0.18) 40deg,
+      rgba(217, 224, 232, 0.35) 90deg,
+      rgba(180, 156, 204, 0.28) 140deg,
+      rgba(122, 45, 255, 0.18) 200deg,
+      transparent 280deg,
+      transparent 360deg);
+  filter: blur(40px);
+}
+
+/* Cyan spotlight beam — sharp directional highlight */
+.hero .spotlight-beam {
+  position: absolute;
+  top: -10%;
+  right: 8%;
+  width: 18%;
+  height: 120%;
+  z-index: 2;
+  pointer-events: none;
+  transform: rotate(15deg);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(48, 213, 232, 0.45) 15%,
+    rgba(48, 213, 232, 0.25) 35%,
+    rgba(48, 213, 232, 0.10) 60%,
+    transparent 90%
+  );
+  filter: blur(22px);
+  mix-blend-mode: screen;
+}
+
+/* Paper grain — SVG noise overlay */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Soft vignette bringing focus to center */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 10, 10, 0.14) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Paint blocks — large color fields (Basquiat oil-stick blocks) */
+.hero .block {
+  position: absolute;
+  z-index: 3;
+  opacity: 0.88;
+  mix-blend-mode: multiply;
+  filter: url(#rough-edge);
+}
+.hero .block--lime {
+  top: 8%; left: -4%;
+  width: 340px; height: 160px;
+  background: var(--lime);
+  transform: rotate(-4deg);
+}
+.hero .block--orange {
+  bottom: 12%; right: -2%;
+  width: 280px; height: 110px;
+  background: var(--orange);
+  transform: rotate(3deg);
+}
+.hero .block--plasma {
+  top: 62%; left: 38%;
+  width: 200px; height: 200px;
+  background: var(--plasma);
+  transform: rotate(-8deg);
+  opacity: 0.55;
+}
+
+/* Scrawled background phrases */
+.hero .scrawl {
+  position: absolute;
+  z-index: 4;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.hero .scrawl--xout { position: relative; }
+.hero .scrawl--xout::after {
+  content: '';
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 48%;
+  height: 0.22em;
+  background: var(--ink);
+  transform: rotate(-1.5deg);
+  border-radius: 2px;
+}
+.hero .scrawl--orange { color: var(--orange); }
+.hero .scrawl--plasma { color: var(--plasma); }
+.hero .scrawl--lime {
+  color: var(--ink);
+  background: var(--lime);
+  padding: 0 0.25em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+/* Cyan mood-accent: readable ink text with a cyan highlighter bar under it */
+.hero .scrawl--cyan {
+  color: var(--ink);
+  background-image: linear-gradient(transparent 60%, var(--cyan) 60%, var(--cyan) 95%, transparent 95%);
+  background-repeat: no-repeat;
+  padding: 0 0.2em;
+}
+.hero .scrawl--underline {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+/* Iconography — crowns, arrow, asterisk, ©, tally */
+.hero .icon {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  color: var(--ink);
+}
+.hero .icon svg { display: block; }
+.hero .icon--crown-main {
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 140px;
+}
+
+.hero .copyright {
+  position: absolute;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.9rem;
+  color: var(--ink);
+  z-index: 6;
+}
+.hero .tally {
+  position: absolute;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--ink);
+  letter-spacing: 0;
+  z-index: 6;
+}
+
+/* Headline block */
 .hero__content {
   position: relative;
-  z-index: 2;
-  padding: var(--space-3xl) 0 var(--space-2xl);
-  padding-left: max(var(--space-lg), calc(50vw - 450px + var(--space-lg)));
-  padding-right: max(var(--space-lg), calc(50vw - 450px + var(--space-lg)));
+  z-index: 10;
+  padding: clamp(4rem, 10vh, 9rem) clamp(1.5rem, 5vw, 5rem);
+  min-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Hide logo in hero — treated as byline in nav only */
-.hero__logo-wrap { display: none; }
-.hero__logo { display: none; }
-
-.hero h1 {
-  margin-bottom: var(--space-lg);
-  max-width: 800px;
-  color: var(--text-on-dark);
+.hero__headline {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 10vw, 8.5rem);
+  line-height: 0.88;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.035em;
+  max-width: 12ch;
+  margin-bottom: 2rem;
+  text-shadow:
+    3px 3px 0 rgba(255, 75, 31, 0.25),
+    6px 6px 0 rgba(122, 45, 255, 0.14);
+  transform: rotate(-1deg);
+  position: relative;
+  text-transform: uppercase;
 }
-
-.hero__subtitle {
-  color: rgba(255,255,255,0.6);
-  font-size: 1.15rem;
-  max-width: 520px;
-  line-height: 1.7;
-  font-weight: 400;
-  background: rgba(10, 10, 10, 0.85);
-  padding: 12px 16px;
-  border-radius: 6px;
+.hero__headline .accent {
+  position: relative;
+  display: inline-block;
+  color: var(--ink);
 }
-
-.hero__subtitle strong {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* Scroll indicator */
-.hero__scroll {
-  display: block;
-  margin-top: var(--space-2xl);
-  width: 1px;
-  height: 48px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
-  animation: scrollPulse 2s ease-in-out infinite;
-}
-
-@keyframes scrollPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-
-/* ============================================================
-   MATRIX RAIN CANVAS — absolute background layer in hero
-   ============================================================ */
-
-#matrix-canvas {
+.hero__headline .accent::before {
+  content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  display: block;
+  inset: 72% -4% -10% -2%;
+  background: var(--orange);
+  z-index: -1;
+  transform: skewY(-1.5deg);
+  filter: url(#rough-edge);
+}
+
+/* Subtitle — torn paper with lime masking-tape corners */
+.hero__subtitle {
+  font-family: var(--font);
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  line-height: 1.6;
+  color: var(--ink);
+  background: #ffffff;
+  padding: 1.25rem 1.5rem;
+  max-width: 460px;
+  position: relative;
+  transform: rotate(1deg);
+  box-shadow:
+    2px 3px 0 rgba(10, 10, 10, 0.08),
+    0 12px 30px rgba(10, 10, 10, 0.12);
+  clip-path: polygon(
+    0 6%, 3% 0, 20% 4%, 45% 0, 70% 3%, 95% 0, 100% 8%,
+    99% 40%, 100% 70%, 98% 95%, 85% 100%, 60% 97%,
+    30% 100%, 5% 96%, 0 88%
+  );
+}
+.hero__subtitle strong {
+  font-weight: 500;
+  background: var(--lime);
+  padding: 0 0.25em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  color: var(--ink);
+}
+.hero__subtitle::before,
+.hero__subtitle::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 18px;
+  background: rgba(184, 255, 114, 0.65);
+  box-shadow: inset 0 0 12px rgba(10, 10, 10, 0.08);
+}
+.hero__subtitle::before { top: -8px; left: 16px; transform: rotate(-6deg); }
+.hero__subtitle::after  { bottom: -8px; right: 24px; transform: rotate(4deg); }
+
+/* Typewritten meta (sundays · east village · ...) */
+.hero__meta {
+  font-family: var(--font);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ink);
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+.hero__meta .dot {
+  width: 8px; height: 8px;
+  background: var(--orange);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .hero .block--lime   { width: 180px; height: 100px; }
+  .hero .block--orange { width: 160px; height: 70px; }
+  .hero .block--plasma { width: 120px; height: 120px; top: 70%; left: 30%; }
+  .hero .scrawl        { font-size: 0.85rem !important; }
+  .hero .icon--crown-main { width: 90px; top: 8%; }
 }
 
 /* ============================================================
@@ -970,6 +1221,7 @@ h4 {
 }
 
 .role-card:hover h3 { color: var(--bg-accent); }
+.role-card[data-role="brain_trust"]:hover h3 { color: var(--accent-reflect); }
 
 .role-card p {
   color: var(--text-dim);
@@ -2508,7 +2760,6 @@ h4 {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-  #matrix-canvas { display: none; }
   .reveal { opacity: 1; transform: none; }
 }
 

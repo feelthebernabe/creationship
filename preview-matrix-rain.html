@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>archive · matrix rain hero</title>
+  <meta name="description" content="Archived snapshot of the matrix-rain hero that lived on creationship.vercel.app before the Basquiat redesign. Kept as a reference.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       ARCHIVED DESIGN — matrix rain hero
+       Lived on the live site from commit f236c64 until
+       the Basquiat composition replaced it. Preserved here
+       as a standalone page so we can always look at it.
+       ========================================================= */
+    :root {
+      --bg:            #f2f2f2;
+      --bg-dark:       #0a0a0a;
+      --bg-accent:     #ff4b1f;
+      --text:          #0a0a0a;
+      --text-on-dark:  #f2f2f2;
+      --accent:        #b8ff72;
+      --accent-reflect:#7a2dff;
+      --font:          'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+      --space-lg:  1.5rem;
+      --space-xl:  2.5rem;
+      --space-2xl: 5rem;
+      --space-3xl: 8rem;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: var(--font);
+      background: var(--bg-dark);
+      color: var(--text-on-dark);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.95;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+
+    .archive-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--bg-accent);
+      color: var(--bg-dark);
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+      text-align: center;
+    }
+    .archive-banner a { color: var(--bg-dark); text-decoration: underline; }
+
+    /* --- the hero itself, as it shipped --- */
+    .hero {
+      position: relative;
+      text-align: left;
+      padding: 0;
+      background: var(--bg-dark);
+      color: var(--text-on-dark);
+      overflow: hidden;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 2;
+      padding: var(--space-3xl) 0 var(--space-2xl);
+      padding-left: max(var(--space-lg), calc(50vw - 450px + var(--space-lg)));
+      padding-right: max(var(--space-lg), calc(50vw - 450px + var(--space-lg)));
+    }
+
+    .hero h1 {
+      margin-bottom: var(--space-lg);
+      max-width: 800px;
+      color: var(--text-on-dark);
+    }
+
+    .hero__subtitle {
+      color: rgba(255,255,255,0.6);
+      font-size: 1.15rem;
+      max-width: 520px;
+      line-height: 1.7;
+      font-weight: 400;
+      background: rgba(10, 10, 10, 0.85);
+      padding: 12px 16px;
+      border-radius: 6px;
+    }
+    .hero__subtitle strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .hero__scroll {
+      display: block;
+      margin-top: var(--space-2xl);
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    #matrix-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="archive-banner">
+    archive · matrix rain hero · not live · <a href="index.html">← back to site</a>
+  </div>
+
+  <header class="hero" id="matrix-rain">
+    <canvas id="matrix-canvas"></canvas>
+    <div class="hero__content">
+      <h1>the infinite<br>create-a-thon</h1>
+      <p class="hero__subtitle">
+        a weekly create-a-thon for <strong>moral imagination</strong>.
+        part weekly ritual, part build session — a place to create things that matter, irl together.
+      </p>
+      <span class="hero__scroll"></span>
+    </div>
+  </header>
+
+  <script>
+    // ============================================================
+    // MATRIX RAIN EFFECT — slow horizontal phrase rain on dark bg
+    // Preserved here in its final shipped form.
+    // ============================================================
+    (function initMatrixRain() {
+      const canvas = document.getElementById('matrix-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const container = document.getElementById('matrix-rain');
+
+      const PHRASES = [
+        'build things that matter',
+        'moral ambition',
+        "never stop human'ing",
+        'creation over consumption',
+        'the relationships are the point',
+        'collective intelligence',
+        'move at the speed of trust',
+        'small is all',
+        'what you pay attention to grows',
+        'creationship',
+        'if you can describe it you can build it',
+        'stealth education',
+        'no rest for the wicked',
+        'moral imagination',
+        'the infinite create-a-thon',
+        'creationships compound',
+        'half-baked is welcome',
+        'you are the toolkit',
+        'come as you are',
+        'prototypes that became new worlds',
+        'ship it sunday',
+        'dream in public',
+        'trust the room',
+        'ideas want to be built',
+        'show your work',
+        'make something real',
+        'critical connections over critical mass',
+        'transform yourself to transform the world',
+        'the pattern is the path',
+        'another world is possible',
+        'change is constant and can be shaped',
+        'interdependence is the goal',
+        'prefigure the future',
+        'less prep more presence',
+        'the room remembers what you built',
+        'the world is not yet finished',
+        'we are the ones',
+        'fractal responsibility',
+      ];
+
+      const FONT_SIZE = 13;
+      let drops = [];
+      let animFrameId = null;
+      let lastTime = 0;
+      const MAX_DROPS = 22;
+
+      const COLOR_ORANGE = '255, 75, 31';
+      const COLOR_PLASMA = '122, 45, 255';
+
+      function pickDropColor() {
+        return Math.random() < 0.15 ? COLOR_PLASMA : COLOR_ORANGE;
+      }
+
+      function resize() {
+        const rect = container.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        drops = [];
+        for (let i = 0; i < MAX_DROPS; i++) drops.push(createDrop(true));
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function createDrop(isInit) {
+        const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+        const speed = 10 + Math.random() * 20;
+        const opacity = 0.06 + Math.random() * 0.22;
+        const drop = {
+          text: phrase.toUpperCase(),
+          x: Math.random() * canvas.width,
+          y: isInit ? Math.random() * canvas.height : -20 - Math.random() * 200,
+          speed, opacity,
+          fontSize: FONT_SIZE + Math.floor(Math.random() * 4) - 1,
+        };
+        drop.color = pickDropColor();
+        return drop;
+      }
+
+      function draw(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+        lastTime = timestamp;
+
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.14)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < drops.length; i++) {
+          const drop = drops[i];
+          drop.y += drop.speed * dt;
+
+          let edgeFade = 1;
+          if (drop.y < 60) edgeFade = Math.max(0, drop.y / 60);
+          else if (drop.y > canvas.height - 60) edgeFade = Math.max(0, (canvas.height - drop.y) / 60);
+
+          const alpha = drop.opacity * edgeFade;
+          if (alpha <= 0.01) {
+            if (drop.y > canvas.height) drops[i] = createDrop(false);
+            continue;
+          }
+
+          ctx.font = `700 ${drop.fontSize}px 'Inter', sans-serif`;
+          ctx.textAlign = 'left';
+
+          if (drop.opacity > 0.2) {
+            ctx.shadowColor = `rgba(${drop.color}, ${alpha * 0.5})`;
+            ctx.shadowBlur = 6;
+          } else {
+            ctx.shadowBlur = 0;
+          }
+
+          ctx.fillStyle = `rgba(${drop.color}, ${alpha})`;
+          ctx.fillText(drop.text, drop.x, drop.y);
+          ctx.shadowBlur = 0;
+
+          if (drop.y > canvas.height + 30) drops[i] = createDrop(false);
+        }
+
+        animFrameId = requestAnimationFrame(draw);
+      }
+
+      let isVisible = false;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !isVisible) {
+            isVisible = true;
+            lastTime = 0;
+            animFrameId = requestAnimationFrame(draw);
+          } else if (!entry.isIntersecting && isVisible) {
+            isVisible = false;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+          }
+        });
+      }, { threshold: 0.05 });
+
+      observer.observe(container);
+      window.addEventListener('resize', resize);
+      resize();
+    })();
+  </script>
+
+</body>
+</html>
