@@ -681,13 +681,22 @@
     // BULK IMPORT — paste WhatsApp chunk → extract → review → import
     // ============================================================
 
-    let bulkDrafts = []; // array of { selected, title, author_name, description, stage, github_url, website_url, demo_url, team_members }
+    let bulkDrafts = []; // array of { selected, title, author_name, display_name, description, stage, github_url, website_url, demo_url, team_members }
 
     function el(tag, className, text) {
       const n = document.createElement(tag);
       if (className) n.className = className;
       if (text !== undefined && text !== null) n.textContent = String(text);
       return n;
+    }
+
+    // "First L." initials shown as a live placeholder for the display_name input.
+    function toPrivateNameAdmin(full) {
+      if (!full) return '';
+      const parts = String(full).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0];
+      const last = parts[parts.length - 1];
+      return parts[0] + ' ' + last[0].toUpperCase() + '.';
     }
 
     function bulkSetStatus(msg) {
@@ -739,8 +748,25 @@
         authorInput.type = 'text';
         authorInput.placeholder = 'author name';
         authorInput.value = draft.author_name || '';
-        authorInput.addEventListener('input', () => { draft.author_name = authorInput.value; });
         meta.appendChild(authorInput);
+
+        const displayInput = document.createElement('input');
+        displayInput.type = 'text';
+        displayInput.value = draft.display_name || '';
+        // Placeholder shows the live computed fallback.
+        const updateDisplayPlaceholder = () => {
+          const fallback = toPrivateNameAdmin(draft.author_name);
+          displayInput.placeholder = fallback
+            ? 'public display (default: ' + fallback + ')'
+            : 'public display name';
+        };
+        updateDisplayPlaceholder();
+        authorInput.addEventListener('input', () => {
+          draft.author_name = authorInput.value;
+          updateDisplayPlaceholder();
+        });
+        displayInput.addEventListener('input', () => { draft.display_name = displayInput.value; });
+        meta.appendChild(displayInput);
 
         const stageSel = document.createElement('select');
         ['seed', 'project', 'company'].forEach(s => {
@@ -826,6 +852,7 @@
           selected: true,
           title: p.title || '',
           author_name: p.author_name || '',
+          display_name: '',
           description: p.description || '',
           stage: p.stage || 'seed',
           github_url: p.github_url || '',
@@ -864,6 +891,7 @@
             projects: selected.map(d => ({
               title: d.title.trim(),
               author_name: d.author_name,
+              display_name: d.display_name || '',
               description: d.description,
               stage: d.stage,
               github_url: d.github_url,

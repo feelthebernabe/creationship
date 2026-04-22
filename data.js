@@ -33,6 +33,16 @@ function _showConnectionError() {
   }, 100);
 }
 
+// URL slug from a title. Matches the SQL-backfilled form for the
+// original 18 rows and stays the same across client/server/admin.
+function _slugify(str) {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 // ============================================================
 // PUBLIC API
 // ============================================================
@@ -298,32 +308,48 @@ window.DB = {
     return data || [];
   },
 
-  async addIdea({ title, description, github_url, website_url, demo_url, team_members, stage, company_name }) {
+  async addIdea({ title, description, github_url, website_url, demo_url, team_members, stage, company_name, display_name }) {
     const user = await this.getUser();
     if (!user) throw new Error('Not authenticated');
-    
-    const displayName = user.user_metadata?.display_name || user.email.split('@')[0];
-    
-    const { data, error } = await _supabaseClient
-      .from('ideas')
-      .insert({
-        user_id: user.id,
-        author_name: displayName,
-        author_email: user.email,
-        title: title,
-        description: description || '',
-        github_url: github_url || '',
-        website_url: website_url || '',
-        demo_url: demo_url || '',
-        team_members: team_members || [],
-        stage: stage || 'seed',
-        company_name: company_name || '',
-        status: 'active'
-      })
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+
+    const authorName = user.user_metadata?.display_name || user.email.split('@')[0];
+    const baseSlug = _slugify(title);
+
+    // Retry with -2, -3… on slug collision (unique constraint).
+    let attempt = 0;
+    while (attempt < 5) {
+      const slug = attempt === 0 ? baseSlug : baseSlug + '-' + (attempt + 1);
+
+      const { data, error } = await _supabaseClient
+        .from('ideas')
+        .insert({
+          user_id: user.id,
+          author_name: authorName,
+          author_email: user.email,
+          title: title,
+          description: description || '',
+          github_url: github_url || '',
+          website_url: website_url || '',
+          demo_url: demo_url || '',
+          team_members: team_members || [],
+          stage: stage || 'seed',
+          company_name: company_name || '',
+          status: 'active',
+          display_name: (display_name || '').trim(),
+          slug: slug
+        })
+        .select()
+        .single();
+
+      if (!error) return data;
+
+      // 23505 = unique_violation in Postgres.
+      const isSlugCollision = error.code === '23505' && /slug/.test(error.message || '');
+      if (!isSlugCollision) throw error;
+
+      attempt += 1;
+    }
+    throw new Error('could not generate a unique slug after 5 tries');
   },
 
   async updateIdea(id, updates) {

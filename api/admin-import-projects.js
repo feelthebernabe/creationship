@@ -11,6 +11,14 @@ const SUPABASE_URL = 'https://cxsbqptqgreywutbfbtx.supabase.co';
 const MAX_BATCH = 100;
 const VALID_STAGES = new Set(['seed', 'project', 'company']);
 
+function slugify(str) {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method not allowed' });
@@ -62,6 +70,8 @@ module.exports = async function handler(req, res) {
       stage,
       company_name: typeof p?.company_name === 'string' ? p.company_name.trim() : '',
       status: 'active',
+      display_name: typeof p?.display_name === 'string' ? p.display_name.trim() : '',
+      slug: slugify(title),
     });
   }
 
@@ -69,16 +79,39 @@ module.exports = async function handler(req, res) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  try {
-    const { data, error } = await client.from('ideas').insert(rows).select('id');
-    if (error) {
-      console.error('supabase insert error:', error.message);
-      res.status(500).json({ error: 'insert failed' });
-      return;
+  // Per-row insert with -2, -3 suffix retry on slug collision.
+  // Batch size here is small (admin paste ~5-30 rows) so N inserts
+  // is fine, and we get per-row error attribution for free.
+  let inserted = 0;
+  const errors = [];
+  for (const row of rows) {
+    const baseSlug = row.slug || slugify(row.title);
+    let attempt = 0;
+    let rowInserted = false;
+    while (attempt < 10 && !rowInserted) {
+      const candidate = attempt === 0 ? baseSlug : baseSlug + '-' + (attempt + 1);
+      const { error } = await client.from('ideas').insert({ ...row, slug: candidate });
+      if (!error) {
+        rowInserted = true;
+        inserted += 1;
+        break;
+      }
+      const isSlugCollision = error.code === '23505' && /slug/.test(error.message || '');
+      if (!isSlugCollision) {
+        errors.push({ title: row.title, message: error.message });
+        break;
+      }
+      attempt += 1;
     }
-    res.status(200).json({ inserted: data.length });
-  } catch (err) {
-    console.error('unexpected error:', err?.message || err);
-    res.status(500).json({ error: 'insert failed' });
+    if (!rowInserted && attempt >= 10) {
+      errors.push({ title: row.title, message: 'slug collision retries exhausted' });
+    }
   }
+
+  if (errors.length) {
+    console.error('admin-import partial failure:', errors);
+    res.status(207).json({ inserted, errors });
+    return;
+  }
+  res.status(200).json({ inserted });
 };

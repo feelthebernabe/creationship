@@ -217,6 +217,12 @@
             </div>
 
             <div class="form-group">
+              <label for="idea-display-name">how to show you on the public page <small>(optional)</small></label>
+              <input type="text" id="idea-display-name" name="display_name" placeholder="e.g. Michelle M. — leave blank and we'll use initials">
+              <span class="hint" id="idea-display-name-hint">leave blank and we'll auto-use initials like "First L."</span>
+            </div>
+
+            <div class="form-group">
               <label for="idea-desc">brief description <small>(optional)</small></label>
               <textarea id="idea-desc" name="description" placeholder="what's the idea? what problem does it solve?" style="min-height:80px;"></textarea>
             </div>
@@ -739,6 +745,7 @@
       const website_url = document.getElementById('idea-website').value.trim();
       const demo_url = document.getElementById('idea-demo').value.trim();
       const company_name = document.getElementById('idea-company-name').value.trim();
+      const display_name = document.getElementById('idea-display-name').value.trim();
       const team = teamMembers.map(name => ({ name }));
 
       const btn = document.getElementById('btn-submit-idea');
@@ -750,7 +757,8 @@
           github_url, website_url, demo_url,
           team_members: team,
           stage: selectedStage,
-          company_name
+          company_name,
+          display_name
         });
         document.getElementById('idea-form').reset();
         teamMembers = [];
