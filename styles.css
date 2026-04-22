@@ -573,6 +573,131 @@ h4 {
   max-width: 700px;
 }
 
+/* ============================================================
+   THEME CARRY-THROUGH — Basquiat marks on landing sections
+   Rule: every © (wherever it appears on the site) is struck through.
+   ============================================================ */
+
+/* Eyebrow label modifiers — add ONE of these to .landing-section__label */
+.landing-section__label--tally::after {
+  content: ' |||';
+  letter-spacing: 0.05em;
+  margin-left: 0.4rem;
+  color: var(--bg-accent);
+  font-weight: 800;
+}
+.landing-section__label--copyright {
+  position: relative;
+}
+.landing-section__label--copyright::after {
+  content: ' ©';
+  margin-left: 0.3rem;
+  color: var(--bg-accent);
+  font-size: 1.15em;
+  text-decoration: line-through;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 0.09em;
+  text-decoration-skip-ink: none;
+}
+.landing-section__label--swipe {
+  position: relative;
+  padding-bottom: 6px;
+  display: inline-block;
+}
+.landing-section__label--swipe::after {
+  content: '';
+  position: absolute;
+  left: -2px; right: -2px;
+  bottom: 0;
+  height: 3px;
+  background: var(--bg-accent);
+  transform: skewX(-8deg);
+}
+
+/* Section heading: wrap one key word in <span class="swipe"> for orange highlight */
+.landing-section__heading .swipe {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+  padding: 0 0.06em;
+}
+.landing-section__heading .swipe::before {
+  content: '';
+  position: absolute;
+  inset: 70% -3% -6% -2%;
+  background: var(--bg-accent);
+  z-index: -1;
+  transform: skewY(-1deg);
+  filter: url(#rough-edge);
+}
+
+/* Body strike-through: wrap a word/phrase in <span class="tier-strike"> */
+.tier-strike {
+  position: relative;
+}
+.tier-strike::after {
+  content: '';
+  position: absolute;
+  left: -3%; right: -3%;
+  top: 52%;
+  height: 0.18em;
+  background: currentColor;
+  transform: rotate(-2deg);
+  border-radius: 2px;
+}
+
+/* Proof cards: crown marker on "shipped" items (add <svg class="proof__crown">) */
+.proof__crown {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 22px;
+  color: var(--accent);
+  pointer-events: none;
+}
+
+/* Role cards: orange arrow SVG replaces the text "→" on hover */
+.role-card__arrow-svg {
+  position: absolute;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  width: 56px;
+  height: 20px;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all var(--transition);
+  pointer-events: none;
+}
+.role-card:hover .role-card__arrow-svg {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* Hide the old text arrow now that the SVG version is wired in */
+.role-card::after { display: none !important; }
+
+/* "New here?" callout — rough-edged torn-paper */
+.new-here {
+  position: relative;
+  transform: rotate(-0.5deg);
+  box-shadow:
+    2px 3px 0 rgba(10, 10, 10, 0.08),
+    0 12px 30px rgba(10, 10, 10, 0.10);
+  clip-path: polygon(
+    0 6%, 3% 0, 25% 4%, 50% 0, 75% 3%, 97% 0, 100% 8%,
+    99% 40%, 100% 72%, 97% 96%, 82% 100%, 55% 97%,
+    28% 100%, 4% 96%, 0 88%
+  );
+}
+
+/* Hero © — per site rule, struck through like all other ©s */
+.hero .copyright {
+  text-decoration: line-through;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 0.08em;
+  text-decoration-skip-ink: none;
+}
+
 .landing-section__body {
   color: var(--text-dim);
   font-size: 0.95rem;

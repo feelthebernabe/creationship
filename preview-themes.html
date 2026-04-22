@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>preview · theme carry-through (tiers 1 / 2 / 3)</title>
+
+  <!-- Inherit all site tokens and base styles so the preview
+       matches the production look exactly. -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* =========================================================
+       PREVIEW SCAFFOLDING — toggle bar + sample section spacing
+       ========================================================= */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding-top: 90px;
+    }
+
+    .preview-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--bg-dark);
+      color: var(--text-on-dark);
+      padding: 0.75rem 1.25rem;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+      flex-wrap: wrap;
+    }
+    .preview-bar__label {
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      opacity: 0.6;
+    }
+    .preview-bar__btns {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .tier-btn {
+      background: transparent;
+      color: var(--text-on-dark);
+      border: 1.5px solid rgba(242, 242, 242, 0.25);
+      padding: 0.5rem 0.9rem;
+      font-family: var(--font);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tier-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tier-btn.is-active {
+      background: var(--bg-accent);
+      border-color: var(--bg-accent);
+      color: var(--bg-dark);
+    }
+    .preview-bar__legend {
+      font-size: 0.78rem;
+      opacity: 0.7;
+      margin-left: auto;
+      max-width: 40ch;
+      line-height: 1.4;
+    }
+
+    /* Sample section wrapper */
+    .demo-section {
+      max-width: 900px;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
+    }
+    .demo-section__ghost-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-family: var(--font);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    /* =========================================================
+       SAMPLE MARKUP MIMICKING SITE SECTIONS
+       (base styling; tier overrides are layered below)
+       ========================================================= */
+
+    /* Eyebrow label above headings */
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Section heading */
+    .section-h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .section-h2 .swipe {
+      position: relative;
+      display: inline-block;
+      z-index: 1;
+    }
+
+    /* Body paragraph */
+    .body-p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 1rem;
+      max-width: 65ch;
+    }
+    .body-p strong { font-weight: 600; }
+
+    /* Card base */
+    .currents-card, .proof-card, .role-card {
+      background: var(--bg-dark);
+      color: var(--text-on-dark);
+      padding: 2rem;
+      border-radius: 8px;
+      position: relative;
+    }
+    .currents-card { max-width: 400px; }
+    .currents-card__number {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: var(--bg-accent);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .currents-card__title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+    .currents-card__desc {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      opacity: 0.75;
+      margin-bottom: 1.25rem;
+    }
+    .currents-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tag {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid rgba(242, 242, 242, 0.3);
+      border-radius: 100px;
+      font-family: var(--font);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* Proof card row */
+    .proof-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .proof-card {
+      padding: 1.75rem;
+    }
+    .proof-card__name {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      text-transform: lowercase;
+      margin-bottom: 0.4rem;
+    }
+    .proof-card__desc {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    .proof-card__crown {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 28px;
+      height: 18px;
+      display: none;
+      color: var(--accent);
+    }
+
+    /* Role card */
+    .role-card {
+      background: var(--bg-elevated);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      max-width: 420px;
+      padding: 2rem;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .role-card:hover { border-color: var(--text); }
+    .role-card__title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-transform: lowercase;
+      margin-bottom: 0.5rem;
+    }
+    .role-card__desc {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .role-card__arrow {
+      font-size: 1.6rem;
+      color: var(--text);
+      position: absolute;
+      bottom: 1.25rem;
+      right: 1.5rem;
+    }
+    .role-card__arrow-svg {
+      position: absolute;
+      bottom: 1.25rem;
+      right: 1.5rem;
+      width: 48px;
+      height: 18px;
+      display: none;
+    }
+
+    /* New here callout */
+    .new-here {
+      background: var(--bg-elevated);
+      padding: 1.5rem 1.75rem;
+      max-width: 540px;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text);
+      position: relative;
+    }
+
+    /* Join CTA */
+    .join-cta {
+      text-align: center;
+      padding: 4rem 1rem;
+      position: relative;
+    }
+    .join-cta__h2 {
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .join-cta__tagline {
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+    .join-cta__copyright {
+      position: absolute;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 8rem;
+      line-height: 1;
+      color: var(--text);
+      top: 20%;
+      left: 5%;
+      opacity: 0;
+      transform: rotate(-12deg);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =========================================================
+       TIER 1 — QUIET CONNECTIVE TISSUE
+       Eyebrow marks · H2 paint swipe · body strike-through
+       ========================================================= */
+
+    /* 1a. Eyebrow labels each get ONE small appended mark */
+    body.show-tier-1 .eyebrow--tally::after {
+      content: ' |||';
+      letter-spacing: 0.05em;
+      margin-left: 0.4rem;
+      color: var(--bg-accent);
+      font-weight: 800;
+    }
+    body.show-tier-1 .eyebrow--copyright::after {
+      content: ' ©';
+      margin-left: 0.3rem;
+      color: var(--bg-accent);
+      font-size: 1em;
+      /* Rule: every © is struck through. */
+      text-decoration: line-through;
+      text-decoration-color: currentColor;
+      text-decoration-thickness: 0.09em;
+      text-decoration-skip-ink: none;
+    }
+    body.show-tier-1 .eyebrow--swipe::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: -2px; right: -2px;
+      bottom: -4px;
+      height: 3px;
+      background: var(--bg-accent);
+      transform: skewX(-8deg);
+    }
+
+    /* 1b. Section h2 — one word gets an orange paint swipe */
+    body.show-tier-1 .section-h2 .swipe::before {
+      content: '';
+      position: absolute;
+      inset: 70% -3% -6% -2%;
+      background: var(--bg-accent);
+      z-index: -1;
+      transform: skewY(-1deg);
+    }
+
+    /* 1c. Body strikethrough — on the "consumption" word */
+    body.show-tier-1 .tier-strike {
+      position: relative;
+      color: var(--text);
+    }
+    body.show-tier-1 .tier-strike::after {
+      content: '';
+      position: absolute;
+      left: -3%; right: -3%;
+      top: 50%;
+      height: 0.18em;
+      background: var(--text);
+      transform: rotate(-2deg);
+      border-radius: 2px;
+    }
+
+    /* =========================================================
+       TIER 2 — ICONOGRAPHY THREADING
+       Crown on proof · arrow on role · rough edge on callout
+       ========================================================= */
+
+    /* 2a. Crown indicator on proof cards */
+    body.show-tier-2 .proof-card__crown {
+      display: block;
+    }
+
+    /* 2b. Role card arrow — swap plain "→" for hero-style orange arrow */
+    body.show-tier-2 .role-card__arrow {
+      display: none;
+    }
+    body.show-tier-2 .role-card__arrow-svg {
+      display: block;
+    }
+
+    /* 2c. "New here?" callout — rough-edged torn-paper feel */
+    body.show-tier-2 .new-here {
+      background: #ffffff;
+      box-shadow:
+        2px 3px 0 rgba(10, 10, 10, 0.08),
+        0 12px 30px rgba(10, 10, 10, 0.12);
+      transform: rotate(-0.5deg);
+      clip-path: polygon(
+        0 6%, 3% 0, 25% 4%, 50% 0, 75% 3%, 97% 0, 100% 8%,
+        99% 40%, 100% 72%, 97% 96%, 82% 100%, 55% 97%,
+        28% 100%, 4% 96%, 0 88%
+      );
+    }
+
+    /* =========================================================
+       TIER 3 — PAINTERLY DETAILS
+       Scrawled tags · oversized © on CTA · slight h2 rotation
+       ========================================================= */
+
+    /* 3a. Three Currents tags — one highlighted, one crossed out */
+    body.show-tier-3 .tag--highlight {
+      background: var(--accent);
+      color: var(--text);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    body.show-tier-3 .tag--xout {
+      position: relative;
+      opacity: 0.7;
+    }
+    body.show-tier-3 .tag--xout::after {
+      content: '';
+      position: absolute;
+      left: 6%; right: 6%;
+      top: 50%;
+      height: 2px;
+      background: currentColor;
+      transform: rotate(-3deg);
+    }
+
+    /* 3b. Join CTA — oversized © signature in corner (struck through, per rule) */
+    body.show-tier-3 .join-cta__copyright {
+      opacity: 0.12;            /* slight bump so the strike still reads at 0.12 alpha */
+      text-decoration: line-through;
+      text-decoration-color: currentColor;
+      text-decoration-thickness: 0.06em;
+      text-decoration-skip-ink: none;
+    }
+
+    /* 3c. Slight rotation on h2s */
+    body.show-tier-3 .section-h2 {
+      transform: rotate(-0.6deg);
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       TOGGLE BAR — pick a tier to see
+       ========================================================= -->
+  <div class="preview-bar">
+    <span class="preview-bar__label">theme tier</span>
+    <div class="preview-bar__btns">
+      <button class="tier-btn is-active" data-tier="0">baseline</button>
+      <button class="tier-btn" data-tier="1">+ tier 1</button>
+      <button class="tier-btn" data-tier="2">+ tier 1,2</button>
+      <button class="tier-btn" data-tier="3">+ tier 1,2,3</button>
+    </div>
+    <span class="preview-bar__legend">
+      tier 1 = eyebrow marks + h2 swipes + body strikes · tier 2 = crowns, arrows, torn-paper · tier 3 = scrawled tags, ©, h2 tilt
+    </span>
+  </div>
+
+  <!-- =========================================================
+       SAMPLE 1 · premise-style section
+       (eyebrow + h2 + body paragraph with inline strikethrough)
+       ========================================================= -->
+  <section class="demo-section">
+    <p class="demo-section__ghost-label">sample · premise section</p>
+    <div class="eyebrow eyebrow--tally">the premise</div>
+    <h2 class="section-h2">creationships <span class="swipe">compound</span></h2>
+    <p class="body-p">
+      once a week, the back room of a vegan restaurant on east 6th fills with people
+      who'd never otherwise share a table. we call what happens between them a
+      <strong>creationship</strong> — <span class="tier-strike">consumption</span> over creation,
+      builders over audiences, rooms over feeds.
+    </p>
+  </section>
+
+  <!-- =========================================================
+       SAMPLE 2 · three currents-style card
+       ========================================================= -->
+  <section class="demo-section">
+    <p class="demo-section__ghost-label">sample · three currents card (tags)</p>
+    <div class="eyebrow eyebrow--copyright">three currents, one practice</div>
+    <h2 class="section-h2">holding all three at once is the whole <span class="swipe">discipline</span></h2>
+    <div class="currents-card">
+      <div class="currents-card__number">01 · imagination</div>
+      <div class="currents-card__title">moral imagination</div>
+      <div class="currents-card__desc">
+        not "imagining what could sell". imagining what could matter. what the world needs
+        but hasn't been given permission to exist.
+      </div>
+      <div class="currents-card__tags">
+        <span class="tag tag--highlight">dream in public</span>
+        <span class="tag">prefigure the future</span>
+        <span class="tag tag--xout">shareholder value</span>
+        <span class="tag">another world is possible</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SAMPLE 3 · proof cards row (with crowns)
+       ========================================================= -->
+  <section class="demo-section">
+    <p class="demo-section__ghost-label">sample · proof cards (crown = shipped)</p>
+    <div class="eyebrow eyebrow--swipe">what's come out of this room</div>
+    <h2 class="section-h2">prototypes that became new <span class="swipe">worlds</span></h2>
+    <div class="proof-row">
+      <div class="proof-card">
+        <svg class="proof-card__crown" viewBox="0 0 140 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M 10 60 L 30 12 L 50 45 L 70 8 L 90 45 L 110 12 L 130 60 Z"
+                fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <div class="proof-card__name">kula</div>
+        <div class="proof-card__desc">a gift-economy exchange platform</div>
+      </div>
+      <div class="proof-card">
+        <svg class="proof-card__crown" viewBox="0 0 140 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M 10 60 L 30 12 L 50 45 L 70 8 L 90 45 L 110 12 L 130 60 Z"
+                fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <div class="proof-card__name">kitty share</div>
+        <div class="proof-card__desc">pooled kitty fund for group expenses</div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-card__name">+ see them all</div>
+        <div class="proof-card__desc">the full catalogue of projects</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SAMPLE 4 · role card (with arrow upgrade)
+       ========================================================= -->
+  <section class="demo-section">
+    <p class="demo-section__ghost-label">sample · role card (hover arrow)</p>
+    <div class="eyebrow eyebrow--tally">how to show up</div>
+    <h2 class="section-h2">three ways to <span class="swipe">join</span></h2>
+    <div class="role-card">
+      <div class="role-card__title">hold the space</div>
+      <div class="role-card__desc">
+        help design sundays, set the tone for the room, welcome new builders
+        and make sure the thing actually happens week after week.
+      </div>
+      <div class="role-card__arrow">→</div>
+      <svg class="role-card__arrow-svg" viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M 5 15 L 85 15 M 72 5 L 88 15 L 72 25"
+              fill="none" stroke="var(--bg-accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SAMPLE 5 · "new here?" callout
+       ========================================================= -->
+  <section class="demo-section">
+    <p class="demo-section__ghost-label">sample · "new here?" callout</p>
+    <div class="new-here">
+      <strong>new here?</strong> the easiest way to show up is just to come on sunday.
+      read the premise, scan the events list, and pick a week that works. no signup required
+      for your first time — just walk in.
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SAMPLE 6 · join CTA (with © signature in tier 3)
+       ========================================================= -->
+  <section class="demo-section">
+    <p class="demo-section__ghost-label">sample · join CTA (oversized © in tier 3)</p>
+    <div class="join-cta">
+      <span class="join-cta__copyright">©</span>
+      <h2 class="section-h2 join-cta__h2">come as you <span class="swipe">are</span></h2>
+      <div class="join-cta__tagline">creativity · community · creationship</div>
+    </div>
+  </section>
+
+  <div style="height: 6rem"></div>
+
+  <script>
+    const buttons = document.querySelectorAll('.tier-btn');
+    const body = document.body;
+
+    function setTier(level) {
+      body.classList.remove('show-tier-1', 'show-tier-2', 'show-tier-3');
+      if (level >= 1) body.classList.add('show-tier-1');
+      if (level >= 2) body.classList.add('show-tier-2');
+      if (level >= 3) body.classList.add('show-tier-3');
+
+      buttons.forEach(b => b.classList.toggle('is-active', +b.dataset.tier === level));
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => setTier(+btn.dataset.tier));
+    });
+
+    // Keyboard shortcut: 0 / 1 / 2 / 3 to jump between tiers
+    document.addEventListener('keydown', (e) => {
+      if (['0','1','2','3'].includes(e.key)) setTier(+e.key);
+    });
+  </script>
+</body>
+</html>
