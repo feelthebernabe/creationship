@@ -3133,6 +3133,246 @@ h4 {
   .projects-stage { padding: var(--space-lg) var(--space-md); }
 }
 
+/* Cards signal they're clickable. */
+.project-card {
+  cursor: pointer;
+}
+.project-card:focus-visible {
+  outline: 2px solid var(--bg-accent);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   PROJECT DETAIL MODAL
+   ============================================================ */
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.project-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.project-modal[hidden] { display: none; }
+
+.project-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: modalFadeIn 0.24s var(--ease);
+}
+
+.project-modal__card {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100vh - 40px);
+  margin: 20px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideUp 0.3s var(--ease);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.project-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition);
+  z-index: 1;
+}
+.project-modal__close:hover { background: rgba(0, 0, 0, 0.12); }
+.project-modal__close:focus-visible {
+  outline: 2px solid var(--bg-accent);
+  outline-offset: 2px;
+}
+
+.project-modal__body {
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.project-modal__stage {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-md);
+}
+.project-modal__stage--company {
+  background: var(--bg-accent);
+  color: #fff;
+}
+.project-modal__stage--project {
+  background: var(--bg-dark);
+  color: var(--text-on-dark);
+}
+.project-modal__stage--seed {
+  background: transparent;
+  border: 1px dashed var(--text-muted);
+  color: var(--text-muted);
+}
+
+.project-modal__title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0 0 var(--space-sm);
+  font-weight: 700;
+}
+
+.project-modal__company {
+  font-size: 0.78rem;
+  color: var(--bg-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-xs);
+}
+
+.project-modal__by {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-bottom: var(--space-lg);
+}
+
+.project-modal__desc {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 var(--space-lg);
+}
+
+.project-modal__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.project-modal__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  padding: 10px 16px;
+  background: var(--bg-dark);
+  color: var(--text-on-dark);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.project-modal__link:hover {
+  background: var(--bg-accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.project-modal__team {
+  margin-bottom: var(--space-md);
+}
+.project-modal__team-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xs);
+}
+.project-modal__team-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-modal__footer {
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--bg-hover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.project-modal__tagline {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.project-modal__actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.project-modal__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-elevated);
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.project-modal__action:hover {
+  background: var(--bg-dark);
+  color: var(--text-on-dark);
+  border-color: var(--bg-dark);
+}
+.project-modal__action--accent {
+  background: var(--bg-accent);
+  color: #fff;
+  border-color: var(--bg-accent);
+}
+.project-modal__action--accent:hover {
+  background: var(--bg-dark);
+  border-color: var(--bg-dark);
+}
+
+@media (min-width: 640px) {
+  .project-modal {
+    align-items: center;
+  }
+  .project-modal__card {
+    margin: 40px;
+  }
+}
+
 /* ============================================================
    ADMIN — BULK IMPORT TAB
    ============================================================ */

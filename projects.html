@@ -90,6 +90,28 @@
 
   </main>
 
+  <!-- Detail modal (populated dynamically; hidden by default) -->
+  <div class="project-modal" id="project-modal" hidden aria-hidden="true" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <div class="project-modal__backdrop" id="modal-backdrop"></div>
+    <div class="project-modal__card" id="modal-card">
+      <button class="project-modal__close" id="modal-close" aria-label="close">×</button>
+      <div class="project-modal__body" id="modal-body"></div>
+      <div class="project-modal__footer">
+        <div class="project-modal__tagline">built at the creationship · sundays at caravan of dreams</div>
+        <div class="project-modal__actions">
+          <button type="button" class="project-modal__action" id="modal-copy">
+            <span aria-hidden="true">🔗</span><span>copy link</span>
+          </button>
+          <button type="button" class="project-modal__action project-modal__action--accent" id="modal-tweet">
+            <span aria-hidden="true">✕</span><span>tweet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
   <footer class="site-footer">
     <p>the creationship · the infinite create-a-thon</p>
     <p style="margin-top:var(--space-sm);font-size:0.72rem;color:var(--text-muted);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:underline;">dear crisis</a> · © <span id="year"></span></p>
@@ -100,6 +122,10 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------
 
     function safeUrl(url) {
       if (!url) return '';
@@ -115,8 +141,53 @@
       return n;
     }
 
+    // "First L." from a full name. Keeps single-name inputs ("Sal") unchanged.
+    function toPrivateName(full) {
+      if (!full) return '';
+      const parts = String(full).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0];
+      const last = parts[parts.length - 1];
+      return parts[0] + ' ' + last[0].toUpperCase() + '.';
+    }
+
+    // Display name falls back to initials when display_name is empty.
+    function displayFor(idea) {
+      if (idea.display_name && String(idea.display_name).trim()) return idea.display_name.trim();
+      return toPrivateName(idea.author_name);
+    }
+
+    // Client-side slugifier — only used as a fallback for rows that
+    // came in before the slug column existed. Server/SQL is authoritative.
+    function slugify(str) {
+      return String(str || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+
+    function slugFor(idea) {
+      if (idea.slug && String(idea.slug).trim()) return idea.slug.trim();
+      return slugify(idea.title);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    // ------------------------------------------------------------
+    // Card render
+    // ------------------------------------------------------------
+
     function renderCard(idea) {
       const card = el('article', 'project-card reveal');
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.dataset.slug = slugFor(idea);
+      card.setAttribute('aria-label', 'view details for ' + (idea.title || 'untitled'));
 
       const header = el('div', 'project-card__header');
       header.appendChild(el('h3', 'project-card__title', idea.title || 'untitled'));
@@ -125,8 +196,9 @@
       }
       card.appendChild(header);
 
-      if (idea.author_name) {
-        card.appendChild(el('div', 'project-card__author', 'by ' + idea.author_name));
+      const author = displayFor(idea);
+      if (author) {
+        card.appendChild(el('div', 'project-card__author', 'by ' + author));
       }
 
       if (idea.description) {
@@ -150,6 +222,8 @@
         a.href = safe;
         a.target = '_blank';
         a.rel = 'noopener';
+        // Clicking a link on a clickable card shouldn't also open the modal.
+        a.addEventListener('click', (e) => e.stopPropagation());
         const icon = el('span', 'project-link__icon', iconText);
         icon.setAttribute('aria-hidden', 'true');
         a.appendChild(icon);
@@ -161,8 +235,155 @@
       addLink(idea.demo_url, '▶', 'demo');
       if (linksWrap.childNodes.length) card.appendChild(linksWrap);
 
+      const open = () => openModal(idea);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+
       return card;
     }
+
+    // ------------------------------------------------------------
+    // Detail modal
+    // ------------------------------------------------------------
+
+    const modalEl = document.getElementById('project-modal');
+    const modalBody = document.getElementById('modal-body');
+    let currentIdea = null;
+
+    function renderModalBody(idea) {
+      modalBody.replaceChildren();
+
+      const stage = (idea.stage || 'seed').toLowerCase();
+      const badge = el('div', 'project-modal__stage project-modal__stage--' + stage, stage);
+      modalBody.appendChild(badge);
+
+      modalBody.appendChild(el('h2', 'project-modal__title', idea.title || 'untitled'));
+
+      if (idea.company_name) {
+        modalBody.appendChild(el('div', 'project-modal__company', idea.company_name));
+      }
+
+      const author = displayFor(idea);
+      if (author) {
+        modalBody.appendChild(el('div', 'project-modal__by', 'by ' + author));
+      }
+
+      if (idea.description) {
+        modalBody.appendChild(el('p', 'project-modal__desc', idea.description));
+      }
+
+      const linksWrap = el('div', 'project-modal__links');
+      const addLink = (url, iconText, label) => {
+        const safe = safeUrl(url);
+        if (!safe) return;
+        const a = document.createElement('a');
+        a.className = 'project-modal__link';
+        a.href = safe;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        const icon = el('span', 'project-link__icon', iconText);
+        icon.setAttribute('aria-hidden', 'true');
+        a.appendChild(icon);
+        a.appendChild(el('span', null, label));
+        linksWrap.appendChild(a);
+      };
+      addLink(idea.website_url, '🌐', 'visit site');
+      addLink(idea.github_url, '</>', 'see code');
+      addLink(idea.demo_url, '▶', 'try demo');
+      if (linksWrap.childNodes.length) modalBody.appendChild(linksWrap);
+
+      const team = Array.isArray(idea.team_members) ? idea.team_members : [];
+      const teamNames = team.filter(m => m && m.name).map(m => m.name);
+      if (teamNames.length) {
+        const teamWrap = el('div', 'project-modal__team');
+        teamWrap.appendChild(el('div', 'project-modal__team-label', 'team'));
+        const chips = el('div', 'project-modal__team-chips');
+        teamNames.forEach(name => chips.appendChild(el('span', 'project-chip', name)));
+        teamWrap.appendChild(chips);
+        modalBody.appendChild(teamWrap);
+      }
+    }
+
+    function openModal(idea, opts) {
+      currentIdea = idea;
+      renderModalBody(idea);
+      modalEl.hidden = false;
+      modalEl.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+
+      const slug = slugFor(idea);
+      if (!opts || !opts.skipHistory) {
+        const url = new URL(location.href);
+        url.searchParams.set('p', slug);
+        history.pushState({ p: slug }, '', url.toString());
+      }
+      // Focus the close button for keyboard flow.
+      setTimeout(() => document.getElementById('modal-close').focus(), 10);
+    }
+
+    function closeModal(opts) {
+      if (modalEl.hidden) return;
+      modalEl.hidden = true;
+      modalEl.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      currentIdea = null;
+      if (!opts || !opts.skipHistory) {
+        const url = new URL(location.href);
+        url.searchParams.delete('p');
+        history.pushState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
+      }
+    }
+
+    document.getElementById('modal-close').addEventListener('click', () => closeModal());
+    document.getElementById('modal-backdrop').addEventListener('click', () => closeModal());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modalEl.hidden) closeModal();
+    });
+    window.addEventListener('popstate', () => {
+      const p = new URLSearchParams(location.search).get('p');
+      if (!p) {
+        closeModal({ skipHistory: true });
+      } else if (!currentIdea || slugFor(currentIdea) !== p) {
+        const match = allIdeas.find(i => slugFor(i) === p);
+        if (match) openModal(match, { skipHistory: true });
+      }
+    });
+
+    // ------------------------------------------------------------
+    // Share actions
+    // ------------------------------------------------------------
+
+    function permalinkFor(idea) {
+      const slug = slugFor(idea);
+      return location.origin + location.pathname + '?p=' + encodeURIComponent(slug);
+    }
+
+    document.getElementById('modal-copy').addEventListener('click', async () => {
+      if (!currentIdea) return;
+      const url = permalinkFor(currentIdea);
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('link copied');
+      } catch {
+        window.prompt('copy this link:', url);
+      }
+    });
+
+    document.getElementById('modal-tweet').addEventListener('click', () => {
+      if (!currentIdea) return;
+      const url = permalinkFor(currentIdea);
+      const text = (currentIdea.title || 'my project') + ' — from the creationship';
+      const intent =
+        'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) +
+        '&url=' + encodeURIComponent(url);
+      window.open(intent, '_blank', 'noopener');
+    });
+
+    // ------------------------------------------------------------
+    // Reveal-on-scroll
+    // ------------------------------------------------------------
 
     function applyReveal() {
       const els = document.querySelectorAll('.reveal:not(.visible)');
@@ -177,16 +398,22 @@
       els.forEach(el => obs.observe(el));
     }
 
+    // ------------------------------------------------------------
+    // Load + bind
+    // ------------------------------------------------------------
+
+    let allIdeas = [];
+
     async function loadProjects() {
       const loading = document.getElementById('projects-loading');
       const emptyAll = document.getElementById('projects-empty-all');
 
       try {
         const ideas = await DB.getIdeas();
-        const active = (ideas || []).filter(i => i.status === 'active');
+        allIdeas = (ideas || []).filter(i => i.status === 'active');
 
         const buckets = { seed: [], project: [], company: [] };
-        active.forEach(i => {
+        allIdeas.forEach(i => {
           const stage = (i.stage || 'seed').toLowerCase();
           if (buckets[stage]) buckets[stage].push(i);
           else buckets.seed.push(i);
@@ -209,9 +436,16 @@
         render('seed', 'grid-seeds', 'stage-seeds');
 
         loading.hidden = true;
-        if (active.length === 0) emptyAll.hidden = false;
+        if (allIdeas.length === 0) emptyAll.hidden = false;
 
         applyReveal();
+
+        // Deep-link: ?p=<slug> opens that project's modal on load.
+        const paramSlug = new URLSearchParams(location.search).get('p');
+        if (paramSlug) {
+          const match = allIdeas.find(i => slugFor(i) === paramSlug);
+          if (match) openModal(match, { skipHistory: true });
+        }
       } catch (err) {
         console.error('loadProjects error:', err);
         loading.hidden = true;
