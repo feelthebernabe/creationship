@@ -17,7 +17,7 @@
 -- ============================================================
 
 WITH me AS (
-  SELECT id FROM auth.users WHERE email = 'tracymacuga@gmail.com' LIMIT 1
+  SELECT id FROM auth.users WHERE email = 'feelthebernabe@gmail.com' LIMIT 1
 )
 INSERT INTO ideas
   (user_id, author_name, author_email, title, description,
