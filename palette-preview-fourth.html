@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>fourth color preview — goat palette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #e5e5e5;
+    color: #0a0a0a;
+    line-height: 1.5;
+    font-weight: 300;
+    padding: 48px 24px 120px;
+  }
+
+  .page-header {
+    max-width: 1200px;
+    margin: 0 auto 16px;
+  }
+  .page-header h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    color: #555;
+    font-size: 0.95rem;
+    max-width: 680px;
+    margin-bottom: 8px;
+  }
+  .page-header .callout {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 14px;
+    background: #fff;
+    border-left: 3px solid #ff4b1f;
+    font-size: 0.85rem;
+    color: #333;
+    max-width: 680px;
+  }
+  .page-header .callout strong { font-weight: 700; }
+
+  .grid {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 32px;
+  }
+
+  /* ---------- sample card ---------- */
+  .sample {
+    /* locked Goat palette */
+    --s-bg: #f2f2f2;
+    --s-bg-dark: #0a0a0a;
+    --s-text: #0a0a0a;
+    --s-text-on-dark: #f2f2f2;
+    --s-bg-accent: #ff4b1f; /* orange — locked */
+    --s-accent: #b8ff72;    /* lime — locked */
+
+    /* fourth color — overridden per variant */
+    --s-fourth: #f5e6a8;
+    --s-fourth-on: #0a0a0a; /* text color that reads on the 4th bg */
+
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    background: var(--s-bg);
+    color: var(--s-text);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sample__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .sample__name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
+  }
+  .sample__vibe {
+    font-size: 0.7rem;
+    color: #777;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .sample__swatches {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px 12px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    flex-wrap: wrap;
+  }
+  .swatch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    font-family: ui-monospace, Menlo, monospace;
+    color: #555;
+  }
+  .swatch.fourth { color: #0a0a0a; font-weight: 700; }
+  .swatch__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+  .swatch__star {
+    font-size: 0.6rem;
+    color: #ff4b1f;
+    margin-left: 2px;
+  }
+  .sample__job {
+    padding: 8px 20px;
+    background: #fafafa;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    font-size: 0.68rem;
+    color: #555;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .sample__job strong {
+    color: #0a0a0a;
+    font-weight: 700;
+  }
+
+  /* ---------- mini nav ---------- */
+  .mini-nav {
+    background: var(--s-bg-dark);
+    color: var(--s-text-on-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .mini-nav__brand {
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+  }
+  .mini-nav__links { display: flex; gap: 14px; opacity: 0.75; }
+
+  /* ---------- mini hero ---------- */
+  .mini-hero {
+    background: var(--s-bg-dark);
+    color: var(--s-text-on-dark);
+    padding: 28px 20px 30px;
+  }
+  .mini-hero h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    margin-bottom: 12px;
+  }
+  .mini-hero h2 em {
+    font-style: normal;
+    color: var(--s-accent);
+  }
+  .mini-hero__sub {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.8rem;
+    max-width: 340px;
+    line-height: 1.55;
+  }
+
+  /* ---------- accent strip ---------- */
+  .accent-strip {
+    background: var(--s-bg-accent);
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .accent-strip__label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.88;
+  }
+  .accent-strip__time {
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------- event list (where the 4th color shines) ---------- */
+  .mini-body { padding: 20px; background: var(--s-bg); }
+  .events__title {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #555;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .event {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .event:last-of-type { border-bottom: none; }
+  .event__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .event__title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #0a0a0a;
+  }
+  .event__date {
+    font-size: 0.72rem;
+    color: #777;
+  }
+  .event__tag {
+    background: var(--s-fourth);
+    color: var(--s-fourth-on);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* a second place the 4th color lives: a highlighted "featured" card */
+  .featured {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--s-fourth);
+    color: var(--s-fourth-on);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .featured__marker {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--s-fourth-on);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  .cta-row { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+  .mini-cta {
+    display: inline-block;
+    background: var(--s-accent);
+    color: #0a0a0a;
+    padding: 9px 16px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .mini-badge {
+    display: inline-block;
+    border: 1px solid var(--s-bg-accent);
+    color: var(--s-bg-accent);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- palette variants (4th color + its job) ---------- */
+  .p-cream    { --s-fourth: #f5e6a8; --s-fourth-on: #0a0a0a; }
+  .p-butter   { --s-fourth: #ffd447; --s-fourth-on: #0a0a0a; }
+  .p-cyan     { --s-fourth: #00e5ff; --s-fourth-on: #0a0a0a; }
+  .p-blue     { --s-fourth: #2b5cff; --s-fourth-on: #ffffff; }
+  .p-plasma   { --s-fourth: #7a2dff; --s-fourth-on: #ffffff; }
+  .p-pink     { --s-fourth: #ff4fd8; --s-fourth-on: #0a0a0a; }
+  .p-sage     { --s-fourth: #8fb87a; --s-fourth-on: #0a0a0a; }
+  .p-coral    { --s-fourth: #f47c6e; --s-fourth-on: #0a0a0a; }
+
+  /* ---------- custom picker ---------- */
+  .custom {
+    max-width: 1200px;
+    margin: 64px auto 0;
+    padding: 32px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  }
+  .custom h3 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    margin-bottom: 8px;
+  }
+  .custom p {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    max-width: 560px;
+  }
+  .custom__controls {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .control label {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #555;
+  }
+  .control__row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .control input[type="color"] {
+    width: 44px; height: 44px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  .control input[type="text"] {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 6px;
+    width: 110px;
+    text-transform: lowercase;
+  }
+  .control__row select {
+    font-size: 0.82rem;
+    padding: 8px 10px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 6px;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+  <header class="page-header">
+    <h1>adding a fourth color</h1>
+    <p>Orange (<code>#ff4b1f</code>) and lime (<code>#b8ff72</code>) stay locked. Each card introduces a third accent in a realistic slot: an <strong>event category tag</strong> and a <strong>"featured" info card</strong>. Same content across cards — only the 4th color changes.</p>
+    <div class="callout"><strong>Heads up:</strong> a third accent only works if it has a <em>job</em>. The job here is "category/info" (e.g., workshop vs. ritual vs. social). If the job isn't clear, the palette reads as noisy.</div>
+  </header>
+
+  <div class="grid">
+
+    <!-- CREAM -->
+    <article class="sample p-cream">
+      <div class="sample__label">
+        <span class="sample__name">cream</span>
+        <span class="sample__vibe">warm neutral · archival</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#f5e6a8"></span>#f5e6a8<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">best for: <strong>quiet/archival</strong> — calm, library, notes</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- BUTTER YELLOW -->
+    <article class="sample p-butter">
+      <div class="sample__label">
+        <span class="sample__name">butter</span>
+        <span class="sample__vibe">sunny · highlighted</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#ffd447"></span>#ffd447<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">best for: <strong>featured/highlight</strong> — "pay attention to this"</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- CYBER CYAN -->
+    <article class="sample p-cyan">
+      <div class="sample__label">
+        <span class="sample__name">cyber cyan</span>
+        <span class="sample__vibe">terminal · pairs w/ matrix rain</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#00e5ff"></span>#00e5ff<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">best for: <strong>tech/tools</strong> — code, links, external resources</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- ELECTRIC BLUE -->
+    <article class="sample p-blue">
+      <div class="sample__label">
+        <span class="sample__name">electric blue</span>
+        <span class="sample__vibe">structural · info</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#2b5cff"></span>#2b5cff<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">best for: <strong>info/secondary</strong> — links, navigation, cool anchor</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- PLASMA PURPLE -->
+    <article class="sample p-plasma">
+      <div class="sample__label">
+        <span class="sample__name">plasma</span>
+        <span class="sample__vibe">contemplative · depth</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#7a2dff"></span>#7a2dff<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">best for: <strong>contemplative</strong> — reflection, longform, quiet</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- HOT PINK -->
+    <article class="sample p-pink">
+      <div class="sample__label">
+        <span class="sample__name">hot pink</span>
+        <span class="sample__vibe">femme-punk · loud ⚠</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#ff4fd8"></span>#ff4fd8<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">risky: <strong>competes with orange</strong> — two warm pops fighting</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- SAGE -->
+    <article class="sample p-sage">
+      <div class="sample__label">
+        <span class="sample__name">sage</span>
+        <span class="sample__vibe">grounded · ritual</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#8fb87a"></span>#8fb87a<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">best for: <strong>grounded/natural</strong> — earthy, softened version of lime</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- DUSTY CORAL -->
+    <article class="sample p-coral">
+      <div class="sample__label">
+        <span class="sample__name">dusty coral</span>
+        <span class="sample__vibe">humanized · soft ⚠</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" style="background:#f47c6e"></span>#f47c6e<span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">risky: <strong>too close to orange</strong> — reads as a muddy orange variant</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+    <!-- CUSTOM -->
+    <article class="sample" id="custom-sample">
+      <div class="sample__label">
+        <span class="sample__name">your fourth color</span>
+        <span class="sample__vibe">live — edit below ↓</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+        <span class="swatch fourth"><span class="swatch__dot" id="sw-fourth-dot" style="background:#f5e6a8"></span><span id="sw-fourth-hex">#f5e6a8</span><span class="swatch__star">NEW</span></span>
+      </div>
+      <div class="sample__job">picking the text color matters — white text needs dark bg, black text needs light bg</div>
+      <div class="mini-nav"><span class="mini-nav__brand">the creationship</span><span class="mini-nav__links"><span>events</span><span>join</span></span></div>
+      <div class="mini-hero"><h2>a church for <em>people who make things</em></h2><p class="mini-hero__sub">Sundays at 11am. Bring a work-in-progress.</p></div>
+      <div class="accent-strip"><span class="accent-strip__label">next sunday</span><span class="accent-strip__time">11:00 AM</span></div>
+      <div class="mini-body">
+        <p class="events__title">upcoming</p>
+        <div class="event"><div class="event__main"><span class="event__title">zine-making sunday</span><span class="event__date">apr 27 · 11am</span></div><span class="event__tag">workshop</span></div>
+        <div class="event"><div class="event__main"><span class="event__title">show & tell</span><span class="event__date">may 4 · 11am</span></div><span class="event__tag">ritual</span></div>
+        <div class="featured"><span class="featured__marker"></span>featured this week — bring a sketch-in-progress</div>
+        <div class="cta-row"><a class="mini-cta" href="#">rsvp →</a><span class="mini-badge">new here</span></div>
+      </div>
+    </article>
+
+  </div>
+
+  <section class="custom">
+    <h3>try your own fourth color</h3>
+    <p>Orange and lime are locked — only the third accent changes. Updates the "your fourth color" card in real time.</p>
+    <div class="custom__controls">
+      <div class="control">
+        <label>fourth color</label>
+        <div class="control__row">
+          <input type="color" id="pick-fourth" value="#f5e6a8" />
+          <input type="text" id="text-fourth" value="#f5e6a8" maxlength="7" />
+        </div>
+      </div>
+      <div class="control">
+        <label>text on 4th</label>
+        <div class="control__row">
+          <select id="pick-fourth-on">
+            <option value="#0a0a0a">black text</option>
+            <option value="#ffffff">white text</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<script>
+  const sample = document.getElementById('custom-sample');
+  const pickFourth = document.getElementById('pick-fourth');
+  const textFourth = document.getElementById('text-fourth');
+  const pickFourthOn = document.getElementById('pick-fourth-on');
+  const swDot = document.getElementById('sw-fourth-dot');
+  const swHex = document.getElementById('sw-fourth-hex');
+
+  const isHex = (v) => /^#[0-9a-fA-F]{6}$/.test(v);
+
+  function apply(hex) {
+    if (!isHex(hex)) return;
+    sample.style.setProperty('--s-fourth', hex);
+    swDot.style.background = hex;
+    swHex.textContent = hex.toLowerCase();
+  }
+  pickFourth.addEventListener('input', (e) => { textFourth.value = e.target.value; apply(e.target.value); });
+  textFourth.addEventListener('input', (e) => {
+    const v = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
+    if (isHex(v)) { pickFourth.value = v; apply(v); }
+  });
+  pickFourthOn.addEventListener('change', (e) => {
+    sample.style.setProperty('--s-fourth-on', e.target.value);
+  });
+</script>
+
+</body>
+</html>

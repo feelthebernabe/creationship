@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>palette preview — church of creationship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #e5e5e5;
+    color: #0a0a0a;
+    line-height: 1.5;
+    font-weight: 300;
+    padding: 48px 24px 120px;
+  }
+
+  .page-header {
+    max-width: 1200px;
+    margin: 0 auto 48px;
+  }
+  .page-header h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    color: #555;
+    font-size: 0.95rem;
+    max-width: 640px;
+  }
+
+  .grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 32px;
+  }
+
+  /* ---------- sample card ---------- */
+  .sample {
+    /* palette vars — overridden per variant */
+    --s-bg: #f2f2f2;
+    --s-bg-dark: #0a0a0a;
+    --s-text: #0a0a0a;
+    --s-text-on-dark: #f2f2f2;
+    --s-accent: #b8ff72;   /* CTA / highlight */
+    --s-bg-accent: #ff4b1f; /* vibrant section */
+
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    background: var(--s-bg);
+    color: var(--s-text);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sample__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .sample__name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
+  }
+  .sample__vibe {
+    font-size: 0.7rem;
+    color: #777;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .sample__swatches {
+    display: flex;
+    gap: 6px;
+    padding: 0 20px 12px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .swatch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    font-family: ui-monospace, Menlo, monospace;
+    color: #555;
+  }
+  .swatch__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+
+  /* ---------- mini nav ---------- */
+  .mini-nav {
+    background: var(--s-bg-dark);
+    color: var(--s-text-on-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .mini-nav__brand {
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+  }
+  .mini-nav__links {
+    display: flex;
+    gap: 14px;
+    opacity: 0.75;
+  }
+
+  /* ---------- mini hero ---------- */
+  .mini-hero {
+    background: var(--s-bg-dark);
+    color: var(--s-text-on-dark);
+    padding: 32px 20px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mini-hero h2 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    margin-bottom: 16px;
+  }
+  .mini-hero h2 em {
+    font-style: normal;
+    color: var(--s-accent);
+  }
+  .mini-hero__sub {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    max-width: 340px;
+    line-height: 1.55;
+  }
+  .mini-hero__sub strong {
+    color: var(--s-accent);
+    font-weight: 600;
+  }
+
+  /* ---------- accent strip (vibrant section) ---------- */
+  .accent-strip {
+    background: var(--s-bg-accent);
+    color: #fff;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .accent-strip__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.88;
+  }
+  .accent-strip__time {
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------- body + CTA ---------- */
+  .mini-body {
+    padding: 24px 20px 28px;
+    background: var(--s-bg);
+  }
+  .mini-body p {
+    font-size: 0.85rem;
+    color: #333;
+    margin-bottom: 16px;
+    max-width: 360px;
+  }
+  .mini-cta {
+    display: inline-block;
+    background: var(--s-accent);
+    color: #0a0a0a;
+    padding: 10px 18px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .mini-badge {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid var(--s-bg-accent);
+    color: var(--s-bg-accent);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  /* ---------- palette variants ---------- */
+  .p-current   { --s-bg-accent: #ff4b1f; --s-accent: #b8ff72; }
+  .p-magenta   { --s-bg-accent: #ff2e88; --s-accent: #b8ff72; }
+  .p-klein     { --s-bg-accent: #1a2af0; --s-accent: #b8ff72; }
+  .p-cyber     { --s-bg-accent: #ff4b1f; --s-accent: #00e5ff; }
+  .p-plasma    { --s-bg-accent: #7a2dff; --s-accent: #fff200; }
+  .p-blood     { --s-bg-accent: #dc0a2d; --s-accent: #f5e6a8; }
+  .p-softpunk  { --s-bg-accent: #ff4fd8; --s-accent: #39ff14; }
+  .p-bauhaus   { --s-bg-accent: #0a1a3f; --s-accent: #fff200; }
+
+  /* ---------- custom picker ---------- */
+  .custom {
+    max-width: 1200px;
+    margin: 64px auto 0;
+    padding: 32px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  }
+  .custom h3 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    margin-bottom: 8px;
+  }
+  .custom p {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    max-width: 520px;
+  }
+  .custom__controls {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .control label {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #555;
+  }
+  .control__row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .control input[type="color"] {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  .control input[type="text"] {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 6px;
+    width: 110px;
+    text-transform: lowercase;
+  }
+</style>
+</head>
+<body>
+
+  <header class="page-header">
+    <h1>palette preview</h1>
+    <p>Each card is a slice of the real site — nav, hero, accent strip, CTA — rendered with a different palette. Scroll and compare. Current palette is first.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- CURRENT -->
+    <article class="sample p-current">
+      <div class="sample__label">
+        <span class="sample__name">current</span>
+        <span class="sample__vibe">goat agency · editorial</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- MAGENTA + LIME -->
+    <article class="sample p-magenta">
+      <div class="sample__label">
+        <span class="sample__name">riso zine</span>
+        <span class="sample__vibe">magenta + lime · femme-punk</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff2e88"></span>#ff2e88</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- KLEIN BLUE + LIME -->
+    <article class="sample p-klein">
+      <div class="sample__label">
+        <span class="sample__name">gallery</span>
+        <span class="sample__vibe">klein blue + lime · cerebral</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#1a2af0"></span>#1a2af0</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#b8ff72"></span>#b8ff72</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- CYBER CYAN (keeps orange, swaps lime for cyan — pairs with your matrix rain) -->
+    <article class="sample p-cyber">
+      <div class="sample__label">
+        <span class="sample__name">matrix</span>
+        <span class="sample__vibe">orange + cyan · terminal</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4b1f"></span>#ff4b1f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#00e5ff"></span>#00e5ff</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- PLASMA + YELLOW -->
+    <article class="sample p-plasma">
+      <div class="sample__label">
+        <span class="sample__name">rave</span>
+        <span class="sample__vibe">plasma purple + hi-vis yellow</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#7a2dff"></span>#7a2dff</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#fff200"></span>#fff200</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- BLOOD RED + CREAM -->
+    <article class="sample p-blood">
+      <div class="sample__label">
+        <span class="sample__name">bauhaus</span>
+        <span class="sample__vibe">blood red + cream · restrained</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#dc0a2d"></span>#dc0a2d</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#f5e6a8"></span>#f5e6a8</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- SOFT PUNK -->
+    <article class="sample p-softpunk">
+      <div class="sample__label">
+        <span class="sample__name">soft punk</span>
+        <span class="sample__vibe">hot pink + acid green · loud</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#ff4fd8"></span>#ff4fd8</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#39ff14"></span>#39ff14</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- NAVY + YELLOW -->
+    <article class="sample p-bauhaus">
+      <div class="sample__label">
+        <span class="sample__name">archive</span>
+        <span class="sample__vibe">deep navy + yellow · grown-up</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" style="background:#0a1a3f"></span>#0a1a3f</span>
+        <span class="swatch"><span class="swatch__dot" style="background:#fff200"></span>#fff200</span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+    <!-- CUSTOM (live) -->
+    <article class="sample" id="custom-sample">
+      <div class="sample__label">
+        <span class="sample__name">your palette</span>
+        <span class="sample__vibe">live — edit below ↓</span>
+      </div>
+      <div class="sample__swatches">
+        <span class="swatch"><span class="swatch__dot" id="sw-accent-dot" style="background:#ff4b1f"></span><span id="sw-accent-hex">#ff4b1f</span></span>
+        <span class="swatch"><span class="swatch__dot" id="sw-cta-dot" style="background:#b8ff72"></span><span id="sw-cta-hex">#b8ff72</span></span>
+      </div>
+      <div class="mini-nav">
+        <span class="mini-nav__brand">the creationship</span>
+        <span class="mini-nav__links"><span>events</span><span>join</span></span>
+      </div>
+      <div class="mini-hero">
+        <h2>a church for <em>people who make things</em></h2>
+        <p class="mini-hero__sub">Sundays at 11am. Bring <strong>a work-in-progress</strong> and someone to witness it.</p>
+      </div>
+      <div class="accent-strip">
+        <span class="accent-strip__label">next sunday</span>
+        <span class="accent-strip__time">11:00 AM</span>
+      </div>
+      <div class="mini-body">
+        <p>Our weekly ritual is 90 minutes of focused creation alongside other makers.</p>
+        <a class="mini-cta" href="#">rsvp →</a>
+        <span class="mini-badge">new here</span>
+      </div>
+    </article>
+
+  </div>
+
+  <section class="custom">
+    <h3>try your own</h3>
+    <p>Paste any hex, or use the pickers. Updates the "your palette" card above in real time. The <em>accent</em> is the vibrant background color (orange-red today). The <em>CTA</em> is the button/highlight color (lime today).</p>
+    <div class="custom__controls">
+      <div class="control">
+        <label>accent (vibrant section)</label>
+        <div class="control__row">
+          <input type="color" id="pick-accent" value="#ff4b1f" />
+          <input type="text" id="text-accent" value="#ff4b1f" maxlength="7" />
+        </div>
+      </div>
+      <div class="control">
+        <label>cta (button / highlight)</label>
+        <div class="control__row">
+          <input type="color" id="pick-cta" value="#b8ff72" />
+          <input type="text" id="text-cta" value="#b8ff72" maxlength="7" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+<script>
+  const sample = document.getElementById('custom-sample');
+  const pickAccent = document.getElementById('pick-accent');
+  const textAccent = document.getElementById('text-accent');
+  const pickCta = document.getElementById('pick-cta');
+  const textCta = document.getElementById('text-cta');
+  const swAccentDot = document.getElementById('sw-accent-dot');
+  const swAccentHex = document.getElementById('sw-accent-hex');
+  const swCtaDot = document.getElementById('sw-cta-dot');
+  const swCtaHex = document.getElementById('sw-cta-hex');
+
+  const isHex = (v) => /^#[0-9a-fA-F]{6}$/.test(v);
+
+  function applyAccent(hex) {
+    if (!isHex(hex)) return;
+    sample.style.setProperty('--s-bg-accent', hex);
+    swAccentDot.style.background = hex;
+    swAccentHex.textContent = hex.toLowerCase();
+  }
+  function applyCta(hex) {
+    if (!isHex(hex)) return;
+    sample.style.setProperty('--s-accent', hex);
+    swCtaDot.style.background = hex;
+    swCtaHex.textContent = hex.toLowerCase();
+  }
+
+  pickAccent.addEventListener('input', (e) => {
+    textAccent.value = e.target.value;
+    applyAccent(e.target.value);
+  });
+  textAccent.addEventListener('input', (e) => {
+    const v = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
+    if (isHex(v)) { pickAccent.value = v; applyAccent(v); }
+  });
+  pickCta.addEventListener('input', (e) => {
+    textCta.value = e.target.value;
+    applyCta(e.target.value);
+  });
+  textCta.addEventListener('input', (e) => {
+    const v = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
+    if (isHex(v)) { pickCta.value = v; applyCta(v); }
+  });
+</script>
+
+</body>
+</html>
