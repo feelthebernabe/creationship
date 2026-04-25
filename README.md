@@ -91,6 +91,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | `POST /api/extract-project` | claude haiku 4.5 | rate-limited per IP | parse one blob of text into a single project record (forced tool use returns strict JSON) |
 | `POST /api/extract-projects-bulk` | claude sonnet 4.6 | `ADMIN_SECRET` bearer | parse a WhatsApp export chunk into many project records; system prompt is `cache_control: ephemeral` so repeat runs are cheap |
 | `POST /api/admin-import-projects` | n/a | `ADMIN_SECRET` bearer | bulk-insert reviewed projects with `IMPORT_USER_ID` ownership; per-row slug collision retry |
+| `GET /api/luma-events` | n/a | public | parses the public luma iCal feed and returns upcoming creationship events (no API key needed); powers the home-page "this sunday" featured-event card |
 
 ## sql migrations
 
