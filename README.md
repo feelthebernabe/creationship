@@ -1,7 +1,8 @@
 # the creationship
 
 a weekly create-a-thon for moral imagination.  
-part weekly ritual, part infinite create-a-thon — sundays at caravan of dreams, east village.
+part weekly ritual, part build session — a place to create things that matter, irl together.  
+sundays at caravan of dreams, east village.
 
 **live:** [creationship.vercel.app](https://creationship.vercel.app)  
 **source:** [github.com/feelthebernabe/creationship](https://github.com/feelthebernabe/creationship)
@@ -27,7 +28,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - **hosting:** [vercel](https://vercel.com) — static deploy
 - **analytics:** vercel web analytics (`/_vercel/insights/script.js`)
 - **fonts:** inter (display + body)
-- **design:** editorial sans-serif, light chrome, neon lime accent, high-contrast
+- **design:** two-register system — editorial sans-serif base + Basquiat-inspired painterly hero (hand-drawn scrawls, crown, paint swipes, struck-through ©s)
 
 ## supabase tables
 
@@ -43,14 +44,14 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 ## key features
 
 ### landing page
-- full-bleed hero with bold editorial typography
-- manifesto marquee strip
-- "the premise" — narrative explaining creationships
+- Basquiat-inspired full-bleed hero — hand-drawn painterly composition: scattered scrawled phrases (some struck through), crown above headline, orange paint swipe behind CREATE-A-THON, three rough-edged color blocks, chrome iridescent sweep + cyan spotlight + violet pool for dream-chamber atmosphere
+- "the premise" — narrative explaining creationships, with strikethroughs on the things this isn't (e.g. "~~solo builders~~ or ~~siloed disciplines~~")
 - three currents: new tech · forever human · the bridge (`data-accordion` → collapses on mobile ≤640px)
 - sunday schedule timeline
-- proof section (past projects)
+- proof section — past projects with a crown SVG marking shipped items
 - location card with next-sunday countdown
-- role signup flow (hold space / teach / brain trust)
+- role signup flow (hold space / teach / brain trust) — hover swaps text "→" for the hero's orange arrow SVG
+- "new here?" callout with rough-edge torn-paper clip-path
 
 ### collaborative soundscape
 - embedded spotify playlist
@@ -132,15 +133,24 @@ vercel --prod
 
 ## design system
 
-the visual language is inspired by editorial agency sites (goat agency, red antler) — bold sans-serif typography, high contrast, light chrome with saturated accent hits.
+Two registers stacked.
+
+**1. Editorial base** — bold Inter sans-serif, high contrast, light chrome with saturated accent hits. Inspired by editorial agency sites (Goat Agency, Red Antler).
+
+**2. Basquiat-inspired hero + accents** — the landing hero is a hand-drawn painterly composition with scattered scrawled phrases (some struck through with heavy ink bars), crown iconography, orange "paint swipe" behind key headline words, ©  marks, tally strokes, and three rough-edged paint blocks. Chrome/dream-chamber atmospheric layers sit on top: cyan spotlight beam, violet pool, iridescent sweep. The Basquiat language threads quietly through the rest of the landing page — eyebrow labels with appended marks (tally / struck © / orange underline), section h2s with paint swipes on key words, and selective body strikethroughs.
+
+**Site rule:** every © is struck through wherever it appears (hero, eyebrow labels, future ©s). Implemented via `text-decoration: line-through` with `text-decoration-skip-ink: none` so the strike runs straight across the glyph.
+
+**SVG filter `#rough-edge`** is defined once at the top of the landing section in [index.html](index.html) — referenced by paint blocks and headline swipes for that hand-painted edge displacement.
 
 | token | value | usage |
 |-------|-------|-------|
-| `--bg` | `#f2f2f2` | page background |
-| `--bg-dark` | `#0a0a0a` | hero, nav, footer, dark cards |
-| `--accent` | `#b8ff72` | cta buttons, active states, highlights |
-| `--bg-accent` | `#ff4b1f` | vibrant sections (schedule times, "new here") |
-| `--font` | Inter | all typography |
+| `--bg` | `#f2f2f2` | page background, hero canvas |
+| `--bg-dark` | `#0a0a0a` | hero ink, nav, footer, dark cards |
+| `--accent` | `#b8ff72` | neon lime — CTAs, highlights, hero paint block |
+| `--bg-accent` | `#ff4b1f` | orange-red — section accents, paint swipe, hero arrow |
+| `--accent-reflect` | `#7a2dff` | plasma purple — reflective/contemplative moments, hero paint block |
+| `--font` | Inter (300–900) | all typography |
 
 ## accessibility
 
