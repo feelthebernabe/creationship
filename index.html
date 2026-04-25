@@ -50,69 +50,30 @@
          ============================ -->
     <section id="view-landing" class="view active">
 
-      <!-- SVG filter — gives paint blocks a rough, painted edge -->
-      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-        <defs>
-          <filter id="rough-edge">
-            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/>
-            <feDisplacementMap in="SourceGraphic" scale="8"/>
-          </filter>
-        </defs>
-      </svg>
-
       <header class="hero">
 
-        <!-- Mood layers — chrome/disco/spotlight atmosphere -->
-        <div class="chrome-sweep" aria-hidden="true"></div>
-        <div class="spotlight-beam" aria-hidden="true"></div>
+        <!-- Organic gradient blobs -->
+        <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
+        <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
+        <div class="hero__blob hero__blob--3" aria-hidden="true"></div>
 
-        <!-- Paint blocks — color fields sitting under the text -->
-        <div class="block block--lime"></div>
-        <div class="block block--orange"></div>
-        <div class="block block--plasma"></div>
-
-        <!-- Scrawled background words — 8 phrases, 2 crossed out, well-spaced -->
-        <div class="scrawl" style="top: 8%; left: 40%; font-size: 1.1rem; transform: rotate(-6deg);">MORAL AMBITION</div>
-        <div class="scrawl scrawl--orange" style="top: 18%; right: 8%; font-size: 1.6rem; transform: rotate(4deg);">BUILD THINGS THAT MATTER</div>
-        <div class="scrawl scrawl--plasma scrawl--underline" style="top: 30%; right: 24%; font-size: 1.2rem; transform: rotate(-3deg);">COLLECTIVE&nbsp;INTELLIGENCE</div>
-        <div class="scrawl scrawl--xout" style="top: 40%; left: 4%; font-size: 1.3rem; transform: rotate(-1deg);">HUSTLE CULTURE</div>
-        <div class="scrawl scrawl--lime" style="top: 56%; left: 8%; font-size: 1.1rem; transform: rotate(-4deg);">MOVE&nbsp;AT&nbsp;THE&nbsp;SPEED&nbsp;OF&nbsp;TRUST</div>
-        <div class="scrawl scrawl--xout" style="top: 62%; right: 14%; font-size: 1.4rem; transform: rotate(3deg);">OPTIMIZE FOR SCALE</div>
-        <div class="scrawl" style="top: 78%; right: 6%; font-size: 1.2rem; transform: rotate(-5deg);">HALF-BAKED&nbsp;IS&nbsp;WELCOME</div>
-        <div class="scrawl scrawl--plasma" style="top: 88%; left: 6%; font-size: 1.5rem; transform: rotate(-2deg);">ANOTHER WORLD IS POSSIBLE</div>
-
-        <!-- Main crown floating above headline -->
-        <div class="icon icon--crown-main">
-          <svg viewBox="0 0 140 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M 10 60 L 30 12 L 50 45 L 70 8 L 90 45 L 110 12 L 130 60 Z"
-                  fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
-            <circle cx="30"  cy="10" r="3" fill="var(--bg-accent)"/>
-            <circle cx="70"  cy="6"  r="3" fill="var(--accent)"/>
-            <circle cx="110" cy="10" r="3" fill="var(--accent-reflect)"/>
-            <line x1="10"  y1="62" x2="130" y2="62" stroke="currentColor" stroke-width="3"/>
-            <line x1="30"  y1="62" x2="30"  y2="68" stroke="currentColor" stroke-width="2"/>
-            <line x1="70"  y1="62" x2="70"  y2="68" stroke="currentColor" stroke-width="2"/>
-            <line x1="110" y1="62" x2="110" y2="68" stroke="currentColor" stroke-width="2"/>
-          </svg>
+        <!-- Floating ambient words -->
+        <div class="hero__ambient" aria-hidden="true">
+          <span class="hero__word hero__word--lg hero__word--terracotta" style="top:8%;left:58%;animation-delay:0s;">sensemaking</span>
+          <span class="hero__word hero__word--xl" style="top:22%;right:4%;animation-delay:1.5s;">embodiment</span>
+          <span class="hero__word hero__word--lg hero__word--sage" style="top:50%;left:2%;animation-delay:3s;">trust</span>
+          <span class="hero__word" style="top:68%;right:12%;animation-delay:0.8s;">craft</span>
+          <span class="hero__word hero__word--xl hero__word--lavender" style="top:82%;left:18%;animation-delay:2s;">synthetic realities</span>
+          <span class="hero__word hero__word--lg" style="top:38%;right:1%;animation-delay:4s;">ethics</span>
+          <span class="hero__word hero__word--terracotta" style="top:62%;left:45%;animation-delay:1s;">storytelling</span>
+          <span class="hero__word hero__word--sage" style="top:15%;left:30%;animation-delay:3.5s;">vibe coding</span>
         </div>
-
-        <!-- Arrow pointing across composition (one directional accent) -->
-        <div class="icon" style="top: 48%; left: 56%; width: 80px; transform: rotate(-12deg);">
-          <svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M 5 15 L 85 15 M 72 5 L 88 15 L 72 25"
-                  fill="none" stroke="var(--bg-accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <!-- One © mark and one tally — the punctuation, not the sentence -->
-        <span class="copyright" style="top: 12%; left: 72%; transform: rotate(-8deg);">©</span>
-        <span class="tally" style="top: 26%; left: 18%;">|||||</span>
 
         <!-- Headline + subtitle -->
         <div class="hero__content">
           <h1 class="hero__headline">
-            THE INFINITE<br>
-            <span class="accent">CREATE-A-THON</span>
+            The Infinite<br>
+            <span class="accent">Create-a-thon</span>
           </h1>
 
           <p class="hero__subtitle">
@@ -134,6 +95,37 @@
         </div>
 
       </header>
+
+      <!-- Scrolling marquee ticker -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>synthetic realities</span><span>·</span>
+          <span>ai agents</span><span>·</span>
+          <span>vibe coding</span><span>·</span>
+          <span>prompt craft</span><span>·</span>
+          <span>indigenous wisdom</span><span>·</span>
+          <span>embodiment</span><span>·</span>
+          <span>sensemaking</span><span>·</span>
+          <span>trust & consent</span><span>·</span>
+          <span>ethics</span><span>·</span>
+          <span>craftsmanship</span><span>·</span>
+          <span>storytelling</span><span>·</span>
+          <span>synthetic realities</span><span>·</span>
+          <span>ai agents</span><span>·</span>
+          <span>vibe coding</span><span>·</span>
+          <span>prompt craft</span><span>·</span>
+          <span>indigenous wisdom</span><span>·</span>
+          <span>embodiment</span><span>·</span>
+          <span>sensemaking</span><span>·</span>
+          <span>trust & consent</span><span>·</span>
+          <span>ethics</span><span>·</span>
+          <span>craftsmanship</span><span>·</span>
+          <span>storytelling</span><span>·</span>
+        </div>
+      </div>
+
+      <!-- Cursor glow -->
+      <div class="cursor-glow" id="cursor-glow"></div>
 
       <!-- ============================
            THE ROOM — ethos & narrative
@@ -172,6 +164,7 @@
         <div class="territory-tags reveal">
           <div class="territory-tags__label">where what's forever human meets what's newly possible</div>
           <div class="territory-tags__list">
+            <span class="territory-tag territory-tag--accent">synthetic realities</span>
             <span class="territory-tag">ai agents</span>
             <span class="territory-tag">vibe coding</span>
             <span class="territory-tag">prompt craft</span>
@@ -668,16 +661,17 @@
       try {
         const res = await fetch('/api/luma-events');
         if (!res.ok) throw new Error('API ' + res.status);
-        const { events } = await res.json();
+        const data = await res.json();
+        var events = data.events;
         if (!events || events.length === 0) {
-          featuredEl.innerHTML = '';
-          listEl.innerHTML = `<div class="luma-events__empty"><p>no upcoming events — check back soon.</p></div>`;
+          featuredEl.innerHTML = `<a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="btn btn--primary" style="width:100%;text-align:center;">view sessions on luma →</a>`;
+          listEl.innerHTML = '';
           return;
         }
         featuredEl.innerHTML = renderFeaturedEvent(events[0]);
         if (heroCta && events[0].url) heroCta.href = events[0].url;
         if (events.length > 1) {
-          listEl.innerHTML = events.slice(1).map(evt => renderLumaEvent(evt)).join('');
+          listEl.innerHTML = events.slice(1).map(function(evt) { return renderLumaEvent(evt); }).join('');
         } else {
           var lumaSection = document.getElementById('luma-events');
           if (lumaSection) lumaSection.style.display = 'none';
@@ -771,6 +765,21 @@
         }
       });
     });
+
+    // ============================================================
+    // CURSOR GLOW (desktop only)
+    // ============================================================
+    var glow = document.getElementById('cursor-glow');
+    if (glow && !('ontouchstart' in window)) {
+      document.addEventListener('mousemove', function(e) {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+        glow.style.opacity = '1';
+      });
+      document.addEventListener('mouseleave', function() {
+        glow.style.opacity = '0';
+      });
+    }
 
   </script>
 
