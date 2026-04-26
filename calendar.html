@@ -202,6 +202,16 @@
     }
 
     async function init() {
+      // Pick up an invite code from the URL FIRST (before anything async),
+      // and stash it so it survives the magic-link round trip too.
+      const params = new URLSearchParams(window.location.search);
+      const codeFromUrl = params.get('code');
+      if (codeFromUrl) {
+        const upper = codeFromUrl.trim().toUpperCase();
+        localStorage.setItem('pending_invite_code', upper);
+        els.redeemToken.value = upper;
+      }
+
       const session = await window.DB.getSession();
       state.session = session;
       if (session) {
@@ -213,13 +223,12 @@
       await refreshInviteList();
       render();
 
-      const params = new URLSearchParams(window.location.search);
-      const codeFromUrl = params.get('code');
-      if (codeFromUrl) {
-        els.redeemToken.value = codeFromUrl.toUpperCase();
-        if (state.session && state.member && !state.member.approved_at) {
-          await onRedeem(new Event('auto'));
-        }
+      // If we're signed in, not yet approved, and have a code waiting (from
+      // either the URL or a stash from before sign-in), auto-redeem now.
+      const pending = localStorage.getItem('pending_invite_code');
+      if (pending && state.session && state.member && !state.member.approved_at) {
+        els.redeemToken.value = pending;
+        await onRedeem(new Event('auto'));
       }
     }
 
@@ -264,6 +273,20 @@
       els.memberPanel.hidden = !isApproved;
       els.redeemPanel.hidden = !isAuthed || isApproved;
       els.anonCta.hidden = isAuthed;
+
+      // If they landed via a share link, reframe the anon CTA so it's
+      // obvious they've been invited and just need to drop their email.
+      if (!isAuthed && localStorage.getItem('pending_invite_code')) {
+        const h = els.anonCta.querySelector('h3');
+        const hint = els.anonCta.querySelector('.anon-cta__hint');
+        if (h) h.textContent = "you've been invited — drop your email to join";
+        if (hint) hint.textContent = "we'll send you a one-click sign-in link. your invite code is queued — you won't need to type it.";
+        // Scroll the CTA into view so it's the first thing they see.
+        if (!els.anonCta.dataset.scrolled) {
+          els.anonCta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          els.anonCta.dataset.scrolled = '1';
+        }
+      }
 
       if (isApproved) {
         const remaining = state.member.invites_remaining || 0;
@@ -322,26 +345,32 @@
       }
       if (isApproved) {
         const actions = el('div', 'slot__actions');
-        const taken = !!s.teacher_signup_id;
-        const btn = el('button', 'btn btn--sm cal-action ' + (taken ? 'btn--ghost' : 'btn--primary'),
-                       taken ? 'drop out' : 'teach');
-        btn.dataset.action = taken ? 'unclaim-teach' : 'claim-teach';
-        btn.dataset.id = s.id;
-        actions.append(btn);
-        slot.append(actions);
+        if (s.is_my_teach) {
+          const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
+          drop.dataset.action = 'unclaim-teach'; drop.dataset.id = s.id;
+          actions.append(drop);
+        } else if (!s.teacher_signup_id) {
+          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'teach');
+          claim.dataset.action = 'claim-teach'; claim.dataset.id = s.id;
+          actions.append(claim);
+        }
+        if (actions.childNodes.length) slot.append(actions);
       }
       return slot;
     }
 
     function buildMCSlot(s, isApproved) {
       const mcs = s.mc_signups || [];
+      const iAmMC = mcs.some(m => m.is_me);
       const slot = el('div', 'slot');
       slot.append(el('div', 'slot__role', 'mcs (' + mcs.length + ')'));
       const filled = el('div', 'slot__filled');
       if (mcs.length) {
         mcs.forEach((m, i) => {
           if (i > 0) filled.append(document.createTextNode(', '));
-          filled.append(el('span', 'slot__name', m.name));
+          const span = el('span', 'slot__name', m.name);
+          if (m.is_me) span.append(document.createTextNode(' (you)'));
+          filled.append(span);
         });
       } else {
         filled.append(el('span', 'slot__open', 'open'));
@@ -350,11 +379,15 @@
 
       if (isApproved) {
         const actions = el('div', 'slot__actions');
-        const claim = el('button', 'btn btn--ghost btn--sm cal-action', 'i\'ll mc');
-        claim.dataset.action = 'claim-mc'; claim.dataset.id = s.id;
-        const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
-        drop.dataset.action = 'unclaim-mc'; drop.dataset.id = s.id;
-        actions.append(claim, drop);
+        if (iAmMC) {
+          const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
+          drop.dataset.action = 'unclaim-mc'; drop.dataset.id = s.id;
+          actions.append(drop);
+        } else {
+          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'i\'ll mc');
+          claim.dataset.action = 'claim-mc'; claim.dataset.id = s.id;
+          actions.append(claim);
+        }
         slot.append(actions);
       }
       return slot;
@@ -432,8 +465,10 @@
       const btn = $('btn-login');
       btn.disabled = true; btn.textContent = 'sending…';
       try {
-        localStorage.setItem('post_signin_redirect', '/calendar.html');
-        await window.DB.signInWithMagicLink(email, window.location.origin + '/calendar.html');
+        // Preserve any ?code= in the URL so the invite survives the round trip.
+        const back = '/calendar.html' + window.location.search;
+        localStorage.setItem('post_signin_redirect', back);
+        await window.DB.signInWithMagicLink(email, window.location.origin + back);
         els.loginSentEmail.textContent = email;
         els.loginSent.hidden = false;
         els.loginForm.hidden = true;
@@ -454,6 +489,11 @@
       try {
         const member = await window.DB.redeemInvite(token);
         state.member = member;
+        localStorage.removeItem('pending_invite_code');
+        // Strip ?code= from the URL so refreshes don't re-process it.
+        if (window.location.search.includes('code=')) {
+          history.replaceState({}, '', window.location.pathname);
+        }
         await refreshCalendar(); await refreshInviteList(); render();
       } catch (err) {
         els.redeemError.textContent = friendly(err);
@@ -509,6 +549,14 @@
         if (session) {
           try { await window.DB.ensureMember(); } catch (e) {}
           state.member = await window.DB.getMyMember();
+          // If there's a pending invite code from before sign-in, redeem it
+          // automatically — that's the whole point of the share-link flow.
+          const pending = localStorage.getItem('pending_invite_code');
+          if (pending && state.member && !state.member.approved_at) {
+            els.redeemToken.value = pending;
+            await onRedeem(new Event('auto'));
+            return;
+          }
         } else {
           state.member = null;
         }
