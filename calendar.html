@@ -59,6 +59,22 @@
     </section>
     <section class="cal-list cal-list--past" id="cal-list-past" hidden></section>
 
+    <!-- Drop-out helper for anyone who lost the email link. -->
+    <details class="resend-links">
+      <summary class="resend-links__summary">need to drop out? lost the cancel link?</summary>
+      <div class="resend-links__body">
+        <p class="resend-links__hint">
+          enter the email you signed up with — we'll re-send a single email
+          listing every sunday you're currently on, with cancel links for each.
+        </p>
+        <form id="resend-form" novalidate>
+          <input type="email" id="resend-email" placeholder="you@example.com" required>
+          <button type="submit" class="btn btn--ghost btn--sm" id="resend-submit">resend my links</button>
+        </form>
+        <div class="resend-links__msg" id="resend-msg" hidden></div>
+      </div>
+    </details>
+
   </main>
 
   <!-- TEACH modal: name + email + topic + description -->
@@ -147,6 +163,10 @@
       pastList: $('cal-list-past'),
       btnPastToggle: $('btn-past-toggle'),
       cancelBanner: $('cancel-banner'),
+      resendForm: $('resend-form'),
+      resendEmail: $('resend-email'),
+      resendSubmit: $('resend-submit'),
+      resendMsg: $('resend-msg'),
 
       modalTeach: $('modal-teach'),
       teachForm: $('teach-form'),
@@ -476,6 +496,35 @@
       els.cancelBanner.textContent = msg;
       els.cancelBanner.hidden = false;
     }
+
+    // "Lost your cancel link" ----------------------------------------------
+    els.resendForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const addr = els.resendEmail.value.trim();
+      if (!addr) return;
+      els.resendMsg.hidden = true;
+      els.resendSubmit.disabled = true;
+      els.resendSubmit.textContent = 'sending…';
+      try {
+        await fetch('/api/resend-cancel-links', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: addr })
+        });
+        // Generic message: don't reveal whether the email has signups.
+        els.resendMsg.className = 'resend-links__msg resend-links__msg--ok';
+        els.resendMsg.textContent = 'if any sundays are signed up under that email, the cancel links are on their way. check your inbox in the next minute or two.';
+        els.resendMsg.hidden = false;
+        els.resendForm.reset();
+      } catch (err) {
+        els.resendMsg.className = 'resend-links__msg resend-links__msg--error';
+        els.resendMsg.textContent = 'network error — try again in a sec.';
+        els.resendMsg.hidden = false;
+      } finally {
+        els.resendSubmit.disabled = false;
+        els.resendSubmit.textContent = 'resend my links';
+      }
+    });
 
     // Past Sundays toggle ---------------------------------------------------
     els.btnPastToggle.addEventListener('click', async () => {

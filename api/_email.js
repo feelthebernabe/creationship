@@ -115,6 +115,36 @@ function tplCancellation({ name, role_type, sunday_date }) {
   };
 }
 
+// "lost your cancel link" — list every upcoming claim with its cancel URL.
+function tplResendLinks(signups) {
+  const items = signups.map(s => {
+    const role = roleLabel(s.role_type);
+    const date = fmtDate(s.sunday_date);
+    const url = cancelUrl(s.cancel_token);
+    const titleLine = s.title
+      ? `<br><span style="color:#a09890;font-size:0.85rem;">topic: ${escapeHtml(s.title)}</span>`
+      : '';
+    return `<li style="margin-bottom:18px;padding-left:0;">
+      <strong>${role} on ${date}</strong>${titleLine}<br>
+      <a href="${url}" style="color:#c4654a;">cancel this slot →</a>
+    </li>`;
+  }).join('');
+  const textLines = signups.map(s => {
+    const role = roleLabel(s.role_type);
+    const date = fmtDate(s.sunday_date);
+    return `${role} on ${date}${s.title ? ' — ' + s.title : ''}\n  cancel: ${cancelUrl(s.cancel_token)}\n`;
+  }).join('\n');
+  return {
+    subject: `your active sundays at the creationship`,
+    html: shell(`
+      <p>here's everything you're currently signed up for. click "cancel" on any one you can't make:</p>
+      <ul style="list-style:none;padding-left:0;">${items}</ul>
+      <p style="font-size:0.85rem;color:#a09890;margin-top:24px;">if nothing here looks right, you may have signed up under a different email.</p>
+    `),
+    text: 'here\'s everything you\'re currently signed up for:\n\n' + textLines
+  };
+}
+
 function escapeHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -151,6 +181,7 @@ module.exports = {
     confirmation: tplConfirmation,
     day7: tplDay7,
     day1: tplDay1,
-    cancellation: tplCancellation
+    cancellation: tplCancellation,
+    resendLinks: tplResendLinks
   }
 };
