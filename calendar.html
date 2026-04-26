@@ -390,6 +390,18 @@
         head.append(el('div', 'sunday-card__badge sunday-card__badge--past', 'completed'));
       }
       if (s.title) head.append(el('div', 'sunday-card__theme', s.title));
+
+      // Discoverability cue: any card with at least one filled slot gets a
+      // small "drop out" link that scrolls to + opens the email-lookup form.
+      // We don't gate this on whether YOU specifically own a slot — the
+      // intent is "this option exists, here's where to find it."
+      const anyFilled = !!s.teacher_signup_id || ((s.mc_signups || []).length > 0);
+      if (anyFilled && s.status !== 'cancelled' && !opts.past) {
+        const dropLink = el('button', 'sunday-card__drop-link', 'need to drop out? →');
+        dropLink.dataset.action = 'scroll-to-cancel';
+        head.append(dropLink);
+      }
+
       article.append(head);
 
       const slots = el('div', 'sunday-card__slots');
@@ -483,6 +495,19 @@
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       const action = btn.dataset.action;
+      if (action === 'scroll-to-cancel') {
+        const panel = document.getElementById('cancel-by-email');
+        if (panel) {
+          panel.open = true;
+          panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Pre-fill email if we have one from a prior local claim — saves a step.
+          const remembered = (loadLocalSignups()[0] || {}).email;
+          if (remembered && !els.lookupEmail.value) els.lookupEmail.value = remembered;
+          // Focus after the smooth scroll lands so the keyboard pops up nicely on mobile.
+          setTimeout(() => els.lookupEmail.focus(), 400);
+        }
+        return;
+      }
       if (action === 'drop-local') {
         const token = btn.dataset.token;
         if (!token) return;

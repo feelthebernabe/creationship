@@ -4380,6 +4380,26 @@ body.modal-open {
   #modal-mc .form-row { flex-direction: column; gap: 0; }
 }
 
+/* "need to drop out? →" — small discovery link on each filled card.
+   Subtle so it doesn't compete with the primary claim CTAs. */
+.sunday-card__drop-link {
+  flex-basis: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-align: right;
+  cursor: pointer;
+  padding: 4px 0 0;
+  margin-top: var(--space-xs);
+  transition: color var(--transition);
+  font-family: inherit;
+}
+.sunday-card__drop-link:hover {
+  color: var(--bg-accent);
+  text-decoration: underline;
+}
+
 /* "you" tag on cards where a localStorage entry says this is yours */
 .slot__you {
   font-size: 0.75rem;
