@@ -15,3 +15,8 @@ node_modules/
 
 # Internal design tools — not for production
 palette-preview*.html
+
+# Members page — page is built and stays in repo for future re-enable,
+# but we do NOT want it publicly served. Restore by deleting this line
+# and uncommenting the 6 nav links that grep for "members tab hidden 2026-04-26".
+members.html
