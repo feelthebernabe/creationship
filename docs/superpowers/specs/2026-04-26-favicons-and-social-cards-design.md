@@ -82,7 +82,7 @@ Six pages, identical `<head>` edits (admin.html intentionally skipped — intern
 <meta name="twitter:image" content="https://creationship.vercel.app/og-card.png">
 ```
 
-Note: `calendar.html` and `members.html` currently have `og:image` but **no** `twitter:image`. For those two pages, insert the `twitter:image` line (alongside the existing `twitter:card` / `twitter:title` / `twitter:description` block) rather than updating an existing one. The other four pages already have both tags — update in place.
+Note: `calendar.html` and `members.html` currently have `og:image` but **no `twitter:` tags at all** (no `twitter:card`, no `twitter:image`, etc.). For those two pages, insert a minimal two-line Twitter block (`twitter:card` + `twitter:image`) directly after `og:image`. `twitter:title` and `twitter:description` are skipped — Twitter falls back to `og:title` / `og:description` when those aren't set. Without `twitter:card`, Twitter would render only a small thumbnail rather than the large card; that's why the card tag is included even though it wasn't on those pages before. The other four pages already have a full Twitter block — just update `twitter:image` in place there.
 
 (Page titles, descriptions, and other OG tags are unchanged.)
 
