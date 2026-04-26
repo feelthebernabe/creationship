@@ -363,24 +363,26 @@
       );
       head.append(dateBox);
 
-      // Slot-fill summary pill — at-a-glance how full this Sunday is.
-      // Counts: teacher (0 or 1) + mcs.length, out of 1 + ideal_mcs (we
-      // treat 2 MCs as a healthy default, so 1+2=3 total).
+      // Slot-fill summary pill — shows the structure (1 teacher · up to 2
+      // mcs) so the cap is never ambiguous. The mc cap is a soft target
+      // — extra MCs are allowed, the pill just stops showing the
+      // denominator once it's exceeded.
       if (s.status !== 'cancelled' && !opts.past) {
-        const teacherFilled = s.teacher_signup_id ? 1 : 0;
+        const teacherFilled = !!s.teacher_signup_id;
         const mcCount = (s.mc_signups || []).length;
-        const totalFilled = teacherFilled + mcCount;
-        const targetTotal = 3;
-        const fillClass = totalFilled === 0 ? 'fill-empty'
-                        : totalFilled >= targetTotal ? 'fill-full'
+        const mcCap = 2;
+        const allFull = teacherFilled && mcCount >= mcCap;
+        const nothingFilled = !teacherFilled && mcCount === 0;
+        const fillClass = nothingFilled ? 'fill-empty'
+                        : allFull ? 'fill-full'
                         : 'fill-partial';
+        const teacherText = teacherFilled ? '✓ teacher' : 'needs teacher';
+        const mcText = mcCount > mcCap
+          ? mcCount + ' mcs'
+          : mcCount + ' of ' + mcCap + ' mcs';
         const pill = el('div', 'sunday-card__fill ' + fillClass);
         pill.append(el('span', 'sunday-card__fill-dot'));
-        pill.append(document.createTextNode(
-          totalFilled === 0 ? 'all open'
-          : totalFilled >= targetTotal ? 'fully booked'
-          : totalFilled + ' of ' + targetTotal + ' filled'
-        ));
+        pill.append(document.createTextNode(teacherText + ' · ' + mcText));
         head.append(pill);
       }
 
