@@ -396,27 +396,7 @@
         </div>
       </div>
 
-      <!-- Community Suggestions Feed -->
-      <div class="playlist-feed" id="playlist-feed">
-        <div class="playlist-feed__header">
-          <h3>recent suggestions</h3>
-          <span class="playlist-feed__count" id="suggestion-count"></span>
-        </div>
-        <div class="playlist-feed__list" id="suggestions-list">
-          <div class="skeleton-loader">
-            <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Open in Spotify CTA -->
-      <div class="playlist-cta">
-        <a href="https://open.spotify.com/playlist/2RwtWDiCIea2wapOiKiCS8?si=8df0a7c1c33347f3" 
-           target="_blank" rel="noopener" class="btn btn--ghost playlist-cta__btn">
-          follow on spotify →
-        </a>
-      </div>
+      <!-- Suggestions feed hidden — will show when community has entries -->
 
     </div>
   </section>
@@ -727,13 +707,52 @@
     // ============================================================
     const revealObserver = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08 });
 
     document.querySelectorAll('.playlist-header, .playlist-embed, .playlist-paths, .playlist-feed, .luma-events, .featured-event').forEach(function(el) {
       el.classList.add('reveal');
       revealObserver.observe(el);
     });
     document.querySelectorAll('.reveal:not(.visible)').forEach(function(el) { revealObserver.observe(el); });
+
+    // ============================================================
+    // PARALLAX DRIFT — Ambient Art
+    // Respects prefers-reduced-motion for accessibility
+    // ============================================================
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var ambientImages = document.querySelectorAll('.ambient-art');
+      var ticking = false;
+      
+      function updateParallax() {
+        var scrollY = window.scrollY;
+        ambientImages.forEach(function(img) {
+          var parent = img.closest('section, .landing-section, header');
+          if (!parent) return;
+          var rect = parent.getBoundingClientRect();
+          var parentCenter = rect.top + rect.height / 2;
+          var viewCenter = window.innerHeight / 2;
+          var offset = (parentCenter - viewCenter) * -0.06; // subtle 6% parallax
+          img.style.transform = 'translateY(' + offset + 'px) ' + (img.dataset.rotate || 'rotate(0deg)');
+        });
+        ticking = false;
+      }
+
+      // Store original rotations
+      ambientImages.forEach(function(img) {
+        var style = window.getComputedStyle(img);
+        var matrix = style.transform;
+        if (matrix && matrix !== 'none') {
+          img.dataset.rotate = '';
+        }
+      });
+
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      }, { passive: true });
+    }
 
     // Dynamic year
     var yearEl = document.getElementById('year');
