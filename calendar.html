@@ -432,6 +432,7 @@
       const btn = $('btn-login');
       btn.disabled = true; btn.textContent = 'sending…';
       try {
+        localStorage.setItem('post_signin_redirect', '/calendar.html');
         await window.DB.signInWithMagicLink(email, window.location.origin + '/calendar.html');
         els.loginSentEmail.textContent = email;
         els.loginSent.hidden = false;

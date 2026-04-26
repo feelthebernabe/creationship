@@ -1043,6 +1043,7 @@
       const email = document.getElementById('members-signin-email').value.trim();
       if (!email) return;
       try {
+        localStorage.setItem('post_signin_redirect', '/admin.html');
         await DB.signInWithMagicLink(email, window.location.origin + '/admin.html');
         document.getElementById('members-signin-sent').hidden = false;
       } catch (err) { showToast('error: ' + err.message); }

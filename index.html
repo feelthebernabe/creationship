@@ -434,6 +434,23 @@
   <script src="data.js"></script>
 
   <script>
+    // If a magic link landed here (Supabase strips unknown redirect_to
+    // paths back to the Site URL), forward to the page the user wanted.
+    // Breadcrumb is set in localStorage by calendar.html / admin.html
+    // before the link is sent. Falls back to /calendar.html.
+    (function () {
+      if (!/access_token=|error=/.test(window.location.hash)) return;
+      var dest = localStorage.getItem('post_signin_redirect') || '/calendar.html';
+      localStorage.removeItem('post_signin_redirect');
+      if (window.DB && window.DB.onAuthStateChange) {
+        window.DB.onAuthStateChange(function (event) {
+          if (event === 'SIGNED_IN') window.location.replace(dest);
+        });
+      }
+    })();
+  </script>
+
+  <script>
     var DB = window.DB;
 
     // ============================================================
