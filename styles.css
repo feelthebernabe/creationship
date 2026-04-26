@@ -4380,6 +4380,43 @@ body.modal-open {
   #modal-mc .form-row { flex-direction: column; gap: 0; }
 }
 
+/* DROP-OUT BAR — top-of-page, prominent, no scrolling required */
+.dropout-bar {
+  background: rgba(196, 101, 74, 0.05);
+  border: 1px solid rgba(196, 101, 74, 0.18);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+.dropout-bar__head {
+  margin-bottom: var(--space-sm);
+}
+.dropout-bar__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+.dropout-bar__hint {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+.dropout-bar__form {
+  display: flex; gap: var(--space-sm); align-items: stretch;
+  flex-wrap: wrap;
+}
+.dropout-bar__form input[type="email"] {
+  flex: 1; min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
 /* "need to drop out? →" — small discovery link on each filled card.
    Subtle so it doesn't compete with the primary claim CTAs. */
 .sunday-card__drop-link {
