@@ -44,9 +44,13 @@ module.exports = async function handler(req, res) {
   }
 
   // Don't reveal whether the email has signups; always 200.
+  // Await synchronously — see api/claim-slot.js for the fire-and-forget trap.
   if (data && data.length) {
-    await email.send(inputEmail, email.templates.resendLinks(data))
-      .catch(e => console.error('[resend-cancel-links] send failed:', e));
+    try {
+      await email.send(inputEmail, email.templates.resendLinks(data));
+    } catch (e) {
+      console.error('[resend-cancel-links] send failed:', e);
+    }
   }
 
   return res.status(200).json({ ok: true });

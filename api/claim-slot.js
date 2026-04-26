@@ -70,11 +70,18 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'no_cancel_token' });
   }
 
-  // Best-effort confirmation email — never blocks the claim.
-  email.send(inputEmail, email.templates.confirmation({
-    name, role_type: role === 'teach' ? 'teach' : 'hold_space',
-    sunday_date: result.sunday_date, title, cancel_token: result.cancel_token
-  })).catch(e => console.error('[claim-slot] confirmation email failed:', e));
+  // Send confirmation email synchronously. Vercel kills the function as
+  // soon as it responds, so a fire-and-forget .catch() never actually
+  // completes the network call to Resend. Await so the email goes out.
+  // We swallow errors — claim already succeeded; email is best-effort.
+  try {
+    await email.send(inputEmail, email.templates.confirmation({
+      name, role_type: role === 'teach' ? 'teach' : 'hold_space',
+      sunday_date: result.sunday_date, title, cancel_token: result.cancel_token
+    }));
+  } catch (e) {
+    console.error('[claim-slot] confirmation email failed:', e);
+  }
 
   return res.status(200).json({
     ok: true,
