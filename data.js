@@ -471,6 +471,20 @@ window.DB = {
     return data || [];
   },
 
+  async getPastCalendar(weeks) {
+    const { data, error } = await _supabaseClient.rpc('get_past_calendar', {
+      p_weeks: weeks || 12
+    });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getMemberDirectory() {
+    const { data, error } = await _supabaseClient.rpc('get_member_directory');
+    if (error) throw error;
+    return data || [];
+  },
+
   async ensureUpcomingSundays(weeks) {
     const { error } = await _supabaseClient.rpc('ensure_upcoming_sundays', {
       p_weeks: weeks || 8

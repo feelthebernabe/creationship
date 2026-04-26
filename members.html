@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>members — the creationship</title>
+  <meta name="description" content="the people of the creationship.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="og-image.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="members — the creationship">
+  <meta property="og:description" content="the people of the creationship.">
+  <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; padding-bottom: var(--space-3xl); }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__brand"><span>the creationship</span></a>
+      <div class="site-nav__links">
+        <a href="index.html" class="site-nav__link">home</a>
+        <a href="calendar.html" class="site-nav__link">sundays</a>
+        <a href="members.html" class="site-nav__link active">members</a>
+        <a href="projects.html" class="site-nav__link">projects</a>
+        <a href="ideas.html" class="site-nav__link">vault</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="connection-error" id="connection-error">unable to connect — check your internet and refresh</div>
+
+  <main class="container">
+
+    <section class="cal-header">
+      <h1 class="cal-header__title">members</h1>
+      <p class="cal-header__subtitle">
+        the people of the creationship — listed in the order they joined.
+      </p>
+      <div class="member-stats" id="member-stats" hidden></div>
+    </section>
+
+    <section class="member-directory" id="directory" aria-busy="true">
+      <div class="cal-list__loading">loading members…</div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    const $ = (id) => document.getElementById(id);
+    const el = (tag, cls, txt) => {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (txt != null) e.textContent = txt;
+      return e;
+    };
+
+    function joinedLabel(iso) {
+      const d = new Date(iso);
+      const today = new Date();
+      const diffDays = Math.floor((today - d) / 86400000);
+      if (diffDays < 1) return 'joined today';
+      if (diffDays < 7) return 'joined ' + diffDays + ' days ago';
+      if (diffDays < 30) return 'joined ' + Math.floor(diffDays / 7) + ' weeks ago';
+      return 'joined ' + d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toLowerCase();
+    }
+
+    async function init() {
+      const dir = $('directory');
+      dir.removeAttribute('aria-busy');
+      let members;
+      try {
+        members = await window.DB.getMemberDirectory();
+      } catch (e) {
+        dir.replaceChildren();
+        dir.append(el('div', 'cal-list__loading', 'failed to load members.'));
+        console.error(e);
+        return;
+      }
+
+      const stats = $('member-stats');
+      stats.hidden = false;
+      stats.replaceChildren();
+      stats.append(
+        el('span', 'member-stats__num', String(members.length)),
+        el('span', 'member-stats__label', members.length === 1 ? ' member' : ' members')
+      );
+
+      dir.replaceChildren();
+      if (!members.length) {
+        dir.append(el('div', 'cal-list__loading', 'no members yet.'));
+        return;
+      }
+
+      members.forEach((m, i) => {
+        const card = el('article', 'member-card');
+        card.append(el('div', 'member-card__num', '#' + (i + 1)));
+        card.append(el('div', 'member-card__name', m.name || '(no name)'));
+        card.append(el('div', 'member-card__joined', joinedLabel(m.approved_at)));
+        if (m.invited_by_name) {
+          const inv = el('div', 'member-card__invited');
+          inv.append(document.createTextNode('invited by '));
+          inv.append(el('span', 'member-card__inviter', m.invited_by_name));
+          card.append(inv);
+        } else {
+          card.append(el('div', 'member-card__invited member-card__invited--founder', 'founding member'));
+        }
+        dir.append(card);
+      });
+    }
+
+    init();
+  })();
+  </script>
+
+</body>
+</html>

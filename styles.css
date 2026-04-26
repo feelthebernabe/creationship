@@ -4118,6 +4118,106 @@ body.modal-open {
 .invite-row__status.off { background: rgba(160, 152, 144, 0.15); color: var(--text-muted); }
 
 /* ============================================================
+   CALENDAR: STATUS BADGES + PAST + DIRECTORY
+   ============================================================ */
+
+.sunday-card__badge {
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 3px 10px; border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+.sunday-card__badge--cancel {
+  background: rgba(196, 101, 74, 0.12);
+  color: var(--bg-accent);
+}
+.sunday-card__badge--past {
+  background: rgba(160, 152, 144, 0.18);
+  color: var(--text-dim);
+}
+.sunday-card--cancelled .sunday-card__date-num,
+.sunday-card--cancelled .sunday-card__theme {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.sunday-card--cancelled .slot__filled,
+.sunday-card--cancelled .slot__open {
+  opacity: 0.5;
+}
+.sunday-card--past {
+  background: var(--bg);
+}
+.sunday-card--past .sunday-card__date-num {
+  color: var(--text-dim);
+}
+
+.past-toggle {
+  text-align: center;
+  margin: var(--space-xl) 0;
+}
+.cal-list--past {
+  margin-top: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: 1px dashed var(--border);
+}
+
+/* ============================================================
+   MEMBER DIRECTORY — members.html
+   ============================================================ */
+
+.member-stats {
+  display: inline-flex; align-items: baseline;
+  margin-top: var(--space-md);
+  padding: 8px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.member-stats__num {
+  font-weight: 700; color: var(--text);
+  font-size: 1.1rem;
+}
+.member-stats__label { margin-left: 4px; }
+
+.member-directory {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+.member-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  transition: border-color var(--transition);
+  position: relative;
+}
+.member-card:hover { border-color: var(--border-hover); }
+.member-card__num {
+  position: absolute; top: 12px; right: 14px;
+  font-size: 0.7rem; color: var(--text-muted);
+  font-family: ui-monospace, monospace;
+}
+.member-card__name {
+  font-size: 1.05rem; font-weight: 600; color: var(--text);
+  margin-bottom: var(--space-xs);
+  letter-spacing: -0.005em;
+}
+.member-card__joined {
+  font-size: 0.78rem; color: var(--text-dim);
+  margin-bottom: var(--space-sm);
+}
+.member-card__invited {
+  font-size: 0.78rem; color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+.member-card__inviter { color: var(--accent-hover); font-weight: 500; }
+.member-card__invited--founder { color: var(--bg-accent); font-style: italic; font-weight: 500; }
+
+/* ============================================================
    DESIGN-FIRM POLISH — Scroll Reveals, Parallax, Micro-interactions
    ============================================================ */
 

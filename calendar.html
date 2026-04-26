@@ -25,6 +25,7 @@
       <div class="site-nav__links">
         <a href="index.html" class="site-nav__link">home</a>
         <a href="calendar.html" class="site-nav__link active">sundays</a>
+        <a href="members.html" class="site-nav__link">members</a>
         <a href="projects.html" class="site-nav__link">projects</a>
         <a href="ideas.html" class="site-nav__link">vault</a>
       </div>
@@ -75,6 +76,12 @@
       <div class="cal-list__loading">loading sundays…</div>
     </section>
 
+    <!-- Past Sundays toggle (always visible, lazy-loads) -->
+    <section class="past-toggle">
+      <button class="btn btn--ghost btn--sm" id="btn-past-toggle">show past sundays</button>
+    </section>
+    <section class="cal-list cal-list--past" id="cal-list-past" hidden></section>
+
     <section class="anon-cta" id="anon-cta" hidden>
       <h3>want to claim a slot?</h3>
       <p class="anon-cta__hint">sign in with your email — we'll send a one-click link. you'll need an invite code to become a member.</p>
@@ -107,6 +114,26 @@
         </div>
         <button type="submit" class="btn btn--primary btn--full">claim teach slot</button>
         <div class="modal__error" id="teach-error" hidden></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-edit-topic">
+    <div class="modal">
+      <button class="modal__close" data-close-modal aria-label="close">×</button>
+      <h3>edit your topic</h3>
+      <p class="modal__hint">update what you're teaching this sunday.</p>
+      <form id="edit-topic-form">
+        <div class="form-group">
+          <label for="edit-topic-title">topic / title</label>
+          <input type="text" id="edit-topic-title" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-topic-desc">brief description <small>(optional)</small></label>
+          <textarea id="edit-topic-desc" style="min-height:90px;"></textarea>
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">save</button>
+        <div class="modal__error" id="edit-topic-error" hidden></div>
       </form>
     </div>
   </div>
@@ -162,14 +189,23 @@
       modalInvite: $('modal-invite'),
       mintedCode: $('minted-code'),
       mintedUrl: $('minted-url'),
-      btnCopyInvite: $('btn-copy-invite')
+      btnCopyInvite: $('btn-copy-invite'),
+      modalEditTopic: $('modal-edit-topic'),
+      editTopicForm: $('edit-topic-form'),
+      editTopicTitle: $('edit-topic-title'),
+      editTopicDesc: $('edit-topic-desc'),
+      editTopicError: $('edit-topic-error'),
+      pastList: $('cal-list-past'),
+      btnPastToggle: $('btn-past-toggle')
     };
 
     let state = {
       session: null,
       member: null,
       calendar: [],
-      pendingTeachSundayId: null
+      pendingTeachSundayId: null,
+      pendingEditSundayId: null,
+      pastLoaded: false
     };
 
     const ERR = {
@@ -313,23 +349,44 @@
       });
     }
 
-    function buildSundayCard(s, isApproved) {
+    function buildSundayCard(s, isApproved, opts) {
+      opts = opts || {};
       const article = el('article', 'sunday-card');
+      if (s.status === 'cancelled') article.classList.add('sunday-card--cancelled');
+      if (s.status === 'completed') article.classList.add('sunday-card--past');
+
       const head = el('header', 'sunday-card__head');
       const dateBox = el('div', 'sunday-card__date');
       dateBox.append(
         el('span', 'sunday-card__date-num', formatSundayDate(s.date)),
-        el('span', 'sunday-card__date-rel', relativeLabel(s.date))
+        el('span', 'sunday-card__date-rel', opts.past ? pastLabel(s.date) : relativeLabel(s.date))
       );
       head.append(dateBox);
+      if (s.status === 'cancelled') {
+        head.append(el('div', 'sunday-card__badge sunday-card__badge--cancel', 'cancelled'));
+      } else if (s.status === 'completed') {
+        head.append(el('div', 'sunday-card__badge sunday-card__badge--past', 'completed'));
+      }
       if (s.title) head.append(el('div', 'sunday-card__theme', s.title));
       article.append(head);
 
       const slots = el('div', 'sunday-card__slots');
-      slots.append(buildTeacherSlot(s, isApproved));
-      slots.append(buildMCSlot(s, isApproved));
+      // Past + cancelled cards are display-only — pass false for isApproved
+      // so no claim/drop buttons render.
+      const showActions = isApproved && s.status !== 'cancelled' && !opts.past;
+      slots.append(buildTeacherSlot(s, showActions));
+      slots.append(buildMCSlot(s, showActions));
       article.append(slots);
       return article;
+    }
+
+    function pastLabel(isoDate) {
+      const d = new Date(isoDate + 'T12:00:00');
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.round((today - d) / 86400000);
+      if (diff < 7) return diff + ' days ago';
+      if (diff < 30) return Math.round(diff / 7) + ' weeks ago';
+      return Math.round(diff / 30) + ' months ago';
     }
 
     function buildTeacherSlot(s, isApproved) {
@@ -346,6 +403,11 @@
       if (isApproved) {
         const actions = el('div', 'slot__actions');
         if (s.is_my_teach) {
+          const edit = el('button', 'btn btn--ghost btn--sm cal-action', 'edit topic');
+          edit.dataset.action = 'edit-teach'; edit.dataset.id = s.id;
+          edit.dataset.title = s.title || '';
+          edit.dataset.desc = s.description || '';
+          actions.append(edit);
           const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
           drop.dataset.action = 'unclaim-teach'; drop.dataset.id = s.id;
           actions.append(drop);
@@ -419,6 +481,13 @@
           els.teachError.hidden = true;
           openModal(els.modalTeach);
           els.teachTitle.focus();
+        } else if (action === 'edit-teach') {
+          state.pendingEditSundayId = id;
+          els.editTopicTitle.value = btn.dataset.title || '';
+          els.editTopicDesc.value = btn.dataset.desc || '';
+          els.editTopicError.hidden = true;
+          openModal(els.modalEditTopic);
+          els.editTopicTitle.focus();
         } else if (action === 'unclaim-teach') {
           await window.DB.unclaimTeach(id);
           await refreshCalendar(); renderCalendar();
@@ -433,6 +502,28 @@
         alert(friendly(err));
       } finally {
         btn.disabled = false;
+      }
+    });
+
+    els.editTopicForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!state.pendingEditSundayId) return;
+      const title = els.editTopicTitle.value.trim();
+      const description = els.editTopicDesc.value.trim();
+      if (!title) return;
+      els.editTopicError.hidden = true;
+      const submitBtn = els.editTopicForm.querySelector('button[type=submit]');
+      submitBtn.disabled = true;
+      try {
+        await window.DB.updateSundayTheme(state.pendingEditSundayId, { title, description });
+        closeModal(els.modalEditTopic);
+        state.pendingEditSundayId = null;
+        await refreshCalendar(); renderCalendar();
+      } catch (err) {
+        els.editTopicError.textContent = friendly(err);
+        els.editTopicError.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
       }
     });
 
@@ -530,6 +621,32 @@
       } catch (e) {
         alert('copy failed — long-press to copy:\n\n' + url);
       }
+    });
+
+    els.btnPastToggle.addEventListener('click', async () => {
+      const isHidden = els.pastList.hidden;
+      if (isHidden && !state.pastLoaded) {
+        els.btnPastToggle.disabled = true;
+        try {
+          const past = await window.DB.getPastCalendar(12);
+          els.pastList.replaceChildren();
+          if (!past.length) {
+            els.pastList.append(el('div', 'cal-list__loading', 'no past sundays in the archive yet.'));
+          } else {
+            past.forEach(s => {
+              els.pastList.append(buildSundayCard(s, false, { past: true }));
+            });
+          }
+          state.pastLoaded = true;
+        } catch (err) {
+          alert(friendly(err));
+          return;
+        } finally {
+          els.btnPastToggle.disabled = false;
+        }
+      }
+      els.pastList.hidden = !isHidden;
+      els.btnPastToggle.textContent = els.pastList.hidden ? 'show past sundays' : 'hide past sundays';
     });
 
     function openModal(modal) { modal.classList.add('active'); }
