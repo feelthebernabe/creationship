@@ -34,7 +34,6 @@ BOUQUET_CROP = (60, 10, 540, 490)  # (left, upper, right, lower) — 480x480 squ
 WHITE_THRESHOLD = 245
 
 OG_CANVAS = (1200, 630)
-HERO_HEIGHT = 590  # leaves 20px top/bottom padding on the 630-tall canvas
 
 FAVICON_SIZES = [32, 180, 192, 512]
 ICO_SIZES = [(16, 16), (32, 32), (48, 48)]
@@ -61,18 +60,15 @@ def build_favicon_master() -> Image.Image:
 
 
 def build_og_card() -> Image.Image:
-    """Hero centered on a 1200x630 white canvas."""
-    canvas = Image.new("RGB", OG_CANVAS, (255, 255, 255))
-    hero = Image.open(ASSETS / "tech_birdhouse.png").convert("RGBA")
-    # Scale proportionally to HERO_HEIGHT
-    scale = HERO_HEIGHT / hero.height
-    new_w = int(round(hero.width * scale))
-    new_h = HERO_HEIGHT
-    hero_resized = hero.resize((new_w, new_h), Image.LANCZOS)
-    x = (OG_CANVAS[0] - new_w) // 2
-    y = (OG_CANVAS[1] - new_h) // 2
-    canvas.paste(hero_resized, (x, y), hero_resized)
-    return canvas
+    """Scale-to-cover: hero fills the 1200x630 canvas, vertical edges cropped."""
+    src = Image.open(ASSETS / "tech_birdhouse.png").convert("RGB")
+    sw, sh = src.size
+    cw, ch = OG_CANVAS
+    scale = cw / sw
+    new_h = int(round(sh * scale))
+    scaled = src.resize((cw, new_h), Image.LANCZOS)
+    top = (new_h - ch) // 2
+    return scaled.crop((0, top, cw, top + ch))
 
 
 def main() -> None:
