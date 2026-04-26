@@ -78,8 +78,9 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.75;
+  line-height: 1.7;
   font-weight: 400;
+  font-size: 1.05rem;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -94,7 +95,7 @@ img { max-width: 100%; display: block; }
 /* --- Layout --- */
 .container {
   position: relative;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 var(--space-lg);
 }
@@ -113,7 +114,7 @@ img { max-width: 100%; display: block; }
 }
 
 .site-nav__inner {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -182,24 +183,24 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  font-size: clamp(3rem, 7.5vw, 5rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
 
 h2 {
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
-  letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.025em;
 }
 
 h3 {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 h4 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -254,13 +255,13 @@ h4 {
 
 .hero__headline {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: 0.95;
+  font-size: clamp(3.5rem, 9vw, 6.5rem);
+  line-height: 0.92;
   font-weight: 800;
   color: var(--text);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   max-width: 14ch;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .hero__headline .accent {
@@ -270,10 +271,10 @@ h4 {
 /* Subtitle — clean flowing text */
 .hero__subtitle {
   font-family: var(--font);
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
   line-height: 1.7;
   color: var(--text-dim);
-  max-width: 480px;
+  max-width: 520px;
   font-weight: 400;
 }
 
@@ -285,12 +286,12 @@ h4 {
 /* Meta line */
 .hero__meta {
   font-family: var(--font);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 500;
   color: var(--text-muted);
-  margin-top: 2.5rem;
+  margin-top: 3rem;
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -316,6 +317,7 @@ h4 {
   mix-blend-mode: multiply;
   opacity: 1;
   z-index: 0;
+  
   /* Feather edges — art bleeds into the page like real spray paint */
   -webkit-mask-image: radial-gradient(
     ellipse 70% 70% at center,
@@ -331,50 +333,50 @@ h4 {
 
 /* Hero — large, proud, anchored right */
 .ambient-art--hero {
-  top: 0%;
-  right: -5%;
-  width: 620px;
-  max-width: 60vw;
+  top: -5%;
+  right: -8%;
+  width: 720px;
+  max-width: 65vw;
   transform: rotate(0.5deg);
 }
 
 /* Room — mid-right, contained within the section */
 .ambient-art--room {
-  top: 15%;
+  top: 0;
   bottom: auto;
-  right: -18%;
-  width: 450px;
-  max-width: 50vw;
+  right: -15%;
+  width: 520px;
+  max-width: 55vw;
   transform: rotate(2deg);
 }
 
 /* Showcase — bottom-left, grounding the section */
 .ambient-art--showcase {
-  bottom: -15%;
+  bottom: -5%;
   top: auto;
-  left: -10%;
+  left: -12%;
   right: auto;
+  width: 520px;
+  max-width: 55vw;
+  transform: rotate(-1.5deg);
+}
+
+/* Schedule — right side, vertical stencil art */
+.ambient-art--schedule {
+  top: 15%;
+  left: auto;
+  right: -8%;
+  width: 550px;
+  max-width: 55vw;
+  transform: rotate(-1.5deg);
+}
+
+/* Events — right side, top of the section */
+.ambient-art--events {
+  top: -8%;
+  right: -10%;
   width: 450px;
   max-width: 50vw;
-  transform: rotate(-1.5deg);
-}
-
-/* Schedule — right side, pushed down clear of heading */
-.ambient-art--schedule {
-  top: 8%;
-  left: auto;
-  right: -25%;
-  width: 420px;
-  max-width: 45vw;
-  transform: rotate(-1.5deg);
-}
-
-/* Events — right side, tucked behind the event cards */
-.ambient-art--events {
-  top: 5%;
-  right: -15%;
-  width: 450px;
-  max-width: 48vw;
   transform: rotate(1.5deg);
 }
 
@@ -418,11 +420,12 @@ h4 {
 .landing-section {
   padding: calc(var(--space-3xl) + 2rem) 0 calc(var(--space-3xl) + 3rem);
   border-bottom: none;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding-left: var(--space-lg);
   padding-right: var(--space-lg);
   position: relative;
+  overflow: hidden; /* Keep stencil art contained within each section */
 }
 
 /* Decorative section divider — gradient fade instead of boring 1px line */
@@ -448,22 +451,22 @@ h4 {
 }
 
 .landing-section__label {
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: var(--space-lg);
 }
 
 .landing-section__heading {
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
   color: var(--text);
-  margin-bottom: var(--space-lg);
-  max-width: 700px;
+  margin-bottom: var(--space-xl);
+  max-width: 780px;
 }
 
 /* ============================================================
@@ -592,9 +595,9 @@ h4 {
 
 .landing-section__body {
   color: var(--text-dim);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.75;
-  max-width: 600px;
+  max-width: 660px;
 }
 
 .landing-section__body p {
@@ -648,16 +651,16 @@ h4 {
 }
 
 .current__name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #fff;
   margin-bottom: var(--space-sm);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
 }
 
 .current__desc {
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   color: rgba(255,255,255,0.75);
   line-height: 1.65;
 }
@@ -759,7 +762,7 @@ h4 {
 }
 
 .schedule__time {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--bg-accent);
   letter-spacing: 0.02em;
@@ -774,7 +777,7 @@ h4 {
 }
 
 .schedule__title {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.01em;
@@ -782,7 +785,7 @@ h4 {
 }
 
 .schedule__desc {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--text-dim);
   line-height: 1.6;
 }
@@ -818,7 +821,7 @@ h4 {
 }
 
 .proof__name {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #fff;
   margin-bottom: 4px;
@@ -826,9 +829,9 @@ h4 {
 }
 
 .proof__desc {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: rgba(255,255,255,0.7);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* --- Location --- */
@@ -1299,11 +1302,11 @@ h4 {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  padding: 0.85rem 2rem;
+  padding: 1rem 2.25rem;
   font-family: var(--font);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   border: none;
   border-radius: var(--radius-pill);
@@ -3529,12 +3532,12 @@ body.modal-open {
   background: transparent;
   color: var(--text);
   border-radius: 0;
-  font-size: clamp(1.15rem, 2vw, 1.35rem);
-  line-height: 1.65;
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+  line-height: 1.55;
   font-weight: 400;
   position: relative;
   font-style: italic;
-  max-width: 600px;
+  max-width: 660px;
 }
 
 .pull-quote strong {
