@@ -30,6 +30,8 @@ All written to project root (alongside existing `assets/`, `styles.css`, etc.):
 | `favicon-512.png` | 512×512 | Android splash / PWA |
 | `scripts/generate-icons.py` | — | Re-runnable Pillow script that produces all of the above |
 
+**Generation script interface:** `python3 scripts/generate-icons.py` from repo root. No CLI args. Reads from `assets/phone_bouquet.png` and `assets/tech_birdhouse.png`; writes to project root. Idempotent (overwrites prior outputs). Requires Pillow (already available on the dev machine; no new install needed).
+
 ### OG card composition
 
 - Canvas: 1200 × 630, filled with `#ffffff` (matches site `--bg`).
@@ -80,15 +82,19 @@ Six pages, identical `<head>` edits (admin.html intentionally skipped — intern
 <meta name="twitter:image" content="https://creationship.vercel.app/og-card.png">
 ```
 
+Note: `calendar.html` and `members.html` currently have `og:image` but **no** `twitter:image`. For those two pages, insert the `twitter:image` line (alongside the existing `twitter:card` / `twitter:title` / `twitter:description` block) rather than updating an existing one. The other four pages already have both tags — update in place.
+
 (Page titles, descriptions, and other OG tags are unchanged.)
 
 ### Cleanup
 
-After all pages are switched over and verified locally, delete:
+After all pages are switched over and verified locally:
 
-- `favicon.svg` (placeholder TC text icon, no longer referenced)
-- `og-image.png` (old social card, no longer referenced — confirmed by user that no shared links rely on it)
-- `og-vault.png` (old ideas-page social card, no longer referenced)
+1. Run `git grep -nE "favicon\.svg|og-image\.png|og-vault\.png"` from the repo root and confirm zero matches outside the spec doc and the WhatsApp export folder. Catches stray references in scripts, READMEs, or markdown beyond the six HTML pages.
+2. Delete:
+   - `favicon.svg` (placeholder TC text icon, no longer referenced)
+   - `og-image.png` (old social card, no longer referenced — confirmed by user that no shared links rely on it)
+   - `og-vault.png` (old ideas-page social card, no longer referenced)
 
 ## Verification
 
