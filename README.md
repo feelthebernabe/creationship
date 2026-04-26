@@ -15,14 +15,15 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 
 ## pages
 
-| page | url | purpose |
-|------|-----|---------|
-| **home** | `/index.html` | landing with manifesto, schedule, role signup, soundscape |
-| **sundays** | `/calendar.html` | member sign-up calendar — claim teach/MC, mint invite codes, edit topic |
-| **members** | `/members.html` | public directory of approved members |
-| **receipts** | `/projects.html` | public showcase of community work — per-project detail modal, shareable permalink URLs, falls back to a built-in static seed of 18 WhatsApp-extracted projects so the page is never empty (renamed from "projects" 2026-04-26; filename retained to avoid breaking links) |
-| **creations** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
-| **core team** | `/admin.html` | password-gated admin dashboard for signups, calendar, members, invitations, bulk-paste import |
+| nav label | url | purpose |
+|-----------|-----|---------|
+| **home** | `/index.html` | landing — ambient-art hero, "the room" narrative, schedule, this-sunday Luma feed, "made here" projects preview, soundscape |
+| **volunteer** | `/calendar.html` | member sign-up calendar — claim teach/MC, mint invite codes, edit topic, past archive |
+| **projects** | `/projects.html` | public showcase of community work — per-project detail modal, shareable permalink URLs, falls back to a built-in static seed of 17 WhatsApp-extracted projects so the page is never empty. (Page hero reads "show me the receipts"; nav label kept as `projects` for clarity. Filename never renamed.) |
+| **submit** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault" / "creations") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
+| **ethics** | `/ethics.html` | how the room agrees to work — financial-exchange clarity + consent/credit principles. Static page, no data layer. |
+| _members_ | `/members.html` | public directory of approved members. **Hidden from nav 2026-04-26**; page still lives at the URL but is intentionally unlinked + the underlying RPC has been revoked from anon. Uncomment the nav line in every page to restore. |
+| _core team_ | `/admin.html` | password-gated admin dashboard for signups, calendar, members, invitations, bulk-paste import. Not in public nav. |
 
 ## tech stack
 
@@ -49,19 +50,20 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 ## key features
 
 ### landing page
-- Basquiat-inspired full-bleed hero — hand-drawn painterly composition: scattered scrawled phrases (some struck through), crown above headline, orange paint swipe behind CREATE-A-THON, three rough-edged color blocks, chrome iridescent sweep + cyan spotlight + violet pool for dream-chamber atmosphere
-- "the premise" — narrative explaining creationships, with strikethroughs on the things this isn't (e.g. "~~solo builders~~ or ~~siloed disciplines~~")
-- three currents: new tech · forever human · the bridge (`data-accordion` → collapses on mobile ≤640px)
-- sunday schedule timeline
-- proof section — past projects with a crown SVG marking shipped items, links out to the receipts page (`/projects.html`) for the full gallery
-- location card with next-sunday countdown
-- role signup flow (hold space / teach / brain trust) — hover swaps text "→" for the hero's orange arrow SVG
-- "new here?" callout with rough-edge torn-paper clip-path
+- **hero** — quiet two-line headline ("the / creationship") over an ambient stencil background (`assets/tech_birdhouse.png`); two CTAs: "join this sunday →" (Luma calendar) and "host or teach →" (volunteer page); subtitle, scroll cue, "sundays · noon · east village · come as you are" meta
+- **the room** (`#the-room`) — narrative on what creationships are, framed by a `we don't curate the guest list` heading with an orange swipe on "whoever shows up"; pull-quote on the finite-game outside vs. the room; territory tags (synthetic realities · ai agents · vibe coding · prompt craft · indigenous wisdom · embodiment · sensemaking · trust & consent · ethics · craftsmanship · storytelling)
+- **how it works** (`#how-it-works`) — sunday schedule timeline with eyebrow tally and orange swipe on "finish line"
+- **this sunday** (`#this-sunday`) — featured Luma event card + upcoming events list pulled live from `/api/luma-events`
+- **made here** (`#made-here`) — tease of the projects gallery, links to `/projects.html` for the full set
+- **soundscape** — embedded Spotify playlist with two add-paths: open in Spotify, or suggest via form
+- ambient stencil art (`assets/planting_phones.png`, `assets/phone_bouquet.png`) anchored in each major section as soft background imagery
 
-### receipts (public showcase)
-- responsive grid of all `status='active'` ideas, grouped by stage (companies / projects / seeds)
-- 18 WhatsApp-extracted projects are baked into [projects.html](projects.html) as a `SEED_PROJECTS` array — they always render even if Supabase is unreachable. DB rows take precedence on title collision (case-insensitive), so live edits via the Vault override the seed
-- click any card → detail modal with bigger layout, labeled site / code / demo link pills, team chips
+### projects (public showcase)
+- page hero reads "show me the receipts" — the work the room has actually shipped
+- responsive grid of all `status='active'` ideas, grouped by stage. Empty stage sections auto-hide (currently no `company`-stage rows in the seed, so the "shipped into the world" header doesn't render)
+- 17 WhatsApp-extracted projects (Feb–Apr 2026) are baked into [projects.html](projects.html) as a `SEED_PROJECTS` array — they always render even if Supabase is unreachable. DB rows take precedence on title collision (case-insensitive), so live edits via the Submit page override the seed
+- card + modal both render the author line as `by [name] and team` whenever `team_members` has any entries (chips removed; team is summarized, not listed). Solo authors render plainly as `by [name]`
+- click any card → detail modal with bigger layout, labeled site / code / demo link pills
 - per-project permalink URLs: `/projects.html?p=<slug>` — back button works, deep links auto-open the matching modal on load
 - share actions in modal footer: copy link + tweet intent (no oauth flow, just `twitter.com/intent/tweet`)
 - privacy default: contributors render as `display_name` (typically "First L." initials); `author_name` keeps the full name as record-of-truth
@@ -71,7 +73,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - two paths: add directly on spotify, or suggest a song via form
 - community suggestions feed with real-time rendering
 
-### creations (formerly "the vault")
+### submit (formerly "creations" / "the vault")
 - magic link authentication (supabase auth OTP) — easy-mode auto-approves every sign-in as a member
 - idea lifecycle: seed → project → company
 - stage pipeline visualization with filtering and search
@@ -79,15 +81,20 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - ✨ "paste anything — we'll extract it" panel: paste a whatsapp message, tweet, or rough notes → POSTs to `/api/extract-project` → prefills the form fields
 - **full-edit modal** — click "edit" on your own card to change every field (title, description, links, team, stage, display name); delete also lives here
 
-### sundays calendar (members)
+### volunteer calendar (formerly "sundays")
 - public read of the next 8 weeks; auto-extends each visit
 - claim teach or MC slot; edit your topic; drop out
 - mint per-member invite codes (codes still functional even though gating is dormant)
 - past archive view + cancellation badges + 1-of-3-filled summary pill per Sunday card
 
-### members directory (public)
+### ethics
+- static `/ethics.html` — no data layer, just principles
+- two sections: **Ethics and Clarity around financial exchange** (use Michelle's verbatim copy for the financial framing — see commit `fec56c9`) and **consent and credit**
+- accent: eyebrow label uses the struck-through © modifier, headline uses the orange swipe; rest of the page intentionally quiet so the principles read as plain text
+
+### members directory (page exists but hidden)
 - `/members.html` — every approved member by join order with inviter attribution; founding members tagged
-- read-only; no auth required
+- **2026-04-26: hidden from nav across all pages, and the underlying RPC was revoked from the anon key** (commit `b08c3b1`). The page itself still loads but the data fetch will fail under anon. To restore: uncomment the nav line in every HTML file *and* re-grant the RPC in Supabase.
 
 ### admin dashboard
 - sha-256 hashed password gate (no plaintext in source)
@@ -131,6 +138,7 @@ set in **vercel → project settings → environment variables**, then redeploy:
 | `SUPABASE_SERVICE_ROLE_KEY` | bypasses RLS for server-side admin inserts |
 | `IMPORT_USER_ID` | `auth.users.id` UUID that owns admin-imported rows |
 | `ADMIN_SECRET` | bearer token for `/api/extract-projects-bulk` and `/api/admin-import-projects` — match the plaintext password used at `/admin.html` |
+| `RESEND_API_KEY` | placeholder — not yet wired to any endpoint. Reserved for future email notifications (signup confirmations, invite delivery). Free tier 3,000 emails/month; from-address `onboarding@resend.dev` works without domain verification. |
 
 `.env.local` (gitignored) holds the same keys for local script use; copy from `.env.example`.
 
@@ -170,10 +178,14 @@ vercel auto-deploys on push to `main`.
 ## project structure
 
 ```
-├── index.html                       # landing + signup + soundscape
-├── projects.html                    # public projects showcase + detail modal
-├── ideas.html                       # creations — authenticated idea board + edit modal + paste-and-prefill
+├── index.html                       # landing — ambient art, hero CTAs, "the room", schedule, this-sunday Luma feed, soundscape
+├── calendar.html                    # volunteer calendar — claim slots, mint invite codes
+├── projects.html                    # public projects showcase ("the receipts") — SEED_PROJECTS array + detail modal
+├── ideas.html                       # submit — authenticated idea board + edit modal + paste-and-prefill
+├── ethics.html                      # money + consent/credit principles (static)
+├── members.html                     # public directory — page exists but hidden from nav (RPC revoked)
 ├── admin.html                       # core team dashboard + bulk-paste ideas tab
+├── assets/                          # ambient stencil art (PNG) used as section backgrounds
 ├── styles.css                       # full design system + modal + bulk-row styles
 ├── data.js                          # supabase client + all CRUD ops + slug helper
 ├── package.json                     # deps for serverless functions and scripts
@@ -206,13 +218,13 @@ vercel auto-deploys on push to `main`.
 
 Two registers stacked.
 
-**1. Editorial base** — bold Inter sans-serif, high contrast, light chrome with saturated accent hits. Inspired by editorial agency sites (Goat Agency, Red Antler).
+**1. Editorial base** — bold Inter sans-serif, light chrome, generous typography (1.05rem body, 1000px container max-width as of commit `4af0230`). Saturated accent hits. Inspired by editorial agency sites (Goat Agency, Red Antler).
 
-**2. Basquiat-inspired hero + accents** — the landing hero is a hand-drawn painterly composition with scattered scrawled phrases (some struck through with heavy ink bars), crown iconography, orange "paint swipe" behind key headline words, ©  marks, tally strokes, and three rough-edged paint blocks. Chrome/dream-chamber atmospheric layers sit on top: cyan spotlight beam, violet pool, iridescent sweep. The Basquiat language threads quietly through the rest of the landing page — eyebrow labels with appended marks (tally / struck © / orange underline), section h2s with paint swipes on key words, and selective body strikethroughs.
+**2. Ambient stencil art + Basquiat-language accents.** The landing hero pivoted away from the all-Basquiat composition (preserved at [preview-basquiat-mood.html](preview-basquiat-mood.html) and [preview-matrix-rain.html](preview-matrix-rain.html) as references); the live hero now centers ambient stencil art (`assets/tech_birdhouse.png`, `assets/planting_phones.png`, `assets/phone_bouquet.png`) with quiet typography and two CTAs. The Basquiat *language* — struck-through ©s, orange paint swipes on key headline words, tally / © / underline marks on eyebrow labels, hand-drawn strikethroughs on body copy — still threads through every section as connective tissue.
 
-**Site rule:** every © is struck through wherever it appears (hero, eyebrow labels, future ©s). Implemented via `text-decoration: line-through` with `text-decoration-skip-ink: none` so the strike runs straight across the glyph.
+**Site rule:** every © is struck through wherever it appears. Implemented via `text-decoration: line-through` with `text-decoration-skip-ink: none` so the strike runs straight across the glyph.
 
-**SVG filter `#rough-edge`** is defined once at the top of the landing section in [index.html](index.html) — referenced by paint blocks and headline swipes for that hand-painted edge displacement.
+**SVG filter `#rough-edge`** is defined once at the top of the landing section in [index.html](index.html) — referenced by paint swipes for hand-painted edge displacement.
 
 | token | value | usage |
 |-------|-------|-------|
