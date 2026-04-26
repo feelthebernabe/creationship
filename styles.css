@@ -4380,6 +4380,35 @@ body.modal-open {
   #modal-mc .form-row { flex-direction: column; gap: 0; }
 }
 
+/* "you" tag on cards where a localStorage entry says this is yours */
+.slot__you {
+  font-size: 0.75rem;
+  color: var(--accent-hover);
+  font-weight: 600;
+  font-style: normal;
+}
+.slot--mine {
+  box-shadow: inset 0 0 0 1px rgba(143, 168, 133, 0.4);
+}
+
+/* "find my sundays" results list inside the cancel-by-email panel */
+.lookup-results {
+  margin-top: var(--space-md);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.lookup-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-md);
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+.lookup-row__label {
+  flex: 1; color: var(--text);
+}
+
 /* Cancel-code box on the success modal — shows the token in-page so
    the user has it without depending on email delivery. */
 .cancel-code-box {

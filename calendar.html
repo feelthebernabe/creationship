@@ -59,35 +59,37 @@
     </section>
     <section class="cal-list cal-list--past" id="cal-list-past" hidden></section>
 
-    <!-- Direct cancel by token — primary drop-out path because email-link
-         clicks have to traverse Resend's broken click-tracker. -->
-    <details class="resend-links" id="cancel-by-token" open>
-      <summary class="resend-links__summary">have your cancel code? drop out here</summary>
+    <!-- Cancel by email — type the address you signed up with, see your
+         active slots, drop them inline. Same trust model as sign-up:
+         anyone can do this for anyone, with a notification email as the
+         safety valve. -->
+    <details class="resend-links" id="cancel-by-email" open>
+      <summary class="resend-links__summary">need to drop out?</summary>
       <div class="resend-links__body">
         <p class="resend-links__hint">
-          paste the cancel code from your confirmation email. one slot per submit.
+          enter the email you signed up with — we'll show your active sundays + a drop button for each.
         </p>
-        <form id="cancel-token-form" novalidate>
-          <input type="text" id="cancel-token-input" placeholder="paste code (looks like a long string of letters + numbers)" required style="font-family:ui-monospace,monospace;letter-spacing:0.02em;">
-          <button type="submit" class="btn btn--primary btn--sm" id="cancel-token-submit">drop out</button>
+        <form id="lookup-form" novalidate>
+          <input type="email" id="lookup-email" placeholder="you@example.com" required>
+          <button type="submit" class="btn btn--primary btn--sm" id="lookup-submit">find my sundays</button>
         </form>
-        <div class="resend-links__msg" id="cancel-token-msg" hidden></div>
+        <div class="resend-links__msg" id="lookup-msg" hidden></div>
+        <div class="lookup-results" id="lookup-results" hidden></div>
       </div>
     </details>
 
-    <!-- Lost the cancel code? Get a fresh email with all your active codes. -->
+    <!-- Power-user fallback: paste a cancel code directly. -->
     <details class="resend-links">
-      <summary class="resend-links__summary">lost your cancel code? email it to yourself</summary>
+      <summary class="resend-links__summary">have a cancel code? paste it here</summary>
       <div class="resend-links__body">
         <p class="resend-links__hint">
-          enter the email you signed up with — we'll send one message listing
-          every sunday you're on, each with its cancel code.
+          if you saved your cancel code from the success page or email, paste it here.
         </p>
-        <form id="resend-form" novalidate>
-          <input type="email" id="resend-email" placeholder="you@example.com" required>
-          <button type="submit" class="btn btn--ghost btn--sm" id="resend-submit">resend my codes</button>
+        <form id="cancel-token-form" novalidate>
+          <input type="text" id="cancel-token-input" placeholder="paste code" required style="font-family:ui-monospace,monospace;letter-spacing:0.02em;">
+          <button type="submit" class="btn btn--ghost btn--sm" id="cancel-token-submit">drop out</button>
         </form>
-        <div class="resend-links__msg" id="resend-msg" hidden></div>
+        <div class="resend-links__msg" id="cancel-token-msg" hidden></div>
       </div>
     </details>
 
@@ -187,10 +189,11 @@
       pastList: $('cal-list-past'),
       btnPastToggle: $('btn-past-toggle'),
       cancelBanner: $('cancel-banner'),
-      resendForm: $('resend-form'),
-      resendEmail: $('resend-email'),
-      resendSubmit: $('resend-submit'),
-      resendMsg: $('resend-msg'),
+      lookupForm: $('lookup-form'),
+      lookupEmail: $('lookup-email'),
+      lookupSubmit: $('lookup-submit'),
+      lookupMsg: $('lookup-msg'),
+      lookupResults: $('lookup-results'),
 
       cancelTokenForm: $('cancel-token-form'),
       cancelTokenInput: $('cancel-token-input'),
@@ -224,8 +227,56 @@
       calendar: [],
       pastLoaded: false,
       pendingSundayId: null,
-      pendingDate: null
+      pendingDate: null,
+      myLocalSignups: []  // {sunday_id, sunday_date, role, cancel_token, name, email}
     };
+
+    // ----- localStorage: per-browser memory of what this user claimed -----
+    // The whole point: cancel-by-button works without saving a code or
+    // depending on email arriving. Only valid in the browser they claimed in.
+    const LS_KEY = 'creationship_my_signups';
+    function loadLocalSignups() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    }
+    function saveLocalSignup(entry) {
+      const all = loadLocalSignups();
+      all.push(entry);
+      try { localStorage.setItem(LS_KEY, JSON.stringify(all)); } catch (e) {}
+      state.myLocalSignups = all;
+    }
+    function removeLocalSignupByToken(token) {
+      const all = loadLocalSignups().filter(s => s.cancel_token !== token);
+      try { localStorage.setItem(LS_KEY, JSON.stringify(all)); } catch (e) {}
+      state.myLocalSignups = all;
+    }
+    function pruneStaleLocalSignups() {
+      // Drop entries for sundays that no longer have a matching signup
+      // server-side (someone cancelled it, or the date passed). Compares
+      // each local entry's sunday_id+role against the loaded calendar.
+      const all = loadLocalSignups();
+      const live = state.calendar;
+      const kept = all.filter(local => {
+        const sun = live.find(s => s.id === local.sunday_id);
+        if (!sun) return true; // calendar might just not include past dates yet
+        if (local.role === 'teach') {
+          return !!sun.teacher_signup_id;
+        }
+        // mc: any mc_signups present means the slot is still filled by SOMEONE.
+        // Can't verify it's specifically us without signup_id, but at least we
+        // won't show a stale button on a totally empty slot.
+        return Array.isArray(sun.mc_signups) && sun.mc_signups.length > 0;
+      });
+      if (kept.length !== all.length) {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(kept)); } catch (e) {}
+      }
+      state.myLocalSignups = kept;
+    }
+    function findMyLocal(sunday_id, role) {
+      return state.myLocalSignups.find(s => s.sunday_id === sunday_id && s.role === role);
+    }
 
     // Friendly error map ----------------------------------------------------
     const ERR = {
@@ -269,6 +320,8 @@
 
     // Init ------------------------------------------------------------------
     async function init() {
+      state.myLocalSignups = loadLocalSignups();
+
       // Cancel-token URL handler runs first so the user sees their drop-out
       // confirmation immediately even before the calendar loads.
       const params = new URLSearchParams(window.location.search);
@@ -279,6 +332,7 @@
 
       await window.DB.ensureUpcomingSundays(8);
       await refreshCalendar();
+      pruneStaleLocalSignups();
       render();
     }
 
@@ -348,7 +402,8 @@
 
     function buildTeacherSlot(s, allowClaim) {
       const isFilled = !!s.teacher_signup_id;
-      const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open'));
+      const myLocal = findMyLocal(s.id, 'teach');
+      const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open') + (myLocal ? ' slot--mine' : ''));
 
       const roleRow = el('div', 'slot__role-row');
       roleRow.append(el('span', 'slot__role-icon', isFilled ? '✓' : '+'));
@@ -358,28 +413,35 @@
       if (isFilled) {
         const filled = el('div', 'slot__filled');
         filled.append(el('span', 'slot__name', s.teacher_name));
+        if (myLocal) filled.append(el('span', 'slot__you', ' (you)'));
         if (s.teacher_topic) filled.append(el('span', 'slot__topic', ' — ' + s.teacher_topic));
         slot.append(filled);
       } else {
         slot.append(el('div', 'slot__open', 'open — claim to teach'));
       }
 
-      if (allowClaim && !isFilled) {
-        const actions = el('div', 'slot__actions');
+      const actions = el('div', 'slot__actions');
+      if (myLocal && isFilled) {
+        const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
+        drop.dataset.action = 'drop-local';
+        drop.dataset.token = myLocal.cancel_token;
+        actions.append(drop);
+      } else if (allowClaim && !isFilled) {
         const claim = el('button', 'btn btn--primary btn--sm cal-action', 'teach this sunday →');
         claim.dataset.action = 'claim-teach';
         claim.dataset.id = s.id;
         claim.dataset.date = s.date;
         actions.append(claim);
-        slot.append(actions);
       }
+      if (actions.childNodes.length) slot.append(actions);
       return slot;
     }
 
     function buildMCSlot(s, allowClaim) {
       const mcs = s.mc_signups || [];
       const isFilled = mcs.length > 0;
-      const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open'));
+      const myLocal = findMyLocal(s.id, 'mc');
+      const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open') + (myLocal ? ' slot--mine' : ''));
 
       const roleRow = el('div', 'slot__role-row');
       roleRow.append(el('span', 'slot__role-icon', isFilled ? '✓' : '+'));
@@ -392,28 +454,57 @@
           if (i > 0) filled.append(document.createTextNode(', '));
           filled.append(el('span', 'slot__name', m.name));
         });
+        if (myLocal) filled.append(el('span', 'slot__you', ' · including you'));
       } else {
         filled.append(el('span', 'slot__open', 'open — claim to host'));
       }
       slot.append(filled);
 
-      if (allowClaim) {
-        const actions = el('div', 'slot__actions');
+      const actions = el('div', 'slot__actions');
+      if (myLocal) {
+        const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
+        drop.dataset.action = 'drop-local';
+        drop.dataset.token = myLocal.cancel_token;
+        actions.append(drop);
+      }
+      if (allowClaim && !myLocal) {
         const claim = el('button', 'btn btn--primary btn--sm cal-action', 'i\'ll mc →');
         claim.dataset.action = 'claim-mc';
         claim.dataset.id = s.id;
         claim.dataset.date = s.date;
         actions.append(claim);
-        slot.append(actions);
       }
+      if (actions.childNodes.length) slot.append(actions);
       return slot;
     }
 
-    // Card click → open right modal -----------------------------------------
-    els.list.addEventListener('click', (e) => {
+    // Card click → open right modal or drop a local signup ------------------
+    els.list.addEventListener('click', async (e) => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       const action = btn.dataset.action;
+      if (action === 'drop-local') {
+        const token = btn.dataset.token;
+        if (!token) return;
+        if (!confirm('drop out of this sunday?')) return;
+        btn.disabled = true; btn.textContent = 'dropping…';
+        try {
+          const resp = await fetch('/api/cancel-claim?token=' + encodeURIComponent(token));
+          const json = await resp.json().catch(() => ({}));
+          if (resp.ok) {
+            removeLocalSignupByToken(token);
+            await refreshCalendar();
+            render();
+          } else {
+            alert(friendly(json.error));
+            btn.disabled = false; btn.textContent = 'drop out';
+          }
+        } catch (err) {
+          alert('network error — try again.');
+          btn.disabled = false; btn.textContent = 'drop out';
+        }
+        return;
+      }
       const id = btn.dataset.id;
       const date = btn.dataset.date;
       state.pendingSundayId = id;
@@ -449,6 +540,11 @@
       const result = await submitClaim('teach', { name, email, title, description }, els.teachError);
       els.teachSubmit.disabled = false; els.teachSubmit.textContent = 'claim teach slot';
       if (result) {
+        saveLocalSignup({
+          sunday_id: state.pendingSundayId, sunday_date: state.pendingDate,
+          role: 'teach', cancel_token: result.cancel_token,
+          name, email, title, claimed_at: new Date().toISOString()
+        });
         closeModal(els.modalTeach);
         showConfirmed('teaching', state.pendingDate, result.cancel_token);
         await refreshCalendar(); render();
@@ -465,6 +561,11 @@
       const result = await submitClaim('mc', { name, email }, els.mcError);
       els.mcSubmit.disabled = false; els.mcSubmit.textContent = 'i\'ll mc';
       if (result) {
+        saveLocalSignup({
+          sunday_id: state.pendingSundayId, sunday_date: state.pendingDate,
+          role: 'mc', cancel_token: result.cancel_token,
+          name, email, claimed_at: new Date().toISOString()
+        });
         closeModal(els.modalMC);
         showConfirmed('MCing', state.pendingDate, result.cancel_token);
         await refreshCalendar(); render();
@@ -565,6 +666,7 @@
           const date = formatSundayDate(json.sunday_date);
           els.cancelTokenMsg.className = 'resend-links__msg resend-links__msg--ok';
           els.cancelTokenMsg.textContent = "you've been dropped from " + role + ' on ' + date + '. thanks.';
+          removeLocalSignupByToken(token);
           els.cancelTokenForm.reset();
           await refreshCalendar(); render();
         }
@@ -579,32 +681,82 @@
       }
     });
 
-    // "Lost your cancel link" ----------------------------------------------
-    els.resendForm.addEventListener('submit', async (e) => {
+    // Type-email-to-cancel — primary drop-out path for cross-device or
+    // anyone who didn't save their cancel code. Trust model is the same
+    // as sign-up: anyone can do this for anyone, with email as the
+    // safety net. ---------------------------------------------------------
+    els.lookupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const addr = els.resendEmail.value.trim();
+      const addr = els.lookupEmail.value.trim();
       if (!addr) return;
-      els.resendMsg.hidden = true;
-      els.resendSubmit.disabled = true;
-      els.resendSubmit.textContent = 'sending…';
+      els.lookupMsg.hidden = true;
+      els.lookupResults.hidden = true;
+      els.lookupResults.replaceChildren();
+      els.lookupSubmit.disabled = true;
+      els.lookupSubmit.textContent = 'looking…';
       try {
-        await fetch('/api/resend-cancel-links', {
+        const resp = await fetch('/api/lookup-by-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: addr })
         });
-        // Generic message: don't reveal whether the email has signups.
-        els.resendMsg.className = 'resend-links__msg resend-links__msg--ok';
-        els.resendMsg.textContent = 'if any sundays are signed up under that email, the cancel links are on their way. check your inbox in the next minute or two.';
-        els.resendMsg.hidden = false;
-        els.resendForm.reset();
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          els.lookupMsg.className = 'resend-links__msg resend-links__msg--error';
+          els.lookupMsg.textContent = friendly(json.error);
+          els.lookupMsg.hidden = false;
+          return;
+        }
+        const slots = json.slots || [];
+        if (!slots.length) {
+          els.lookupMsg.className = 'resend-links__msg';
+          els.lookupMsg.textContent = "nothing signed up under that email. (if you signed up under a different address, try that.)";
+          els.lookupMsg.hidden = false;
+          return;
+        }
+        slots.forEach(s => {
+          const row = el('div', 'lookup-row');
+          const role = s.role_type === 'teach' ? 'teaching' : 'MCing';
+          const date = formatSundayDate(s.sunday_date);
+          const titleSuffix = s.title ? ' · ' + s.title : '';
+          row.append(el('div', 'lookup-row__label', role + ' on ' + date + titleSuffix));
+          const drop = el('button', 'btn btn--ghost btn--sm', 'drop out');
+          drop.dataset.token = s.cancel_token;
+          drop.addEventListener('click', async () => {
+            if (!confirm('drop ' + role + ' on ' + date + '?')) return;
+            drop.disabled = true; drop.textContent = 'dropping…';
+            try {
+              const r = await fetch('/api/cancel-claim?token=' + encodeURIComponent(s.cancel_token));
+              if (r.ok) {
+                row.remove();
+                removeLocalSignupByToken(s.cancel_token);
+                await refreshCalendar(); render();
+                if (!els.lookupResults.children.length) {
+                  els.lookupResults.hidden = true;
+                  els.lookupMsg.className = 'resend-links__msg resend-links__msg--ok';
+                  els.lookupMsg.textContent = "you've been dropped from all your sundays. thanks.";
+                  els.lookupMsg.hidden = false;
+                }
+              } else {
+                drop.disabled = false; drop.textContent = 'drop out';
+                alert('that one didn\'t work — try refreshing.');
+              }
+            } catch (err) {
+              drop.disabled = false; drop.textContent = 'drop out';
+              alert('network error — try again.');
+            }
+          });
+          row.append(drop);
+          els.lookupResults.append(row);
+        });
+        els.lookupResults.hidden = false;
       } catch (err) {
-        els.resendMsg.className = 'resend-links__msg resend-links__msg--error';
-        els.resendMsg.textContent = 'network error — try again in a sec.';
-        els.resendMsg.hidden = false;
+        els.lookupMsg.className = 'resend-links__msg resend-links__msg--error';
+        els.lookupMsg.textContent = 'network error — try again in a sec.';
+        els.lookupMsg.hidden = false;
       } finally {
-        els.resendSubmit.disabled = false;
-        els.resendSubmit.textContent = 'resend my links';
+        els.lookupSubmit.disabled = false;
+        els.lookupSubmit.textContent = 'find my sundays';
       }
     });
 
