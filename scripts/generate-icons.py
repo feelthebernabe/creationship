@@ -26,7 +26,7 @@ ASSETS = ROOT / "assets"
 # Tunable favicon crop bounds, in pixels, against the 1024x1024 phone_bouquet source.
 # Tightens onto the bouquet (upper-center of the source image), excluding the phone
 # and the figure. Adjust if the crop feels off.
-BOUQUET_CROP = (100, 20, 760, 680)  # (left, upper, right, lower) — 660x660 square
+BOUQUET_CROP = (60, 10, 540, 490)  # (left, upper, right, lower) — 480x480 square, bouquet only (excludes phone + figure)
 
 # Threshold for converting near-white pixels to transparent in the favicon.
 # 245 leaves a thin off-white halo intact (avoids speckle on petal edges); raise toward

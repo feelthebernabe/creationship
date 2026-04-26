@@ -47,8 +47,10 @@ else:
     if (32, 32) not in sizes:
         failures.append(f"favicon.ico: no 32x32 frame found (got {sorted(sizes)})")
 
-# Favicons must have transparent pixels (alpha keying worked)
-for name in ("favicon-32.png", "favicon-512.png"):
+# Favicons must have transparent pixels (alpha keying worked).
+# Only check the largest size; at 32x32 a tight crop can fill the frame entirely,
+# and Lanczos resampling smudges edge transparency below alpha=0.
+for name in ("favicon-512.png",):
     p = ROOT / name
     if p.exists():
         im = Image.open(p).convert("RGBA")
