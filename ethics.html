@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ethics — the creationship</title>
+  <meta name="description" content="how the room agrees to work together. clarity around money, consent, and credit.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="og-image.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ethics — the creationship">
+  <meta property="og:description" content="how the room agrees to work together. clarity around money, consent, and credit.">
+  <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
+  <meta property="og:url" content="https://creationship.vercel.app/ethics.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://creationship.vercel.app/og-image.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+
+    /* Page-local: principles list + section spacing */
+    .ethics-section { margin-top: var(--space-2xl); }
+    .ethics-section__heading {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: var(--space-md) 0 var(--space-md);
+      letter-spacing: -0.01em;
+    }
+    .ethics-section__body { color: var(--text-dim); line-height: 1.7; max-width: 64ch; }
+    .ethics-section__body p { margin-bottom: var(--space-md); }
+    .ethics-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-md) 0;
+      max-width: 64ch;
+    }
+    .ethics-list li {
+      position: relative;
+      padding: var(--space-sm) 0 var(--space-sm) var(--space-lg);
+      color: var(--text-dim);
+      line-height: 1.6;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .ethics-list li:last-child { border-bottom: none; }
+    .ethics-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      top: var(--space-sm);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .ethics-living {
+      margin-top: var(--space-2xl);
+      padding: var(--space-lg);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 64ch;
+    }
+    .ethics-living strong { color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__brand">
+        <span>the creationship</span>
+      </a>
+      <div class="site-nav__links">
+        <a href="index.html" class="site-nav__link">home</a>
+        <a href="calendar.html" class="site-nav__link">sundays</a>
+        <!-- members tab hidden 2026-04-26 — page still lives at members.html; uncomment to restore -->
+        <!-- <a href="members.html" class="site-nav__link">members</a> -->
+        <a href="projects.html" class="site-nav__link">receipts</a>
+        <a href="ideas.html" class="site-nav__link">creations</a>
+        <a href="ethics.html" class="site-nav__link active">ethics</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <header class="projects-hero reveal">
+      <div class="landing-section__label landing-section__label--copyright">the principles</div>
+      <h1 class="projects-hero__title">how the room <span class="swipe">agrees to work</span></h1>
+      <p class="projects-hero__subtitle">
+        the creationship runs on trust. these are the few things we ask everyone
+        to be upfront about, so the room stays a place people want to keep showing up to.
+      </p>
+    </header>
+
+    <article class="ethics-section reveal" id="money">
+      <h2 class="ethics-section__heading">ethics and clarity around financial exchange</h2>
+      <div class="ethics-section__body">
+        <p>if you're proposing a project for the room to build, please be upfront about whether it's:</p>
+        <ul class="ethics-list">
+          <li>purely altruistic — a gift for everyone</li>
+          <li>part of an existing for-profit or nonprofit</li>
+          <li>an idea that might become a new initiative or company</li>
+          <li>a project that supports your personal brand or business</li>
+        </ul>
+        <p>all of these are fine. clarity is what we ask for.</p>
+        <p>
+          if a project becomes financially generative, those who helped ideate and iterate
+          should share in the success — proportional to what they put in.
+        </p>
+      </div>
+    </article>
+
+    <article class="ethics-section reveal" id="credit">
+      <h2 class="ethics-section__heading">consent and credit</h2>
+      <div class="ethics-section__body">
+        <p>
+          the room runs on shared half-formed thoughts. that only works if people trust
+          how their ideas get used.
+        </p>
+        <ul class="ethics-list">
+          <li>if you want to build on someone's idea, ask them</li>
+          <li>if you ship something, credit the people who shaped it — including the early conversations</li>
+          <li>if someone asks not to be named in a write-up, photo, or post, that holds</li>
+        </ul>
+        <p>the simplest version: ask first, credit generously.</p>
+      </div>
+    </article>
+
+    <div class="ethics-living reveal">
+      <strong>this is a living document.</strong> the room evolves and so do the things we
+      need to name out loud. bring tensions, edge cases, and revisions to a sunday.
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>the creationship · the infinite create-a-thon</p>
+    <p style="margin-top:var(--space-sm);font-size:0.75rem;color:rgba(255,255,255,0.5);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.65);text-decoration:underline;">dear crisis</a> · © <span id="year"></span></p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Reveal-on-scroll (matches other pages)
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal:not(.visible)').forEach(function(el) { revealObserver.observe(el); });
+  </script>
+
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>
