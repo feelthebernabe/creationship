@@ -160,12 +160,18 @@ async function send(to, tpl) {
     return { skipped: true };
   }
   try {
+    // text-only by design (for now). Resend's click tracking rewrites
+    // every `<a href>` in HTML emails to route through a tracker domain
+    // (us-east-1.resend-clicks.com), and that domain has had SSL issues
+    // for the onboarding@resend.dev sandbox sender. Plain-text URLs
+    // aren't wrapped, so cancel links work reliably.
+    // Re-enable html once a custom domain is verified in Resend AND
+    // click-tracking is disabled at the domain level.
     const r = await c.emails.send({
       from: FROM,
       to: Array.isArray(to) ? to : [to],
       reply_to: REPLY_TO,
       subject: tpl.subject,
-      html: tpl.html,
       text: tpl.text
     });
     return { id: r.data && r.data.id, error: r.error };
