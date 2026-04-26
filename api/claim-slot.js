@@ -86,9 +86,11 @@ module.exports = async function handler(req, res) {
   return res.status(200).json({
     ok: true,
     sunday_id: result.sunday_id,
-    sunday_date: result.sunday_date
-    // cancel_token deliberately NOT returned to the client — it lives only
-    // in the email so spoofers can't read someone else's cancel link from
-    // a network response.
+    sunday_date: result.sunday_date,
+    cancel_token: result.cancel_token
+    // We DO return the cancel_token to the client. The page shows it on
+    // the success modal so the user has it immediately, even if the
+    // confirmation email never arrives (Resend has been flaky). Token is
+    // single-use against one specific slot — not a session token.
   });
 };

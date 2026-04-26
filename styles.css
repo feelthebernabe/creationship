@@ -4380,6 +4380,44 @@ body.modal-open {
   #modal-mc .form-row { flex-direction: column; gap: 0; }
 }
 
+/* Cancel-code box on the success modal — shows the token in-page so
+   the user has it without depending on email delivery. */
+.cancel-code-box {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(196, 101, 74, 0.06);
+  border: 1px dashed rgba(196, 101, 74, 0.35);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+.cancel-code-box__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--bg-accent);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+.cancel-code-box__token {
+  font-family: ui-monospace, 'SF Mono', monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+  color: var(--text);
+  background: var(--bg-elevated);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  user-select: all;
+  margin-bottom: var(--space-sm);
+  line-height: 1.4;
+}
+.cancel-code-box__hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin: var(--space-xs) 0 0;
+  line-height: 1.5;
+}
+
 /* "Lost your cancel link?" — collapsible helper at bottom of calendar */
 .resend-links {
   margin-top: var(--space-2xl);

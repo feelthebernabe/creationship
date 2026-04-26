@@ -147,14 +147,22 @@
     </div>
   </div>
 
-  <!-- Confirmation modal — shown after a successful claim -->
+  <!-- Confirmation modal — shown after a successful claim. -->
+  <!-- The cancel code is shown HERE so the user has it without depending -->
+  <!-- on email arriving (email is best-effort; the code on screen is canonical). -->
   <div class="modal-overlay" id="modal-confirmed">
     <div class="modal">
       <button class="modal__close" data-close-modal aria-label="close">×</button>
       <h3 id="confirmed-title">you're in.</h3>
       <p class="modal__hint" id="confirmed-msg"></p>
-      <p class="modal__hint" style="margin-top:var(--space-md);">we just emailed you a confirmation with a cancel link in case anything changes.</p>
-      <button type="button" class="btn btn--primary btn--full" data-close-modal>great, close</button>
+      <div class="cancel-code-box">
+        <div class="cancel-code-box__label">your cancel code — save this somewhere</div>
+        <div class="cancel-code-box__token" id="confirmed-token">—</div>
+        <button type="button" class="btn btn--ghost btn--sm" id="confirmed-copy">copy</button>
+        <p class="cancel-code-box__hint">to drop out later, paste this code into the form at the bottom of this page.</p>
+      </div>
+      <p class="modal__hint" style="margin-top:var(--space-md);font-size:0.8rem;">we'll also email a copy with the same code if delivery to your address works.</p>
+      <button type="button" class="btn btn--primary btn--full" data-close-modal>got it</button>
     </div>
   </div>
 
@@ -207,7 +215,9 @@
 
       modalConfirmed: $('modal-confirmed'),
       confirmedTitle: $('confirmed-title'),
-      confirmedMsg: $('confirmed-msg')
+      confirmedMsg: $('confirmed-msg'),
+      confirmedToken: $('confirmed-token'),
+      confirmedCopy: $('confirmed-copy')
     };
 
     let state = {
@@ -436,11 +446,11 @@
       if (!name || !email || !title) return;
       els.teachError.hidden = true;
       els.teachSubmit.disabled = true; els.teachSubmit.textContent = 'claiming…';
-      const ok = await submitClaim('teach', { name, email, title, description }, els.teachError);
+      const result = await submitClaim('teach', { name, email, title, description }, els.teachError);
       els.teachSubmit.disabled = false; els.teachSubmit.textContent = 'claim teach slot';
-      if (ok) {
+      if (result) {
         closeModal(els.modalTeach);
-        showConfirmed('teaching', state.pendingDate);
+        showConfirmed('teaching', state.pendingDate, result.cancel_token);
         await refreshCalendar(); render();
       }
     });
@@ -452,11 +462,11 @@
       if (!name || !email) return;
       els.mcError.hidden = true;
       els.mcSubmit.disabled = true; els.mcSubmit.textContent = 'claiming…';
-      const ok = await submitClaim('mc', { name, email }, els.mcError);
+      const result = await submitClaim('mc', { name, email }, els.mcError);
       els.mcSubmit.disabled = false; els.mcSubmit.textContent = 'i\'ll mc';
-      if (ok) {
+      if (result) {
         closeModal(els.modalMC);
-        showConfirmed('MCing', state.pendingDate);
+        showConfirmed('MCing', state.pendingDate, result.cancel_token);
         await refreshCalendar(); render();
       }
     });
@@ -474,22 +484,40 @@
         if (!resp.ok) {
           errEl.textContent = friendly(json.error);
           errEl.hidden = false;
-          return false;
+          return null;
         }
-        return true;
+        return json;  // { ok, sunday_id, sunday_date, cancel_token }
       } catch (err) {
         errEl.textContent = 'network error — try again?';
         errEl.hidden = false;
-        return false;
+        return null;
       }
     }
 
-    function showConfirmed(role, date) {
+    function showConfirmed(role, date, cancelToken) {
       const human = formatSundayDate(date);
       els.confirmedTitle.textContent = 'you\'re in.';
       els.confirmedMsg.textContent = 'you\'re ' + role + ' on ' + human + '.';
+      els.confirmedToken.textContent = cancelToken || '—';
+      els.confirmedCopy.textContent = 'copy';
       openModal(els.modalConfirmed);
     }
+
+    els.confirmedCopy.addEventListener('click', async () => {
+      const token = els.confirmedToken.textContent;
+      if (!token || token === '—') return;
+      try {
+        await navigator.clipboard.writeText(token);
+        els.confirmedCopy.textContent = 'copied ✓';
+        setTimeout(() => { els.confirmedCopy.textContent = 'copy'; }, 1500);
+      } catch (e) {
+        // Clipboard API can fail; fall back to selecting the text so user can copy manually.
+        const range = document.createRange();
+        range.selectNode(els.confirmedToken);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+      }
+    });
 
     // Cancel-via-token handler ---------------------------------------------
     async function handleCancel(token) {
