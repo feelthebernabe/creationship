@@ -7,10 +7,10 @@
 
 /* --- Tokens --- */
 :root {
-  /* Palette — clean wall white base to match stencil art */
-  --bg:            #f8f7f4;
+  /* Palette — clean white wall for stencil graffiti */
+  --bg:            #ffffff;
   --bg-elevated:   #ffffff;
-  --bg-hover:      #f0eeea;
+  --bg-hover:      #f5f5f5;
   --bg-input:      #ffffff;
   --bg-dark:       #1a1a1a;
   --bg-accent:     #d6336c;       /* Vivid magenta — from the spray-paint flowers */
@@ -418,7 +418,7 @@ h4 {
 
 /* --- Premise / Story --- */
 .landing-section {
-  padding: calc(var(--space-3xl) + 2rem) 0 calc(var(--space-3xl) + 3rem);
+  padding: 4rem 0 5rem;
   border-bottom: none;
   max-width: 1000px;
   margin: 0 auto;
