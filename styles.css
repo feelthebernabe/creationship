@@ -218,6 +218,17 @@ h4 {
   background: var(--bg);
 }
 
+/* Two-column hero grid */
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 80vh;
+  padding: 0 clamp(1.5rem, 5vw, 5rem);
+}
+
 /* Organic gradient blob (simplified) */
 .hero__blob {
   position: absolute;
@@ -242,13 +253,47 @@ h4 {
 .hero__content {
   position: relative;
   z-index: 10;
-  padding: clamp(5rem, 12vh, 10rem) clamp(1.5rem, 5vw, 5rem);
-  min-height: 80vh;
+  padding: clamp(3rem, 8vh, 6rem) 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 1200px;
-  margin: 0 auto;
+}
+
+/* Art column */
+.hero__art {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  mix-blend-mode: multiply;
+}
+
+.hero__art .section-art {
+  width: 100%;
+  max-width: 520px;
+}
+
+@media (max-width: 768px) {
+  .hero__grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding-top: 2rem;
+  }
+  .hero__art {
+    order: -1;
+    padding: 1rem 2rem 0;
+    max-height: 280px;
+    overflow: hidden;
+  }
+  .hero__art .section-art {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .hero__content {
+    padding: 1rem 0 3rem;
+  }
 }
 
 
@@ -305,112 +350,69 @@ h4 {
 }
 
 /* ============================================================
-   STENCIL ART — sprayed on the wall
-   mix-blend-mode: multiply makes white pixels fully transparent,
-   so the stencil art looks painted directly on the page surface.
-   Opacity must be 1.0 for white to fully vanish.
-   Radial mask feathers the edges so there's no hard rectangle.
+   SECTION GRID — side-by-side text + art layout
+   Art and text each get their own column so they never overlap.
+   Sections alternate art-left and art-right for visual rhythm.
+   mix-blend-mode: multiply preserves the stencil-on-wall effect.
    ============================================================ */
-.ambient-art {
-  position: absolute;
-  pointer-events: none;
+
+.section-grid {
+  display: grid;
+  grid-template-columns: 1fr 0.75fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.section-grid--art-left {
+  grid-template-columns: 0.75fr 1fr;
+}
+
+.section-grid__text {
+  position: relative;
+  z-index: 2;
+}
+
+.section-grid__art {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-md) 0;
   mix-blend-mode: multiply;
-  opacity: 1;
-  z-index: 0;
-  
-  /* Feather edges — art bleeds into the page like real spray paint */
-  -webkit-mask-image: radial-gradient(
-    ellipse 70% 70% at center,
-    black 40%,
-    transparent 72%
-  );
-  mask-image: radial-gradient(
-    ellipse 70% 70% at center,
-    black 40%,
-    transparent 72%
-  );
 }
 
-/* Hero — large, proud, anchored right */
-.ambient-art--hero {
-  top: -5%;
-  right: -8%;
-  width: 720px;
-  max-width: 65vw;
-  transform: rotate(0.5deg);
+/* The art image itself — stencil effect */
+.section-art {
+  width: 100%;
+  max-width: 420px;
+  pointer-events: none;
 }
 
-/* Room — mid-right, contained within the section */
-.ambient-art--room {
-  top: 0;
-  bottom: auto;
-  right: -15%;
-  width: 520px;
-  max-width: 55vw;
-  transform: rotate(2deg);
-}
-
-/* Showcase — bottom-left, grounding the section */
-.ambient-art--showcase {
-  bottom: -5%;
-  top: auto;
-  left: -12%;
-  right: auto;
-  width: 520px;
-  max-width: 55vw;
-  transform: rotate(-1.5deg);
-}
-
-/* Schedule — right side, vertical stencil art */
-.ambient-art--schedule {
-  top: 15%;
-  left: auto;
-  right: -8%;
-  width: 550px;
-  max-width: 55vw;
-  transform: rotate(-1.5deg);
-}
-
-/* Events — right side, top of the section */
-.ambient-art--events {
-  top: -8%;
-  right: -10%;
-  width: 450px;
-  max-width: 50vw;
-  transform: rotate(1.5deg);
+/* Sticky art that drifts with scroll within its section */
+.section-grid__art--sticky {
+  position: sticky;
+  top: 80px;
 }
 
 @media (max-width: 768px) {
-  .ambient-art {
-    opacity: 0.8;
+  .section-grid,
+  .section-grid--art-left {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
   }
-  .ambient-art--hero {
-    right: -10%;
-    top: 0%;
-    width: 280px;
-    max-width: 55vw;
+  .section-grid__art {
+    order: -1; /* Art stacks above text on mobile */
+    max-height: 260px;
+    overflow: hidden;
+    justify-content: center;
   }
-  .ambient-art--room {
-    right: -5%;
-    top: 5%;
-    width: 240px;
-    max-width: 50vw;
-  }
-  .ambient-art--showcase {
-    left: -5%;
-    width: 220px;
-    max-width: 45vw;
-  }
-  .ambient-art--schedule {
-    left: -8%;
-    width: 200px;
-    max-width: 40vw;
-  }
-  .ambient-art--events {
-    right: -10%;
-    width: 400px;
+  .section-art {
+    max-width: 280px;
+    margin: 0 auto;
   }
 }
+
+/* Legacy .ambient-art — keep for any pages that still use old markup */
+.ambient-art { display: none; }
 
 /* ============================================================
    LANDING PAGE — narrative sections
@@ -425,7 +427,8 @@ h4 {
   padding-left: var(--space-lg);
   padding-right: var(--space-lg);
   position: relative;
-  overflow: hidden; /* Keep stencil art contained within each section */
+  overflow: visible;
+  mix-blend-mode: multiply;
 }
 
 /* Decorative section divider — gradient fade instead of boring 1px line */
@@ -457,6 +460,8 @@ h4 {
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: var(--space-lg);
+  position: relative;
+  z-index: 2;
 }
 
 .landing-section__heading {
@@ -466,7 +471,9 @@ h4 {
   line-height: 1.12;
   color: var(--text);
   margin-bottom: var(--space-xl);
-  max-width: 780px;
+  max-width: 640px;
+  position: relative;
+  z-index: 2;
 }
 
 /* ============================================================
@@ -574,6 +581,7 @@ h4 {
 /* "New here?" callout — rough-edged torn-paper */
 .new-here {
   position: relative;
+  z-index: 2;
   transform: rotate(-0.5deg);
   box-shadow:
     2px 3px 0 rgba(10, 10, 10, 0.08),
@@ -597,7 +605,9 @@ h4 {
   color: var(--text-dim);
   font-size: 1.05rem;
   line-height: 1.75;
-  max-width: 660px;
+  max-width: 600px;
+  position: relative;
+  z-index: 2;
 }
 
 .landing-section__body p {
@@ -738,6 +748,8 @@ h4 {
   flex-direction: column;
   gap: 0;
   margin-top: var(--space-xl);
+  position: relative;
+  z-index: 2;
 }
 
 .schedule__item {
@@ -844,6 +856,8 @@ h4 {
   background: var(--bg-elevated);
   border: 2px solid var(--border);
   border-radius: var(--radius-lg);
+  position: relative;
+  z-index: 2;
 }
 
 .location-card__info { flex: 1; }
@@ -896,6 +910,8 @@ h4 {
 /* --- Luma Events --- */
 .luma-events {
   margin-top: var(--space-xl);
+  position: relative;
+  z-index: 2;
 }
 
 .luma-events__header {
@@ -3537,7 +3553,8 @@ body.modal-open {
   font-weight: 400;
   position: relative;
   font-style: italic;
-  max-width: 660px;
+  max-width: 600px;
+  z-index: 2;
 }
 
 .pull-quote strong {
@@ -3565,6 +3582,8 @@ body.modal-open {
   margin-top: var(--space-xl);
   padding: var(--space-xl) 0;
   border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 2;
 }
 
 .territory-tags__label {
@@ -3640,11 +3659,15 @@ body.modal-open {
   color: var(--text-dim);
   padding-top: var(--space-lg);
   border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 2;
 }
 
 /* Featured Event Card */
 .featured-event {
   margin-bottom: var(--space-xl);
+  position: relative;
+  z-index: 2;
 }
 
 .featured-event__card {
@@ -3698,6 +3721,8 @@ body.modal-open {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-md);
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 640px) {
@@ -3709,6 +3734,8 @@ body.modal-open {
 .project-showcase__footer {
   text-align: center;
   margin-top: var(--space-xl);
+  position: relative;
+  z-index: 2;
 }
 
 /* Showcase Card */
@@ -4317,6 +4344,39 @@ body.modal-open {
 .member-card__invited--founder { color: var(--bg-accent); font-style: italic; font-weight: 500; }
 
 /* ============================================================
+   CANCEL BANNER + CALENDAR FORMS — calendar.html
+   ============================================================ */
+.cancel-banner {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border: 1px solid var(--border);
+}
+.cancel-banner--ok {
+  background: rgba(143, 168, 133, 0.1);
+  border-color: rgba(143, 168, 133, 0.3);
+  color: var(--accent-hover);
+}
+.cancel-banner--error {
+  background: rgba(196, 101, 74, 0.1);
+  border-color: rgba(196, 101, 74, 0.3);
+  color: var(--bg-accent);
+}
+/* Calendar modals: name + email side-by-side row */
+#modal-teach .form-row,
+#modal-mc .form-row {
+  display: flex; gap: var(--space-md);
+}
+#modal-teach .form-row .form-group,
+#modal-mc .form-row .form-group { flex: 1; }
+@media (max-width: 600px) {
+  #modal-teach .form-row,
+  #modal-mc .form-row { flex-direction: column; gap: 0; }
+}
+
+/* ============================================================
    EDIT-CREATION MODAL — ideas.html
    ============================================================ */
 .modal--wide {
@@ -4370,7 +4430,7 @@ body.modal-open {
 
 .reveal.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 /* Stagger children within sections */
@@ -4406,8 +4466,8 @@ body.modal-open {
   }
 }
 
-/* --- Ambient Art Parallax Drift --- */
-.ambient-art {
+/* --- Section Art Parallax Drift --- */
+.section-art {
   will-change: transform;
   transition: transform 0.1s linear;
 }
@@ -4491,23 +4551,20 @@ body.modal-open {
   transform: scaleX(1);
 }
 
-/* --- Smooth Loading for Ambient Art --- */
-.ambient-art {
-  animation: artFadeIn 2s ease-out 0.5s both;
+/* --- Smooth Loading for Section Art --- */
+.section-art {
+  animation: artFadeIn 1.5s ease-out 0.3s both;
 }
 
 @keyframes artFadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px) rotate(0deg);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
-}
-
-.ambient-art--hero {
-  animation-delay: 0.3s;
 }
 
 /* --- Location Card Hover --- */

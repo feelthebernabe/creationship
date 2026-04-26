@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>sundays — the creationship</title>
-  <meta name="description" content="sign up to host the room or to teach at the intersection of forever-human and new tech. sundays at the creationship.">
+  <title>volunteer — the creationship</title>
+  <meta name="description" content="sign up to host or teach a sunday at the creationship — at the intersection of forever-human and new tech. drop your email to claim a slot.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="og-image.png">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="sundays — the creationship">
-  <meta property="og:description" content="sign up to host or teach at the creationship's weekly create-a-thon.">
+  <meta property="og:title" content="volunteer — the creationship">
+  <meta property="og:description" content="sign up to host or teach a sunday. one email, one click.">
   <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -42,70 +42,42 @@
       <h1 class="cal-header__title">sundays at the creationship</h1>
       <p class="cal-header__subtitle">
         every sunday someone holds the room and someone teaches at the intersection of
-        <em>forever-human</em> and <em>new tech</em>. members can claim a slot below.
+        <em>forever-human</em> and <em>new tech</em>. drop your email below to claim a slot —
+        we'll email a reminder before your day.
       </p>
-      <div class="cal-status" id="cal-status" hidden></div>
     </section>
 
-    <section class="member-panel" id="member-panel" hidden>
-      <div class="member-panel__row">
-        <div>
-          <div class="member-panel__label">your invites</div>
-          <div class="member-panel__count">
-            <span id="invites-remaining">0</span> remaining
-          </div>
-        </div>
-        <button class="btn btn--primary btn--sm" id="btn-mint-invite" disabled>mint a code</button>
-      </div>
-      <div class="invite-list" id="invite-list" hidden></div>
-    </section>
-
-    <section class="redeem-panel" id="redeem-panel" hidden>
-      <h3>you're signed in but not yet a member.</h3>
-      <p class="redeem-panel__hint">
-        paste an invite code below — either the shared launch code or one a member sent you.
-      </p>
-      <form id="redeem-form" novalidate>
-        <div class="form-group">
-          <input type="text" id="redeem-token" placeholder="ABCD-EFGH" autocomplete="off" required style="text-transform:uppercase;letter-spacing:0.1em;">
-        </div>
-        <button type="submit" class="btn btn--primary" id="btn-redeem">redeem code</button>
-      </form>
-      <div class="redeem-panel__error" id="redeem-error" hidden></div>
-    </section>
+    <!-- Cancel result banner — shown when arriving via ?cancel=<token>. -->
+    <div class="cancel-banner" id="cancel-banner" hidden></div>
 
     <section class="cal-list" id="cal-list" aria-busy="true">
       <div class="cal-list__loading">loading sundays…</div>
     </section>
 
-    <!-- Past Sundays toggle (always visible, lazy-loads) -->
     <section class="past-toggle">
       <button class="btn btn--ghost btn--sm" id="btn-past-toggle">show past sundays</button>
     </section>
     <section class="cal-list cal-list--past" id="cal-list-past" hidden></section>
 
-    <section class="anon-cta" id="anon-cta" hidden>
-      <h3>want to claim a slot?</h3>
-      <p class="anon-cta__hint">sign in with your email — we'll send a one-click link. you'll need an invite code to become a member.</p>
-      <form id="login-form" novalidate>
-        <div class="form-group">
-          <input type="email" id="login-email" placeholder="you@example.com" required>
-        </div>
-        <button type="submit" class="btn btn--primary" id="btn-login">send magic link</button>
-      </form>
-      <div class="anon-cta__sent" id="login-sent" hidden>
-        check <strong id="login-sent-email"></strong> for a one-click link.
-      </div>
-    </section>
-
   </main>
 
+  <!-- TEACH modal: name + email + topic + description -->
   <div class="modal-overlay" id="modal-teach">
     <div class="modal">
       <button class="modal__close" data-close-modal aria-label="close">×</button>
       <h3>teach this sunday</h3>
-      <p class="modal__hint">at the intersection of forever-human and new tech. you can edit this anytime before the day.</p>
-      <form id="teach-form">
+      <p class="modal__hint">at the intersection of forever-human and new tech. you'll get a confirmation email with a cancel link if anything changes.</p>
+      <form id="teach-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="teach-name">your name</label>
+            <input type="text" id="teach-name" placeholder="first last" required>
+          </div>
+          <div class="form-group">
+            <label for="teach-email">your email</label>
+            <input type="email" id="teach-email" placeholder="you@example.com" required>
+          </div>
+        </div>
         <div class="form-group">
           <label for="teach-title">topic / title</label>
           <input type="text" id="teach-title" placeholder="e.g. consent in synthetic realities" required>
@@ -114,40 +86,43 @@
           <label for="teach-desc">brief description <small>(optional)</small></label>
           <textarea id="teach-desc" placeholder="what will you walk us through? what should people bring?" style="min-height:90px;"></textarea>
         </div>
-        <button type="submit" class="btn btn--primary btn--full">claim teach slot</button>
+        <button type="submit" class="btn btn--primary btn--full" id="teach-submit">claim teach slot</button>
         <div class="modal__error" id="teach-error" hidden></div>
       </form>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modal-edit-topic">
+  <!-- MC modal: name + email only -->
+  <div class="modal-overlay" id="modal-mc">
     <div class="modal">
       <button class="modal__close" data-close-modal aria-label="close">×</button>
-      <h3>edit your topic</h3>
-      <p class="modal__hint">update what you're teaching this sunday.</p>
-      <form id="edit-topic-form">
-        <div class="form-group">
-          <label for="edit-topic-title">topic / title</label>
-          <input type="text" id="edit-topic-title" required>
+      <h3>mc this sunday</h3>
+      <p class="modal__hint">hold the space — welcome people in, keep the room steady. confirmation email + cancel link arrives right after.</p>
+      <form id="mc-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mc-name">your name</label>
+            <input type="text" id="mc-name" placeholder="first last" required>
+          </div>
+          <div class="form-group">
+            <label for="mc-email">your email</label>
+            <input type="email" id="mc-email" placeholder="you@example.com" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="edit-topic-desc">brief description <small>(optional)</small></label>
-          <textarea id="edit-topic-desc" style="min-height:90px;"></textarea>
-        </div>
-        <button type="submit" class="btn btn--primary btn--full">save</button>
-        <div class="modal__error" id="edit-topic-error" hidden></div>
+        <button type="submit" class="btn btn--primary btn--full" id="mc-submit">i'll mc</button>
+        <div class="modal__error" id="mc-error" hidden></div>
       </form>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modal-invite">
+  <!-- Confirmation modal — shown after a successful claim -->
+  <div class="modal-overlay" id="modal-confirmed">
     <div class="modal">
       <button class="modal__close" data-close-modal aria-label="close">×</button>
-      <h3>your invite code</h3>
-      <p class="modal__hint">share this with one person. it expires in 30 days.</p>
-      <div class="invite-code" id="minted-code">—</div>
-      <button class="btn btn--ghost btn--full" id="btn-copy-invite">copy share link</button>
-      <div class="invite-share-url" id="minted-url"></div>
+      <h3 id="confirmed-title">you're in.</h3>
+      <p class="modal__hint" id="confirmed-msg"></p>
+      <p class="modal__hint" style="margin-top:var(--space-md);">we just emailed you a confirmation with a cancel link in case anything changes.</p>
+      <button type="button" class="btn btn--primary btn--full" data-close-modal>great, close</button>
     </div>
   </div>
 
@@ -159,7 +134,7 @@
 
     const $ = (id) => document.getElementById(id);
 
-    // Tiny DOM helper — equivalent of a JSX fragment but XSS-safe
+    // Tiny DOM helper — XSS-safe (textContent only).
     function el(tag, className, text) {
       const e = document.createElement(tag);
       if (className) e.className = className;
@@ -168,61 +143,55 @@
     }
 
     const els = {
-      status: $('cal-status'),
-      memberPanel: $('member-panel'),
-      invitesRemaining: $('invites-remaining'),
-      btnMintInvite: $('btn-mint-invite'),
-      inviteList: $('invite-list'),
-      redeemPanel: $('redeem-panel'),
-      redeemForm: $('redeem-form'),
-      redeemToken: $('redeem-token'),
-      redeemError: $('redeem-error'),
       list: $('cal-list'),
-      anonCta: $('anon-cta'),
-      loginForm: $('login-form'),
-      loginEmail: $('login-email'),
-      loginSent: $('login-sent'),
-      loginSentEmail: $('login-sent-email'),
+      pastList: $('cal-list-past'),
+      btnPastToggle: $('btn-past-toggle'),
+      cancelBanner: $('cancel-banner'),
+
       modalTeach: $('modal-teach'),
       teachForm: $('teach-form'),
+      teachName: $('teach-name'),
+      teachEmail: $('teach-email'),
       teachTitle: $('teach-title'),
       teachDesc: $('teach-desc'),
       teachError: $('teach-error'),
-      modalInvite: $('modal-invite'),
-      mintedCode: $('minted-code'),
-      mintedUrl: $('minted-url'),
-      btnCopyInvite: $('btn-copy-invite'),
-      modalEditTopic: $('modal-edit-topic'),
-      editTopicForm: $('edit-topic-form'),
-      editTopicTitle: $('edit-topic-title'),
-      editTopicDesc: $('edit-topic-desc'),
-      editTopicError: $('edit-topic-error'),
-      pastList: $('cal-list-past'),
-      btnPastToggle: $('btn-past-toggle')
+      teachSubmit: $('teach-submit'),
+
+      modalMC: $('modal-mc'),
+      mcForm: $('mc-form'),
+      mcName: $('mc-name'),
+      mcEmail: $('mc-email'),
+      mcError: $('mc-error'),
+      mcSubmit: $('mc-submit'),
+
+      modalConfirmed: $('modal-confirmed'),
+      confirmedTitle: $('confirmed-title'),
+      confirmedMsg: $('confirmed-msg')
     };
 
     let state = {
-      session: null,
-      member: null,
       calendar: [],
-      pendingTeachSundayId: null,
-      pendingEditSundayId: null,
-      pastLoaded: false
+      pastLoaded: false,
+      pendingSundayId: null,
+      pendingDate: null
     };
 
+    // Friendly error map ----------------------------------------------------
     const ERR = {
-      'invalid_or_expired': 'that code isn\'t valid (or has been turned off).',
-      'self_redemption': 'you can\'t redeem a code you minted yourself.',
-      'no_member_row': 'something went wrong linking your account — try refreshing.',
-      'not_approved': 'you need to be an approved member to do that.',
-      'no_quota': 'you\'re out of invite codes for now.',
-      'teach_slot_taken': 'someone else just claimed that teach slot. try another sunday.',
-      'past_sunday': 'that sunday has already happened.',
-      'too_late_to_unclaim': 'too close to the day to drop out — message a member instead.',
-      'not_your_slot': 'only the person who claimed it can change it.'
+      teach_slot_taken: 'someone else just claimed that teach slot. try another sunday.',
+      past_sunday: 'that sunday has already passed.',
+      sunday_cancelled: 'that sunday is cancelled.',
+      sunday_not_found: 'we couldn\'t find that sunday — try refreshing.',
+      title_required: 'topic is required.',
+      email_required: 'email is required.',
+      email_invalid: 'that doesn\'t look like a valid email.',
+      sunday_id_required: 'something went wrong — try refreshing.',
+      role_invalid: 'something went wrong — try refreshing.',
+      invalid_token: 'that cancel link isn\'t valid (or was already used).'
     };
-    const friendly = (err) => ERR[err && err.message] || (err && err.message) || 'something went wrong.';
+    const friendly = (code) => ERR[code] || code || 'something went wrong.';
 
+    // Date formatting -------------------------------------------------------
     function formatSundayDate(isoDate) {
       const d = new Date(isoDate + 'T12:00:00');
       const month = d.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
@@ -238,36 +207,28 @@
       if (diff < 14) return 'next sunday';
       return Math.round(diff / 7) + ' weeks out';
     }
+    function pastLabel(isoDate) {
+      const d = new Date(isoDate + 'T12:00:00');
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.round((today - d) / 86400000);
+      if (diff < 7) return diff + ' days ago';
+      if (diff < 30) return Math.round(diff / 7) + ' weeks ago';
+      return Math.round(diff / 30) + ' months ago';
+    }
 
+    // Init ------------------------------------------------------------------
     async function init() {
-      // Pick up an invite code from the URL FIRST (before anything async),
-      // and stash it so it survives the magic-link round trip too.
+      // Cancel-token URL handler runs first so the user sees their drop-out
+      // confirmation immediately even before the calendar loads.
       const params = new URLSearchParams(window.location.search);
-      const codeFromUrl = params.get('code');
-      if (codeFromUrl) {
-        const upper = codeFromUrl.trim().toUpperCase();
-        localStorage.setItem('pending_invite_code', upper);
-        els.redeemToken.value = upper;
+      const cancelToken = params.get('cancel');
+      if (cancelToken) {
+        await handleCancel(cancelToken);
       }
 
-      const session = await window.DB.getSession();
-      state.session = session;
-      if (session) {
-        try { await window.DB.ensureMember(); } catch (e) { console.warn('ensureMember:', e.message); }
-        state.member = await window.DB.getMyMember();
-      }
       await window.DB.ensureUpcomingSundays(8);
       await refreshCalendar();
-      await refreshInviteList();
       render();
-
-      // If we're signed in, not yet approved, and have a code waiting (from
-      // either the URL or a stash from before sign-in), auto-redeem now.
-      const pending = localStorage.getItem('pending_invite_code');
-      if (pending && state.session && state.member && !state.member.approved_at) {
-        els.redeemToken.value = pending;
-        await onRedeem(new Event('auto'));
-      }
     }
 
     async function refreshCalendar() {
@@ -275,87 +236,24 @@
       catch (e) { console.error('getCalendar:', e); state.calendar = []; }
     }
 
-    async function refreshInviteList() {
-      if (!state.member || !state.member.approved_at) return;
-      try {
-        const invites = await window.DB.getMyInvitations();
-        renderInviteList(invites);
-      } catch (e) { console.warn('getMyInvitations:', e.message); }
-    }
-
+    // Render ----------------------------------------------------------------
     function render() {
-      const isAuthed = !!state.session;
-      const isApproved = !!(state.member && state.member.approved_at);
-
-      els.status.replaceChildren();
-      if (isAuthed) {
-        els.status.hidden = false;
-        const dot = el('span'); dot.textContent = isApproved ? '●' : '○';
-        dot.style.color = isApproved ? 'var(--accent)' : 'var(--text-muted)';
-        els.status.append(dot, document.createTextNode(' signed in as '));
-        const strong = el('strong'); strong.textContent = state.session.user.email;
-        els.status.append(strong, document.createTextNode(
-          ' · ' + (isApproved ? 'member' : 'pending — needs invite code')
-        ));
-        const so = el('button', 'btn btn--ghost btn--sm', 'sign out');
-        so.style.marginLeft = 'auto';
-        so.addEventListener('click', async () => {
-          await window.DB.signOut();
-          window.location.reload();
-        });
-        els.status.append(so);
-      } else {
-        els.status.hidden = true;
-      }
-
-      els.memberPanel.hidden = !isApproved;
-      els.redeemPanel.hidden = !isAuthed || isApproved;
-      els.anonCta.hidden = isAuthed;
-
-      // If they landed via a share link, reframe the anon CTA so it's
-      // obvious they've been invited and just need to drop their email.
-      if (!isAuthed && localStorage.getItem('pending_invite_code')) {
-        const h = els.anonCta.querySelector('h3');
-        const hint = els.anonCta.querySelector('.anon-cta__hint');
-        if (h) h.textContent = "you've been invited — drop your email to join";
-        if (hint) hint.textContent = "we'll send you a one-click sign-in link. your invite code is queued — you won't need to type it.";
-        // Scroll the CTA into view so it's the first thing they see.
-        if (!els.anonCta.dataset.scrolled) {
-          els.anonCta.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          els.anonCta.dataset.scrolled = '1';
-        }
-      }
-
-      if (isApproved) {
-        const remaining = state.member.invites_remaining || 0;
-        els.invitesRemaining.textContent = remaining;
-        els.btnMintInvite.disabled = remaining <= 0;
-        els.btnMintInvite.textContent = remaining <= 0 ? 'no codes left' : 'mint a code';
-      }
-
-      renderCalendar();
-    }
-
-    function renderCalendar() {
-      const isApproved = !!(state.member && state.member.approved_at);
       els.list.removeAttribute('aria-busy');
       els.list.replaceChildren();
-
       if (!state.calendar.length) {
         els.list.append(el('div', 'cal-list__loading', 'no upcoming sundays yet.'));
         return;
       }
-
       state.calendar.forEach((s) => {
-        els.list.append(buildSundayCard(s, isApproved));
+        els.list.append(buildSundayCard(s, { past: false }));
       });
     }
 
-    function buildSundayCard(s, isApproved, opts) {
+    function buildSundayCard(s, opts) {
       opts = opts || {};
       const article = el('article', 'sunday-card');
       if (s.status === 'cancelled') article.classList.add('sunday-card--cancelled');
-      if (s.status === 'completed') article.classList.add('sunday-card--past');
+      if (s.status === 'completed' || opts.past) article.classList.add('sunday-card--past');
 
       const head = el('header', 'sunday-card__head');
       const dateBox = el('div', 'sunday-card__date');
@@ -365,23 +263,16 @@
       );
       head.append(dateBox);
 
-      // Slot-fill summary pill — shows the structure (1 teacher · up to 2
-      // mcs) so the cap is never ambiguous. The mc cap is a soft target
-      // — extra MCs are allowed, the pill just stops showing the
-      // denominator once it's exceeded.
+      // Fill summary pill — shows the role structure explicitly.
       if (s.status !== 'cancelled' && !opts.past) {
         const teacherFilled = !!s.teacher_signup_id;
         const mcCount = (s.mc_signups || []).length;
         const mcCap = 2;
         const allFull = teacherFilled && mcCount >= mcCap;
         const nothingFilled = !teacherFilled && mcCount === 0;
-        const fillClass = nothingFilled ? 'fill-empty'
-                        : allFull ? 'fill-full'
-                        : 'fill-partial';
+        const fillClass = nothingFilled ? 'fill-empty' : allFull ? 'fill-full' : 'fill-partial';
         const teacherText = teacherFilled ? '✓ teacher' : 'needs teacher';
-        const mcText = mcCount > mcCap
-          ? mcCount + ' mcs'
-          : mcCount + ' of ' + mcCap + ' mcs';
+        const mcText = mcCount > mcCap ? mcCount + ' mcs' : mcCount + ' of ' + mcCap + ' mcs';
         const pill = el('div', 'sunday-card__fill ' + fillClass);
         pill.append(el('span', 'sunday-card__fill-dot'));
         pill.append(document.createTextNode(teacherText + ' · ' + mcText));
@@ -397,25 +288,14 @@
       article.append(head);
 
       const slots = el('div', 'sunday-card__slots');
-      // Past + cancelled cards are display-only — pass false for isApproved
-      // so no claim/drop buttons render.
-      const showActions = isApproved && s.status !== 'cancelled' && !opts.past;
-      slots.append(buildTeacherSlot(s, showActions));
-      slots.append(buildMCSlot(s, showActions));
+      const allowClaim = s.status !== 'cancelled' && !opts.past;
+      slots.append(buildTeacherSlot(s, allowClaim));
+      slots.append(buildMCSlot(s, allowClaim));
       article.append(slots);
       return article;
     }
 
-    function pastLabel(isoDate) {
-      const d = new Date(isoDate + 'T12:00:00');
-      const today = new Date(); today.setHours(0,0,0,0);
-      const diff = Math.round((today - d) / 86400000);
-      if (diff < 7) return diff + ' days ago';
-      if (diff < 30) return Math.round(diff / 7) + ' weeks ago';
-      return Math.round(diff / 30) + ' months ago';
-    }
-
-    function buildTeacherSlot(s, isApproved) {
+    function buildTeacherSlot(s, allowClaim) {
       const isFilled = !!s.teacher_signup_id;
       const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open'));
 
@@ -432,30 +312,21 @@
       } else {
         slot.append(el('div', 'slot__open', 'open — claim to teach'));
       }
-      if (isApproved) {
+
+      if (allowClaim && !isFilled) {
         const actions = el('div', 'slot__actions');
-        if (s.is_my_teach) {
-          const edit = el('button', 'btn btn--ghost btn--sm cal-action', 'edit topic');
-          edit.dataset.action = 'edit-teach'; edit.dataset.id = s.id;
-          edit.dataset.title = s.title || '';
-          edit.dataset.desc = s.description || '';
-          actions.append(edit);
-          const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
-          drop.dataset.action = 'unclaim-teach'; drop.dataset.id = s.id;
-          actions.append(drop);
-        } else if (!isFilled) {
-          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'teach this sunday →');
-          claim.dataset.action = 'claim-teach'; claim.dataset.id = s.id;
-          actions.append(claim);
-        }
-        if (actions.childNodes.length) slot.append(actions);
+        const claim = el('button', 'btn btn--primary btn--sm cal-action', 'teach this sunday →');
+        claim.dataset.action = 'claim-teach';
+        claim.dataset.id = s.id;
+        claim.dataset.date = s.date;
+        actions.append(claim);
+        slot.append(actions);
       }
       return slot;
     }
 
-    function buildMCSlot(s, isApproved) {
+    function buildMCSlot(s, allowClaim) {
       const mcs = s.mc_signups || [];
-      const iAmMC = mcs.some(m => m.is_me);
       const isFilled = mcs.length > 0;
       const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open'));
 
@@ -468,199 +339,145 @@
       if (isFilled) {
         mcs.forEach((m, i) => {
           if (i > 0) filled.append(document.createTextNode(', '));
-          const span = el('span', 'slot__name', m.name);
-          if (m.is_me) span.append(document.createTextNode(' (you)'));
-          filled.append(span);
+          filled.append(el('span', 'slot__name', m.name));
         });
       } else {
         filled.append(el('span', 'slot__open', 'open — claim to host'));
       }
       slot.append(filled);
 
-      if (isApproved) {
+      if (allowClaim) {
         const actions = el('div', 'slot__actions');
-        if (iAmMC) {
-          const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
-          drop.dataset.action = 'unclaim-mc'; drop.dataset.id = s.id;
-          actions.append(drop);
-        } else {
-          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'i\'ll mc →');
-          claim.dataset.action = 'claim-mc'; claim.dataset.id = s.id;
-          actions.append(claim);
-        }
+        const claim = el('button', 'btn btn--primary btn--sm cal-action', 'i\'ll mc →');
+        claim.dataset.action = 'claim-mc';
+        claim.dataset.id = s.id;
+        claim.dataset.date = s.date;
+        actions.append(claim);
         slot.append(actions);
       }
       return slot;
     }
 
-    function renderInviteList(invites) {
-      els.inviteList.replaceChildren();
-      if (!invites || !invites.length) { els.inviteList.hidden = true; return; }
-      els.inviteList.hidden = false;
-      els.inviteList.append(el('div', 'invite-list__label', 'your codes:'));
-      invites.forEach(i => {
-        const row = el('div', 'invite-list__row');
-        const code = el('code'); code.textContent = i.token;
-        row.append(code, document.createTextNode(' · ' + (i.used_by_name ? 'claimed by ' + i.used_by_name : 'unused')));
-        els.inviteList.append(row);
-      });
-    }
-
-    els.list.addEventListener('click', async (e) => {
+    // Card click → open right modal -----------------------------------------
+    els.list.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       const action = btn.dataset.action;
       const id = btn.dataset.id;
-      btn.disabled = true;
-      try {
-        if (action === 'claim-teach') {
-          state.pendingTeachSundayId = id;
-          els.teachTitle.value = ''; els.teachDesc.value = '';
-          els.teachError.hidden = true;
-          openModal(els.modalTeach);
-          els.teachTitle.focus();
-        } else if (action === 'edit-teach') {
-          state.pendingEditSundayId = id;
-          els.editTopicTitle.value = btn.dataset.title || '';
-          els.editTopicDesc.value = btn.dataset.desc || '';
-          els.editTopicError.hidden = true;
-          openModal(els.modalEditTopic);
-          els.editTopicTitle.focus();
-        } else if (action === 'unclaim-teach') {
-          await window.DB.unclaimTeach(id);
-          await refreshCalendar(); renderCalendar();
-        } else if (action === 'claim-mc') {
-          await window.DB.claimMC(id);
-          await refreshCalendar(); renderCalendar();
-        } else if (action === 'unclaim-mc') {
-          await window.DB.unclaimMC(id);
-          await refreshCalendar(); renderCalendar();
-        }
-      } catch (err) {
-        alert(friendly(err));
-      } finally {
-        btn.disabled = false;
-      }
+      const date = btn.dataset.date;
+      state.pendingSundayId = id;
+      state.pendingDate = date;
+      if (action === 'claim-teach') openTeachModal();
+      else if (action === 'claim-mc') openMCModal();
     });
 
-    els.editTopicForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!state.pendingEditSundayId) return;
-      const title = els.editTopicTitle.value.trim();
-      const description = els.editTopicDesc.value.trim();
-      if (!title) return;
-      els.editTopicError.hidden = true;
-      const submitBtn = els.editTopicForm.querySelector('button[type=submit]');
-      submitBtn.disabled = true;
-      try {
-        await window.DB.updateSundayTheme(state.pendingEditSundayId, { title, description });
-        closeModal(els.modalEditTopic);
-        state.pendingEditSundayId = null;
-        await refreshCalendar(); renderCalendar();
-      } catch (err) {
-        els.editTopicError.textContent = friendly(err);
-        els.editTopicError.hidden = false;
-      } finally {
-        submitBtn.disabled = false;
-      }
-    });
+    function openTeachModal() {
+      els.teachName.value = ''; els.teachEmail.value = '';
+      els.teachTitle.value = ''; els.teachDesc.value = '';
+      els.teachError.hidden = true;
+      openModal(els.modalTeach);
+      setTimeout(() => els.teachName.focus(), 50);
+    }
+    function openMCModal() {
+      els.mcName.value = ''; els.mcEmail.value = '';
+      els.mcError.hidden = true;
+      openModal(els.modalMC);
+      setTimeout(() => els.mcName.focus(), 50);
+    }
 
+    // Submit handlers -------------------------------------------------------
     els.teachForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!state.pendingTeachSundayId) return;
+      const name = els.teachName.value.trim();
+      const email = els.teachEmail.value.trim();
       const title = els.teachTitle.value.trim();
       const description = els.teachDesc.value.trim();
-      if (!title) return;
+      if (!name || !email || !title) return;
       els.teachError.hidden = true;
-      const submitBtn = els.teachForm.querySelector('button[type=submit]');
-      submitBtn.disabled = true;
-      try {
-        await window.DB.claimTeach(state.pendingTeachSundayId, { title, description });
+      els.teachSubmit.disabled = true; els.teachSubmit.textContent = 'claiming…';
+      const ok = await submitClaim('teach', { name, email, title, description }, els.teachError);
+      els.teachSubmit.disabled = false; els.teachSubmit.textContent = 'claim teach slot';
+      if (ok) {
         closeModal(els.modalTeach);
-        state.pendingTeachSundayId = null;
-        await refreshCalendar(); renderCalendar();
-      } catch (err) {
-        els.teachError.textContent = friendly(err);
-        els.teachError.hidden = false;
-      } finally {
-        submitBtn.disabled = false;
+        showConfirmed('teaching', state.pendingDate);
+        await refreshCalendar(); render();
       }
     });
 
-    els.loginForm.addEventListener('submit', async (e) => {
+    els.mcForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = els.loginEmail.value.trim();
-      if (!email) return;
-      const btn = $('btn-login');
-      btn.disabled = true; btn.textContent = 'sending…';
-      try {
-        // Preserve any ?code= in the URL so the invite survives the round trip.
-        const back = '/calendar.html' + window.location.search;
-        localStorage.setItem('post_signin_redirect', back);
-        await window.DB.signInWithMagicLink(email, window.location.origin + back);
-        els.loginSentEmail.textContent = email;
-        els.loginSent.hidden = false;
-        els.loginForm.hidden = true;
-      } catch (err) {
-        alert(friendly(err));
-      } finally {
-        btn.disabled = false; btn.textContent = 'send magic link';
+      const name = els.mcName.value.trim();
+      const email = els.mcEmail.value.trim();
+      if (!name || !email) return;
+      els.mcError.hidden = true;
+      els.mcSubmit.disabled = true; els.mcSubmit.textContent = 'claiming…';
+      const ok = await submitClaim('mc', { name, email }, els.mcError);
+      els.mcSubmit.disabled = false; els.mcSubmit.textContent = 'i\'ll mc';
+      if (ok) {
+        closeModal(els.modalMC);
+        showConfirmed('MCing', state.pendingDate);
+        await refreshCalendar(); render();
       }
     });
 
-    async function onRedeem(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      const token = els.redeemToken.value.trim().toUpperCase();
-      if (!token) return;
-      els.redeemError.hidden = true;
-      const btn = $('btn-redeem');
-      btn.disabled = true;
+    async function submitClaim(role, fields, errEl) {
       try {
-        const member = await window.DB.redeemInvite(token);
-        state.member = member;
-        localStorage.removeItem('pending_invite_code');
-        // Strip ?code= from the URL so refreshes don't re-process it.
-        if (window.location.search.includes('code=')) {
-          history.replaceState({}, '', window.location.pathname);
+        const resp = await fetch('/api/claim-slot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            role, sunday_id: state.pendingSundayId, ...fields
+          })
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          errEl.textContent = friendly(json.error);
+          errEl.hidden = false;
+          return false;
         }
-        await refreshCalendar(); await refreshInviteList(); render();
+        return true;
       } catch (err) {
-        els.redeemError.textContent = friendly(err);
-        els.redeemError.hidden = false;
-      } finally {
-        btn.disabled = false;
+        errEl.textContent = 'network error — try again?';
+        errEl.hidden = false;
+        return false;
       }
     }
-    els.redeemForm.addEventListener('submit', onRedeem);
 
-    els.btnMintInvite.addEventListener('click', async () => {
-      els.btnMintInvite.disabled = true;
+    function showConfirmed(role, date) {
+      const human = formatSundayDate(date);
+      els.confirmedTitle.textContent = 'you\'re in.';
+      els.confirmedMsg.textContent = 'you\'re ' + role + ' on ' + human + '.';
+      openModal(els.modalConfirmed);
+    }
+
+    // Cancel-via-token handler ---------------------------------------------
+    async function handleCancel(token) {
       try {
-        const invite = await window.DB.mintInvite();
-        const url = window.location.origin + '/calendar.html?code=' + encodeURIComponent(invite.token);
-        els.mintedCode.textContent = invite.token;
-        els.mintedUrl.textContent = url;
-        els.mintedUrl.dataset.url = url;
-        openModal(els.modalInvite);
-        state.member = await window.DB.getMyMember();
-        await refreshInviteList(); render();
+        const resp = await fetch('/api/cancel-claim?token=' + encodeURIComponent(token));
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          showCancelBanner('error', friendly(json.error));
+        } else {
+          const role = json.role_type === 'teach' ? 'teaching' : 'MCing';
+          const date = formatSundayDate(json.sunday_date);
+          showCancelBanner('ok', 'you\'ve been dropped from ' + role + ' on ' + date + '. thanks for letting us know.');
+        }
       } catch (err) {
-        alert(friendly(err));
+        showCancelBanner('error', 'something went wrong — try again or message a member.');
       }
-    });
-
-    els.btnCopyInvite.addEventListener('click', async () => {
-      const url = els.mintedUrl.dataset.url;
-      if (!url) return;
-      try {
-        await navigator.clipboard.writeText(url);
-        els.btnCopyInvite.textContent = 'copied ✓';
-        setTimeout(() => { els.btnCopyInvite.textContent = 'copy share link'; }, 1500);
-      } catch (e) {
-        alert('copy failed — long-press to copy:\n\n' + url);
+      // Strip ?cancel= from the URL so a refresh doesn't re-attempt.
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, '', window.location.pathname);
       }
-    });
+    }
+    function showCancelBanner(kind, msg) {
+      els.cancelBanner.replaceChildren();
+      els.cancelBanner.className = 'cancel-banner cancel-banner--' + kind;
+      els.cancelBanner.textContent = msg;
+      els.cancelBanner.hidden = false;
+    }
 
+    // Past Sundays toggle ---------------------------------------------------
     els.btnPastToggle.addEventListener('click', async () => {
       const isHidden = els.pastList.hidden;
       if (isHidden && !state.pastLoaded) {
@@ -671,14 +488,11 @@
           if (!past.length) {
             els.pastList.append(el('div', 'cal-list__loading', 'no past sundays in the archive yet.'));
           } else {
-            past.forEach(s => {
-              els.pastList.append(buildSundayCard(s, false, { past: true }));
-            });
+            past.forEach(s => els.pastList.append(buildSundayCard(s, { past: true })));
           }
           state.pastLoaded = true;
         } catch (err) {
-          alert(friendly(err));
-          return;
+          console.error('past calendar:', err);
         } finally {
           els.btnPastToggle.disabled = false;
         }
@@ -687,6 +501,7 @@
       els.btnPastToggle.textContent = els.pastList.hidden ? 'show past sundays' : 'hide past sundays';
     });
 
+    // Modal helpers ---------------------------------------------------------
     function openModal(modal) { modal.classList.add('active'); }
     function closeModal(modal) { modal.classList.remove('active'); }
     document.querySelectorAll('[data-close-modal]').forEach(btn =>
@@ -696,27 +511,6 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape')
         document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m));
-    });
-
-    window.DB.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-        state.session = session;
-        if (session) {
-          try { await window.DB.ensureMember(); } catch (e) {}
-          state.member = await window.DB.getMyMember();
-          // If there's a pending invite code from before sign-in, redeem it
-          // automatically — that's the whole point of the share-link flow.
-          const pending = localStorage.getItem('pending_invite_code');
-          if (pending && state.member && !state.member.approved_at) {
-            els.redeemToken.value = pending;
-            await onRedeem(new Event('auto'));
-            return;
-          }
-        } else {
-          state.member = null;
-        }
-        await refreshCalendar(); await refreshInviteList(); render();
-      }
     });
 
     init();

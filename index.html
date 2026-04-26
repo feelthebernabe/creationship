@@ -53,65 +53,74 @@
          ============================ -->
     <section id="view-landing" class="view active">
 
-      <header class="hero" style="position: relative;">
-        <!-- Street Art Background -->
-        <img src="assets/tech_birdhouse.png" alt="" class="ambient-art ambient-art--hero" aria-hidden="true">
-        
-        <!-- Soft background gradient (simplified) -->
+      <header class="hero">
+        <!-- Soft background gradient -->
         <div class="hero__blob" aria-hidden="true"></div>
 
-        <!-- Headline + subtitle -->
-        <div class="hero__content">
-          <h1 class="hero__headline">
-            the<br>
-            <span class="accent">creationship</span>
-          </h1>
+        <div class="hero__grid">
+          <!-- Text column -->
+          <div class="hero__content">
+            <h1 class="hero__headline">
+              the<br>
+              <span class="accent">creationship</span>
+            </h1>
 
-          <p class="hero__subtitle">
-            every sunday, the back room of a vegan restaurant on east 6th street fills with people
-            who don't all know each other yet. <strong>three hours later, they do.</strong>
-          </p>
+            <p class="hero__subtitle">
+              every sunday, the back room of a vegan restaurant on east 6th street fills with people
+              who don't all know each other yet. <strong>three hours later, they do.</strong>
+            </p>
 
-          <div class="hero__cta-group">
-            <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="btn btn--primary hero__cta" id="hero-cta-btn">
-              join this sunday →
-            </a>
-            <a href="calendar.html" class="btn btn--ghost hero__cta">host or teach →</a>
-            <a href="#the-room" class="hero__scroll-link">learn more ↓</a>
+            <div class="hero__cta-group">
+              <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="btn btn--primary hero__cta" id="hero-cta-btn">
+                join this sunday →
+              </a>
+              <a href="calendar.html" class="btn btn--ghost hero__cta">host or teach →</a>
+              <a href="#the-room" class="hero__scroll-link">learn more ↓</a>
+            </div>
+
+            <div class="hero__meta">
+              <span class="dot"></span>
+              <span>sundays · noon · east village · come as you are</span>
+            </div>
           </div>
 
-          <div class="hero__meta">
-            <span class="dot"></span>
-            <span>sundays · noon · east village · come as you are</span>
+          <!-- Art column -->
+          <div class="hero__art">
+            <img src="assets/tech_birdhouse.png" alt="" class="section-art" aria-hidden="true">
           </div>
         </div>
-
       </header>
 
       <!-- ============================
            THE ROOM — ethos & narrative
            ============================ -->
-      <div class="landing-section reveal" id="the-room" style="position: relative;">
-        <!-- Street Art Background -->
-        <img src="assets/planting_phones.png" alt="" class="ambient-art ambient-art--room" aria-hidden="true">
-        
-        <div class="landing-section__label landing-section__label--tally">the room</div>
-        <h2 class="landing-section__heading">we don't curate the guest list. the room takes the shape of <span class="swipe">whoever shows up</span>.</h2>
+      <div class="landing-section reveal" id="the-room">
+        <div class="section-grid section-grid--art-right">
+          <div class="section-grid__text">
+            <div class="landing-section__label landing-section__label--tally">the room</div>
+            <h2 class="landing-section__heading">we don't curate the guest list. the room takes the shape of <span class="swipe">whoever shows up</span>.</h2>
+            <div class="landing-section__body">
+              <p>
+                past weeks brought together a doula, a prompt engineer, a high school teacher, 
+                a muralist, and someone restoring old radios. someone teaches a concept they can't 
+                stop thinking about. then, we pitch our half-formed projects. teams form naturally 
+                around whatever sparks interest. for the rest of the time, we build, we eat, and 
+                we share what we made.
+              </p>
+            </div>
+          </div>
+          <div class="section-grid__art">
+            <img src="assets/planting_phones.png" alt="" class="section-art" aria-hidden="true">
+          </div>
+        </div>
+
+        <blockquote class="pull-quote reveal">
+          we are practicing building new worlds. the world outside is largely playing a finite 
+          game — optimizing for extraction, scale, and moving as fast as possible. 
+          <strong>in this room, we step out of that.</strong>
+        </blockquote>
+
         <div class="landing-section__body">
-          <p>
-            past weeks brought together a doula, a prompt engineer, a high school teacher, 
-            a muralist, and someone restoring old radios. someone teaches a concept they can't 
-            stop thinking about. then, we pitch our half-formed projects. teams form naturally 
-            around whatever sparks interest. for the rest of the time, we build, we eat, and 
-            we share what we made.
-          </p>
-
-          <blockquote class="pull-quote reveal">
-            we are practicing building new worlds. the world outside is largely playing a finite 
-            game — optimizing for extraction, scale, and moving as fast as possible. 
-            <strong>in this room, we step out of that.</strong>
-          </blockquote>
-
           <p>
             in practice, we are relearning how to cultivate creative attention and trust. 
             we're slowing down to focus fiercely on one thing, alongside people who think 
@@ -146,80 +155,90 @@
       <!-- ============================
            HOW IT WORKS — compact schedule
            ============================ -->
-      <div class="landing-section reveal" id="how-it-works" style="position: relative;">
-        <!-- Street Art Background -->
-        <img src="assets/phone_bouquet_vertical.png" alt="" class="ambient-art ambient-art--schedule" aria-hidden="true">
-        <div class="landing-section__label landing-section__label--swipe">how a sunday goes</div>
-        <h2 class="landing-section__heading">no experience required. no <span class="swipe">finish line</span>.</h2>
+      <div class="landing-section reveal" id="how-it-works">
+        <div class="section-grid section-grid--art-left">
+          <div class="section-grid__art">
+            <img src="assets/phone_bouquet_vertical.png" alt="" class="section-art" aria-hidden="true">
+          </div>
+          <div class="section-grid__text">
+            <div class="landing-section__label landing-section__label--swipe">how a sunday goes</div>
+            <h2 class="landing-section__heading">no experience required. no <span class="swipe">finish line</span>.</h2>
 
-        <div class="schedule">
-          <div class="schedule__item reveal">
-            <div class="schedule__time">11:50</div>
-            <div class="schedule__content">
-              <div class="schedule__title">doors</div>
-              <div class="schedule__desc">grab food, meet people, get oriented.</div>
+            <div class="schedule">
+              <div class="schedule__item reveal">
+                <div class="schedule__time">11:50</div>
+                <div class="schedule__content">
+                  <div class="schedule__title">doors</div>
+                  <div class="schedule__desc">grab food, meet people, get oriented.</div>
+                </div>
+              </div>
+              <div class="schedule__item reveal">
+                <div class="schedule__time">12:00</div>
+                <div class="schedule__content">
+                  <div class="schedule__title">someone teaches</div>
+                  <div class="schedule__desc">a knowledge share from someone in the group — a concept they can't stop thinking about.</div>
+                </div>
+              </div>
+              <div class="schedule__item reveal">
+                <div class="schedule__time">12:30</div>
+                <div class="schedule__content">
+                  <div class="schedule__title">two-minute pitches</div>
+                  <div class="schedule__desc">everyone shares what they're working on. half-baked is welcome. teams form around what's interesting.</div>
+                </div>
+              </div>
+              <div class="schedule__item reveal">
+                <div class="schedule__time">1:00</div>
+                <div class="schedule__content">
+                  <div class="schedule__title">building</div>
+                  <div class="schedule__desc">deep, collaborative work. bring your laptop, your sketchbook, your ai tools, your napkin ideas.</div>
+                </div>
+              </div>
+              <div class="schedule__item reveal">
+                <div class="schedule__time">3:00</div>
+                <div class="schedule__content">
+                  <div class="schedule__title">show & tell</div>
+                  <div class="schedule__desc">we share what we made. something is alive now that wasn't at noon.</div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="schedule__item reveal">
-            <div class="schedule__time">12:00</div>
-            <div class="schedule__content">
-              <div class="schedule__title">someone teaches</div>
-              <div class="schedule__desc">a knowledge share from someone in the group — a concept they can't stop thinking about.</div>
-            </div>
-          </div>
-          <div class="schedule__item reveal">
-            <div class="schedule__time">12:30</div>
-            <div class="schedule__content">
-              <div class="schedule__title">two-minute pitches</div>
-              <div class="schedule__desc">everyone shares what they're working on. half-baked is welcome. teams form around what's interesting.</div>
-            </div>
-          </div>
-          <div class="schedule__item reveal">
-            <div class="schedule__time">1:00</div>
-            <div class="schedule__content">
-              <div class="schedule__title">building</div>
-              <div class="schedule__desc">deep, collaborative work. bring your laptop, your sketchbook, your ai tools, your napkin ideas.</div>
-            </div>
-          </div>
-          <div class="schedule__item reveal">
-            <div class="schedule__time">3:00</div>
-            <div class="schedule__content">
-              <div class="schedule__title">show & tell</div>
-              <div class="schedule__desc">we share what we made. something is alive now that wasn't at noon.</div>
-            </div>
+
+            <p class="schedule__closing reveal">you leave inspired, a little changed, and with people you'll see again.</p>
           </div>
         </div>
-
-        <p class="schedule__closing reveal">you leave inspired, a little changed, and with people you'll see again.</p>
       </div>
 
       <!-- ============================
            THIS SUNDAY — featured event + RSVP
            ============================ -->
-      <div class="landing-section reveal" id="this-sunday" style="position: relative;">
-        <!-- Street Art Background -->
-        <img src="assets/vr_flowers.png" alt="" class="ambient-art ambient-art--events" aria-hidden="true">
-        <div class="landing-section__label landing-section__label--copyright">this sunday</div>
+      <div class="landing-section reveal" id="this-sunday">
+        <div class="section-grid section-grid--art-right">
+          <div class="section-grid__text">
+            <div class="landing-section__label landing-section__label--copyright">this sunday</div>
 
-        <!-- Featured Next Event (populated by JS) -->
-        <div class="featured-event" id="featured-event">
-          <div class="featured-event__loading">
-            <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
-          </div>
-        </div>
-
-        <!-- Upcoming Events List -->
-        <div class="luma-events" id="luma-events">
-          <div class="luma-events__header">
-            <div class="luma-events__label">upcoming sessions</div>
-            <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="luma-events__cal-link" id="luma-cal-link">
-              view full calendar →
-            </a>
-          </div>
-          <div class="luma-events__list" id="luma-events-list">
-            <div class="skeleton-loader">
-              <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
+            <!-- Featured Next Event (populated by JS) -->
+            <div class="featured-event" id="featured-event">
+              <div class="featured-event__loading">
+                <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
+              </div>
             </div>
+
+            <!-- Upcoming Events List -->
+            <div class="luma-events" id="luma-events">
+              <div class="luma-events__header">
+                <div class="luma-events__label">upcoming sessions</div>
+                <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="luma-events__cal-link" id="luma-cal-link">
+                  view full calendar →
+                </a>
+              </div>
+              <div class="luma-events__list" id="luma-events-list">
+                <div class="skeleton-loader">
+                  <div class="skeleton-card"><div class="skeleton-line skeleton-line--title"></div><div class="skeleton-line skeleton-line--sub"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="section-grid__art">
+            <img src="assets/vr_flowers.png" alt="" class="section-art" aria-hidden="true">
           </div>
         </div>
 
@@ -246,17 +265,21 @@
       <!-- ============================
            WHAT'S COME OUT OF THIS ROOM — inline project showcase
            ============================ -->
-      <div class="landing-section reveal" id="made-here" style="position: relative;">
-        <!-- Street Art Background -->
-        <img src="assets/feeding_pigeons.png" alt="" class="ambient-art ambient-art--showcase" aria-hidden="true">
-
-        <div class="landing-section__label landing-section__label--tally">what's come out of this room</div>
-        <h2 class="landing-section__heading">some weeks, this room makes a tool. some weeks, a <span class="swipe">friendship</span>.</h2>
-        <p class="landing-section__body" style="margin-bottom: var(--space-xl);">
-          some weeks, a sentence one of us will keep using for the rest of our lives. 
-          tools, protocols, poems — things that wouldn't exist if the nurse and the prompt engineer 
-          and the muralist weren't sitting at the same table.
-        </p>
+      <div class="landing-section reveal" id="made-here">
+        <div class="section-grid section-grid--art-left">
+          <div class="section-grid__art">
+            <img src="assets/feeding_pigeons.png" alt="" class="section-art" aria-hidden="true">
+          </div>
+          <div class="section-grid__text">
+            <div class="landing-section__label landing-section__label--tally">what's come out of this room</div>
+            <h2 class="landing-section__heading">some weeks, this room makes a tool. some weeks, a <span class="swipe">friendship</span>.</h2>
+            <p class="landing-section__body" style="margin-bottom: var(--space-xl);">
+              some weeks, a sentence one of us will keep using for the rest of our lives. 
+              tools, protocols, poems — things that wouldn't exist if the nurse and the prompt engineer 
+              and the muralist weren't sitting at the same table.
+            </p>
+          </div>
+        </div>
 
         <div class="project-showcase" id="project-showcase">
           <div class="skeleton-loader">
@@ -719,35 +742,25 @@
     document.querySelectorAll('.reveal:not(.visible)').forEach(function(el) { revealObserver.observe(el); });
 
     // ============================================================
-    // PARALLAX DRIFT — Ambient Art
+    // PARALLAX DRIFT — Section Art
     // Respects prefers-reduced-motion for accessibility
     // ============================================================
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      var ambientImages = document.querySelectorAll('.ambient-art');
+      var sectionArt = document.querySelectorAll('.section-art');
       var ticking = false;
       
       function updateParallax() {
-        var scrollY = window.scrollY;
-        ambientImages.forEach(function(img) {
-          var parent = img.closest('section, .landing-section, header');
+        sectionArt.forEach(function(img) {
+          var parent = img.closest('.section-grid__art, .hero__art');
           if (!parent) return;
           var rect = parent.getBoundingClientRect();
           var parentCenter = rect.top + rect.height / 2;
           var viewCenter = window.innerHeight / 2;
-          var offset = (parentCenter - viewCenter) * -0.06; // subtle 6% parallax
-          img.style.transform = 'translateY(' + offset + 'px) ' + (img.dataset.rotate || 'rotate(0deg)');
+          var offset = (parentCenter - viewCenter) * -0.04; // subtle 4% parallax
+          img.style.transform = 'translateY(' + offset + 'px)';
         });
         ticking = false;
       }
-
-      // Store original rotations
-      ambientImages.forEach(function(img) {
-        var style = window.getComputedStyle(img);
-        var matrix = style.transform;
-        if (matrix && matrix !== 'none') {
-          img.dataset.rotate = '';
-        }
-      });
 
       window.addEventListener('scroll', function() {
         if (!ticking) {
