@@ -18,9 +18,11 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | page | url | purpose |
 |------|-----|---------|
 | **home** | `/index.html` | landing with manifesto, schedule, role signup, soundscape |
+| **sundays** | `/calendar.html` | member sign-up calendar — claim teach/MC, mint invite codes, edit topic |
+| **members** | `/members.html` | public directory of approved members |
 | **projects** | `/projects.html` | public showcase of community work with per-project detail modal and shareable permalink URLs |
-| **the vault** | `/ideas.html` | magic-link-authenticated idea repository — seed → project → company pipeline; includes "paste anything" extract panel |
-| **core team** | `/admin.html` | password-gated admin dashboard for signups, calendar, people, and bulk-paste idea import |
+| **creations** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
+| **core team** | `/admin.html` | password-gated admin dashboard for signups, calendar, members, invitations, bulk-paste import |
 
 ## tech stack
 
@@ -40,7 +42,8 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | `role_signups` | hold space / teach / brain trust signups | anon |
 | `sundays` | calendar + session metadata | anon |
 | `invitations` | community gating tokens | anon |
-| `ideas` | the vault + projects showcase — pipeline + `display_name` + `slug` for sharing | **authenticated** writes, anon reads |
+| `ideas` | submitted creations + public projects showcase — pipeline + `display_name` + `slug` for sharing | **authenticated** writes, anon reads |
+| `invitations` + `invitation_redemptions` | invite codes (master + per-member referrals); ledger tracks multi-use redemptions | service role for mutations; anon read of own |
 | `playlist_suggestions` | soundscape song suggestions | anon |
 
 ## key features
@@ -67,13 +70,23 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - two paths: add directly on spotify, or suggest a song via form
 - community suggestions feed with real-time rendering
 
-### the vault (ideas)
-- magic link authentication (supabase auth OTP)
+### creations (formerly "the vault")
+- magic link authentication (supabase auth OTP) — easy-mode auto-approves every sign-in as a member
 - idea lifecycle: seed → project → company
 - stage pipeline visualization with filtering and search
 - per-idea: title, description, github / website / demo URLs, team members, company name, optional `display_name` for public attribution
 - ✨ "paste anything — we'll extract it" panel: paste a whatsapp message, tweet, or rough notes → POSTs to `/api/extract-project` → prefills the form fields
-- edit/delete your own ideas, read everyone's
+- **full-edit modal** — click "edit" on your own card to change every field (title, description, links, team, stage, display name); delete also lives here
+
+### sundays calendar (members)
+- public read of the next 8 weeks; auto-extends each visit
+- claim teach or MC slot; edit your topic; drop out
+- mint per-member invite codes (codes still functional even though gating is dormant)
+- past archive view + cancellation badges + 1-of-3-filled summary pill per Sunday card
+
+### members directory (public)
+- `/members.html` — every approved member by join order with inviter attribution; founding members tagged
+- read-only; no auth required
 
 ### admin dashboard
 - sha-256 hashed password gate (no plaintext in source)
@@ -82,7 +95,8 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - calendar view for sunday scheduling
 - people directory
 - data export (json)
-- **ideas tab:** bulk-paste a WhatsApp chunk (or drop `_chat.txt`) → `/api/extract-projects-bulk` returns editable draft rows with display_name autoplaceholder → import selected to the vault via `/api/admin-import-projects`
+- **ideas tab:** bulk-paste a WhatsApp chunk (or drop `_chat.txt`) → `/api/extract-projects-bulk` returns editable draft rows with display_name autoplaceholder → import selected via `/api/admin-import-projects`
+- **members tab:** approve/revoke members, adjust invite quotas, mint or toggle the shared launch code (`WELCOME-2026` is the active master code; turn off to switch to invite-only)
 
 ## serverless endpoints (`api/`)
 
@@ -121,11 +135,11 @@ set in **vercel → project settings → environment variables**, then redeploy:
 
 ## auth setup
 
-for the vault (magic link login) to work, configure in supabase dashboard:
+for magic-link login (sundays calendar + creations submit/edit) to work, configure in supabase dashboard:
 
 - **authentication → url configuration:**
   - site url: `https://creationship.vercel.app`
-  - redirect urls: `https://creationship.vercel.app/ideas.html`
+  - redirect urls (allowlist): `https://creationship.vercel.app/**`, `https://church-of-creationship.vercel.app/**`, `https://*.vercel.app/**`, `http://localhost:3000/**`
 
 ## local development
 
@@ -157,7 +171,7 @@ vercel auto-deploys on push to `main`.
 ```
 ├── index.html                       # landing + signup + soundscape
 ├── projects.html                    # public projects showcase + detail modal
-├── ideas.html                       # the vault — authenticated idea board + paste-and-prefill
+├── ideas.html                       # creations — authenticated idea board + edit modal + paste-and-prefill
 ├── admin.html                       # core team dashboard + bulk-paste ideas tab
 ├── styles.css                       # full design system + modal + bulk-row styles
 ├── data.js                          # supabase client + all CRUD ops + slug helper

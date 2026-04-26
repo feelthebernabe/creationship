@@ -31,7 +31,7 @@
         <a href="calendar.html" class="site-nav__link">sundays</a>
         <a href="members.html" class="site-nav__link">members</a>
         <a href="projects.html" class="site-nav__link active">projects</a>
-        <a href="ideas.html" class="site-nav__link">ideas</a>
+        <a href="ideas.html" class="site-nav__link">creations</a>
       </div>
     </div>
   </nav>
@@ -48,6 +48,12 @@
         all born from sunday create-a-thons.
       </p>
     </header>
+
+    <!-- Member-only banner: shows when signed in. -->
+    <div class="member-cta-banner" id="member-banner" hidden>
+      <span><strong>have you made something?</strong> add it to your creations and it'll show up here.</span>
+      <a href="ideas.html">go to your creations →</a>
+    </div>
 
     <section class="projects-stage reveal" id="stage-companies" hidden>
       <div class="projects-stage__header">
@@ -84,7 +90,7 @@
     <section class="projects-cta reveal">
       <h3>have something to add?</h3>
       <p>
-        members can drop projects into <a href="ideas.html">the vault</a> —
+        sign in and drop it into <a href="ideas.html">your creations</a> —
         paste a whatsapp message or fill the form, we'll do the rest.
       </p>
     </section>
@@ -115,7 +121,7 @@
 
   <footer class="site-footer">
     <p>the creationship · the infinite create-a-thon</p>
-    <p style="margin-top:var(--space-sm);font-size:0.72rem;color:var(--text-muted);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:underline;">dear crisis</a> · © <span id="year"></span></p>
+    <p style="margin-top:var(--space-sm);font-size:0.75rem;color:rgba(255,255,255,0.5);">hosted by <a href="https://dearcrisis.com" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.65);text-decoration:underline;">dear crisis</a> · © <span id="year"></span></p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -455,6 +461,17 @@
     }
 
     loadProjects();
+
+    // Reveal the member CTA banner once a session is present.
+    (async function () {
+      try {
+        const session = await DB.getSession();
+        if (session) document.getElementById('member-banner').hidden = false;
+        DB.onAuthStateChange((event, sess) => {
+          document.getElementById('member-banner').hidden = !sess;
+        });
+      } catch (e) { /* anon */ }
+    })();
   </script>
 
   <script defer src="/_vercel/insights/script.js"></script>

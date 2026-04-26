@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>the vault — the creationship</title>
-  <meta name="description" content="where ideas become projects become companies. the creationship's idea repository.">
+  <title>your creations — the creationship</title>
+  <meta name="description" content="where ideas become projects become companies. submit and update what you're making.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="og-vault.png">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="the vault — the creationship">
+  <meta property="og:title" content="your creations — the creationship">
   <meta property="og:description" content="where ideas become projects become companies.">
   <meta property="og:image" content="https://creationship.vercel.app/og-vault.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -31,7 +31,8 @@
         <a href="index.html" class="site-nav__link">home</a>
         <a href="calendar.html" class="site-nav__link">sundays</a>
         <a href="members.html" class="site-nav__link">members</a>
-        <a href="ideas.html" class="site-nav__link active">ideas</a>
+        <a href="projects.html" class="site-nav__link">projects</a>
+        <a href="ideas.html" class="site-nav__link active">creations</a>
       </div>
     </div>
   </nav>
@@ -42,13 +43,13 @@
     <section id="view-login" class="view active">
       <div class="login-view">
         <div class="login-card">
-          <h2>the vault</h2>
+          <h2>your creations</h2>
           <p class="subtitle">where ideas become projects become companies.</p>
 
           <div class="vault-features">
             <div class="vault-feature">
               <span class="vault-feature__icon">→</span>
-              <span>track your project from napkin idea to launch</span>
+              <span>submit + update what you're making</span>
             </div>
             <div class="vault-feature">
               <span class="vault-feature__icon">→</span>
@@ -91,7 +92,7 @@
 
       <div class="board-header">
         <div>
-          <h1 style="font-size:1.4rem;">idea repository</h1>
+          <h1 style="font-size:1.4rem;">your creations</h1>
           <div class="board-header__user">
             signed in as <strong id="user-display-name"></strong>
           </div>
@@ -312,6 +313,77 @@
           <input type="text" id="display-name" placeholder="your name" required>
         </div>
         <button type="submit" class="btn btn--primary btn--full">save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit creation modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal modal--wide">
+      <button class="modal__close" data-close-edit aria-label="close">×</button>
+      <h3>edit your creation</h3>
+      <p class="modal__hint">update anything below — saves to your card immediately.</p>
+      <form id="edit-form" novalidate>
+        <input type="hidden" id="edit-id">
+
+        <div class="form-group">
+          <label for="edit-stage">stage</label>
+          <select id="edit-stage">
+            <option value="seed">seed — half-baked idea</option>
+            <option value="project">project — actively building</option>
+            <option value="company">company — shipped</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-title">project name</label>
+          <input type="text" id="edit-title" required>
+        </div>
+
+        <div class="form-group" id="edit-company-field" hidden>
+          <label for="edit-company-name">company name</label>
+          <input type="text" id="edit-company-name" placeholder="the registered or working name">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-display-name">how to show you on the public page <small>(optional)</small></label>
+          <input type="text" id="edit-display-name" placeholder="leave blank for initials">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-desc">description</label>
+          <textarea id="edit-desc" style="min-height:90px;"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-github">github</label>
+            <input type="url" id="edit-github" placeholder="https://github.com/...">
+          </div>
+          <div class="form-group">
+            <label for="edit-website">website</label>
+            <input type="url" id="edit-website" placeholder="https://...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-demo">demo / prototype link</label>
+          <input type="url" id="edit-demo" placeholder="https://demo.example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-team">team members <small>(comma-separated names)</small></label>
+          <input type="text" id="edit-team" placeholder="alice, bob, …">
+        </div>
+
+        <div class="modal__error" id="edit-error" hidden></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn--danger btn--sm" id="edit-delete-btn">delete</button>
+          <span style="flex:1"></span>
+          <button type="button" class="btn btn--ghost btn--sm" data-close-edit>cancel</button>
+          <button type="submit" class="btn btn--primary btn--sm" id="edit-save-btn">save</button>
+        </div>
       </form>
     </div>
   </div>
@@ -623,7 +695,7 @@
       }
 
       empty.style.display = 'none';
-      countEl.textContent = ideas.length + (ideas.length === 1 ? ' entry' : ' entries') + ' in the vault';
+      countEl.textContent = ideas.length + (ideas.length === 1 ? ' creation' : ' creations');
 
       // If we're filtering by a specific stage, don't group — just list
       if (activeFilter !== 'all') {
@@ -724,7 +796,6 @@
             ${isOwn ? `
               <div class="idea-card__actions">
                 <button class="btn btn--ghost btn--sm" onclick="editIdea('${idea.id}')">edit</button>
-                <button class="btn btn--danger btn--sm" onclick="removeIdea('${idea.id}')">delete</button>
               </div>
             ` : ''}
           </div>
@@ -790,17 +861,101 @@
       } catch (err) { showToast('couldn\'t delete — try again'); }
     }
 
-    async function editIdea(id) {
-      const card = document.querySelector(`[data-id="${id}"]`);
-      const currentTitle = card.querySelector('.idea-card__title').textContent;
-      const newTitle = prompt('update the idea:', currentTitle);
-      if (!newTitle || newTitle === currentTitle) return;
-      try {
-        await DB.updateIdea(id, { title: newTitle });
-        showToast('updated ✓');
-        await loadIdeas();
-      } catch (err) { showToast('couldn\'t update'); }
+    // ============================================================
+    // EDIT MODAL — full edit of an existing creation.
+    // ============================================================
+
+    const editModal = document.getElementById('edit-modal');
+    const editForm = document.getElementById('edit-form');
+
+    function openEditModal(idea) {
+      document.getElementById('edit-id').value = idea.id;
+      document.getElementById('edit-stage').value = idea.stage || 'seed';
+      document.getElementById('edit-title').value = idea.title || '';
+      document.getElementById('edit-company-name').value = idea.company_name || '';
+      document.getElementById('edit-display-name').value = idea.display_name || '';
+      document.getElementById('edit-desc').value = idea.description || '';
+      document.getElementById('edit-github').value = idea.github_url || '';
+      document.getElementById('edit-website').value = idea.website_url || '';
+      document.getElementById('edit-demo').value = idea.demo_url || '';
+      // team_members is array of { name } objects (or strings for legacy)
+      const teamNames = (idea.team_members || []).map(m => typeof m === 'string' ? m : (m.name || '')).filter(Boolean);
+      document.getElementById('edit-team').value = teamNames.join(', ');
+      toggleEditCompanyField();
+      document.getElementById('edit-error').hidden = true;
+      editModal.classList.add('active');
+      setTimeout(() => document.getElementById('edit-title').focus(), 50);
     }
+
+    function closeEditModal() { editModal.classList.remove('active'); }
+
+    function toggleEditCompanyField() {
+      const stage = document.getElementById('edit-stage').value;
+      document.getElementById('edit-company-field').hidden = (stage !== 'company');
+    }
+    document.getElementById('edit-stage').addEventListener('change', toggleEditCompanyField);
+
+    document.querySelectorAll('[data-close-edit]').forEach(b => b.addEventListener('click', closeEditModal));
+    editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && editModal.classList.contains('active')) closeEditModal();
+    });
+
+    function editIdea(id) {
+      const idea = allIdeas.find(i => i.id === id);
+      if (!idea) { showToast('couldn\'t find that creation'); return; }
+      openEditModal(idea);
+    }
+
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-id').value;
+      const title = document.getElementById('edit-title').value.trim();
+      if (!title) {
+        document.getElementById('edit-error').textContent = 'title is required';
+        document.getElementById('edit-error').hidden = false;
+        return;
+      }
+      const team = document.getElementById('edit-team').value
+        .split(',').map(s => s.trim()).filter(Boolean).map(name => ({ name }));
+      const updates = {
+        title,
+        stage: document.getElementById('edit-stage').value,
+        company_name: document.getElementById('edit-company-name').value.trim(),
+        display_name: document.getElementById('edit-display-name').value.trim(),
+        description: document.getElementById('edit-desc').value.trim(),
+        github_url: document.getElementById('edit-github').value.trim(),
+        website_url: document.getElementById('edit-website').value.trim(),
+        demo_url: document.getElementById('edit-demo').value.trim(),
+        team_members: team
+      };
+      const saveBtn = document.getElementById('edit-save-btn');
+      saveBtn.disabled = true; saveBtn.textContent = 'saving…';
+      try {
+        await DB.updateIdea(id, updates);
+        showToast('updated ✓');
+        closeEditModal();
+        await loadIdeas();
+      } catch (err) {
+        console.error('updateIdea:', err);
+        document.getElementById('edit-error').textContent = err.message || 'couldn\'t save — try again?';
+        document.getElementById('edit-error').hidden = false;
+      } finally {
+        saveBtn.disabled = false; saveBtn.textContent = 'save';
+      }
+    });
+
+    document.getElementById('edit-delete-btn').addEventListener('click', async () => {
+      const id = document.getElementById('edit-id').value;
+      if (!id) return;
+      if (!confirm('delete this creation? this cannot be undone.')) return;
+      try {
+        await DB.deleteIdea(id);
+        showToast('deleted');
+        closeEditModal();
+        await loadIdeas();
+      } catch (err) { showToast('couldn\'t delete — try again'); }
+    });
 
     // ============================================================
     // INIT
