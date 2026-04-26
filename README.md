@@ -18,7 +18,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | nav label | url | purpose |
 |-----------|-----|---------|
 | **home** | `/index.html` | landing — ambient-art hero, "the room" narrative, schedule, this-sunday Luma feed, "made here" projects preview, soundscape |
-| **volunteer** | `/calendar.html` | **zero-auth** sunday sign-up — anyone types name + email to claim a teach or MC slot; confirmation email arrives with a per-signup `cancel_token`; visiting `/calendar.html?cancel=<token>` drops the slot. Automated day-7 + day-1 reminder emails via Vercel cron. "Lost the cancel link?" recovery flow re-sends a single email listing every upcoming sunday the address is on. |
+| **volunteer** | `/calendar.html` | **zero-auth** sunday sign-up — anyone types name + email to claim a teach or MC slot. Confirmation email contains a per-signup `cancel_token`. Drop out by pasting the token into the in-page "have your cancel code?" form (primary path; works even when Resend's click-tracker is broken). Automated day-7 + day-1 reminder emails via Vercel cron. "Lost your cancel code?" recovery flow re-sends a single email listing every upcoming sunday the address is on. |
 | **projects** | `/projects.html` | public showcase of community work — per-project detail modal, shareable permalink URLs, falls back to a built-in static seed of 17 WhatsApp-extracted projects so the page is never empty. (Page hero reads "show me the receipts"; nav label kept as `projects` for clarity. Filename never renamed.) |
 | **submit** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault" / "creations") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
 | **ethics** | `/ethics.html` | how the room agrees to work — financial-exchange clarity + consent/credit principles. Static page, no data layer. |
@@ -86,14 +86,16 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 ### volunteer calendar (formerly "sundays") — zero-auth + email reminders
 - **No magic-link gate.** Anyone can claim a teach or MC slot by entering name + email — no sign-in, no member approval. Replaced the prior auth-gated flow as of commit `c2599b8` (2026-04-26).
 - public read of the next 8 weeks; auto-extends each visit
-- claim flow returns a per-signup `cancel_token` that lives only in the confirmation email — it never appears in the page DOM. Visiting `/calendar.html?cancel=<token>` cancels the slot without sign-in.
+- claim flow returns a per-signup `cancel_token`. The token reaches the user via the confirmation email (as a copy-paste string AND as a wrapped clickable URL). Two drop-out paths:
+  1. **primary**: paste the token into the **"have your cancel code?" form** on `/calendar.html` → instant cancel via `/api/cancel-claim`. Works regardless of email-link health.
+  2. **fallback**: visit `/calendar.html?cancel=<token>` directly. Same endpoint. Only works if the user can extract the URL from the wrapped email link.
 - four email types via Resend (graceful no-op if `RESEND_API_KEY` is missing):
-  1. **confirmation** — fires from `/api/claim-slot` immediately after the claim succeeds
+  1. **confirmation** — fires from `/api/claim-slot` immediately after the claim succeeds (awaited synchronously — fire-and-forget breaks in Vercel serverless)
   2. **day-7 reminder** — fires from the daily Vercel cron 7 days before
   3. **day-1 reminder** — fires from the same cron the morning before
   4. **cancellation** — fires from `/api/notify-cancellation` when admin marks a sunday cancelled
-- **emails are sending text-only**, not HTML. Resend's `onboarding@resend.dev` sandbox sender forces click-tracking, and the tracker domain (`us-east-1.resend-clicks.com`) had an SSL outage on 2026-04-27 that broke every wrapped cancel link. Plain-text URLs aren't wrapped, so we switched. To restore HTML: verify a custom Resend sender domain, disable click-tracking on it, then add `html: tpl.html` back to the payload in [api/_email.js](api/_email.js)
-- "**lost your cancel link?**" recovery — `<details>` panel asks for an email; `/api/resend-cancel-links` calls a service-role-only RPC and emails one summary listing every upcoming sunday that address is on, each with its cancel link. Endpoint always returns 200 so it doesn't leak whether an email is signed up.
+- **emails are text-only**, not HTML. Resend's `onboarding@resend.dev` sandbox forces click-tracking on every URL — including in plain text — and the tracker domain (`us-east-1.resend-clicks.com`) has had recurring SSL failures that break clickable links. The cancel-by-token form bypasses this entirely. To restore clean clickable links: verify a custom Resend sender domain, disable click-tracking on it, then optionally re-add `html: tpl.html` to the payload in [api/_email.js](api/_email.js).
+- "**lost your cancel code?**" recovery — `<details>` panel asks for an email; `/api/resend-cancel-links` calls a service-role-only RPC and emails one summary listing every upcoming sunday that address is on, each with its cancel **code** (and a fallback URL). Endpoint always returns 200 so it doesn't leak whether an email is signed up.
 - past archive view + cancellation badges + 1-of-3-filled summary pill per Sunday card
 - old auth-required SQL functions (`claim_teach`, `claim_mc`, `unclaim_*`, `mint_invitation`, etc.) still exist in the DB but are no longer called from the UI — kept for future re-enablement of gated mode
 

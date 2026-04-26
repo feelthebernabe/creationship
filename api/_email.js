@@ -43,61 +43,72 @@ ${bodyHtml}
 
 // Templates ----------------------------------------------------------------
 
+// IMPORTANT: Resend's tracking proxy wraps every URL in both HTML and
+// plain-text emails (us-east-1.resend-clicks.com), and that proxy has
+// had SSL issues that break clickable links entirely. Until a custom
+// domain is verified in Resend (with click-tracking disabled), we make
+// the cancel flow not depend on a clickable URL at all:
+//   • show the cancel token as a copy-paste string (just text — never wrapped)
+//   • point users to /calendar.html → the "have your cancel code?" form
+//   • a wrapped URL appears as a fallback for users whose link works
+
+function cancelInstructions(cancel_token) {
+  return `to cancel:
+  1. open https://creationship.vercel.app/calendar.html
+  2. scroll to "have your cancel code?"
+  3. paste this code: ${cancel_token}
+
+(or if your email link works, click: ${cancelUrl(cancel_token)})`;
+}
+
 function tplConfirmation({ name, role_type, sunday_date, title, cancel_token }) {
   const role = roleLabel(role_type);
   const date = fmtDate(sunday_date);
-  const url = cancelUrl(cancel_token);
-  const topicLine = title ? `<p>your topic: <em>${escapeHtml(title)}</em></p>` : '';
+  const topicLine = title ? `topic: ${title}\n` : '';
   return {
     subject: `you're ${role} on ${date}`,
-    html: shell(`
-      <p>hi ${escapeHtml(name || 'there')},</p>
-      <p>you're confirmed as <strong>${role}</strong> for <strong>${date}</strong>.</p>
-      ${topicLine}
-      <p>noon at caravan of dreams (405 e 6th st, east village).</p>
-      <p style="margin-top:24px;">
-        if this wasn't you, or you can't make it, drop out here:<br>
-        <a href="${url}" style="color:#c4654a;">${url}</a>
-      </p>
-    `),
-    text: `you're confirmed as ${role} for ${date}.\n${title ? 'topic: ' + title + '\n' : ''}noon at caravan of dreams (405 e 6th st).\n\nif this wasn't you, cancel: ${url}\n`
+    text: `hi ${name || 'there'},
+
+you're confirmed as ${role} for ${date}.
+${topicLine}noon at caravan of dreams (405 e 6th st, east village).
+
+${cancelInstructions(cancel_token)}
+`
   };
 }
 
 function tplDay7({ name, role_type, sunday_date, title, cancel_token }) {
   const role = roleLabel(role_type);
   const date = fmtDate(sunday_date);
-  const url = cancelUrl(cancel_token);
+  const topicLine = title ? `topic: ${title}\n` : '';
   return {
     subject: `you're ${role} this sunday in a week`,
-    html: shell(`
-      <p>hi ${escapeHtml(name || 'there')},</p>
-      <p>heads up — you're <strong>${role}</strong> on <strong>${date}</strong>, one week from today.</p>
-      ${title ? `<p>your topic: <em>${escapeHtml(title)}</em></p>` : ''}
-      <p>if anything has changed and you can't make it, drop out and someone else can claim the slot:<br>
-        <a href="${url}" style="color:#c4654a;">${url}</a>
-      </p>
-    `),
-    text: `you're ${role} on ${date}, one week from today.\n${title ? 'topic: ' + title + '\n' : ''}\ncan't make it? cancel: ${url}\n`
+    text: `hi ${name || 'there'},
+
+heads up — you're ${role} on ${date}, one week from today.
+${topicLine}
+if anything has changed and you can't make it, drop out so someone else can claim the slot.
+
+${cancelInstructions(cancel_token)}
+`
   };
 }
 
 function tplDay1({ name, role_type, sunday_date, title, cancel_token }) {
   const role = roleLabel(role_type);
   const date = fmtDate(sunday_date);
-  const url = cancelUrl(cancel_token);
+  const topicLine = title ? `topic: ${title}\n` : '';
   return {
     subject: `tomorrow: you're ${role} at the creationship`,
-    html: shell(`
-      <p>hi ${escapeHtml(name || 'there')},</p>
-      <p><strong>tomorrow</strong> (${date}) at noon — you're <strong>${role}</strong>.</p>
-      ${title ? `<p>your topic: <em>${escapeHtml(title)}</em></p>` : ''}
-      <p>caravan of dreams · 405 e 6th st, east village · doors at 11:50.</p>
-      <p style="margin-top:24px;">if something came up and you can't make it, please drop out so we can fill the slot:<br>
-        <a href="${url}" style="color:#c4654a;">${url}</a>
-      </p>
-    `),
-    text: `tomorrow ${date} at noon, you're ${role}.\n${title ? 'topic: ' + title + '\n' : ''}caravan of dreams, 405 e 6th st.\n\ncan't make it? ${url}\n`
+    text: `hi ${name || 'there'},
+
+tomorrow (${date}) at noon — you're ${role}.
+${topicLine}caravan of dreams · 405 e 6th st, east village · doors at 11:50.
+
+if something came up and you can't make it, please drop out so we can fill the slot.
+
+${cancelInstructions(cancel_token)}
+`
   };
 }
 
@@ -106,42 +117,39 @@ function tplCancellation({ name, role_type, sunday_date }) {
   const date = fmtDate(sunday_date);
   return {
     subject: `${date} sunday is cancelled`,
-    html: shell(`
-      <p>hi ${escapeHtml(name || 'there')},</p>
-      <p>the <strong>${date}</strong> sunday — where you were signed up for <strong>${role}</strong> — has been cancelled.</p>
-      <p>nothing to do; we just wanted to let you know so you don't show up to a closed door. we'll be back the following week.</p>
-    `),
-    text: `the ${date} sunday — where you were ${role} — has been cancelled.\nwe'll be back the following week.\n`
+    text: `hi ${name || 'there'},
+
+the ${date} sunday — where you were signed up for ${role} — has been cancelled.
+
+nothing to do; we just wanted to let you know so you don't show up to a closed door. we'll be back the following week.
+`
   };
 }
 
-// "lost your cancel link" — list every upcoming claim with its cancel URL.
+// "lost your cancel link" — list every upcoming claim with cancel codes
+// the user can copy-paste into the form on calendar.html. URLs included
+// as fallback but the cancel codes are the primary path (work even when
+// Resend's tracker domain is broken).
 function tplResendLinks(signups) {
-  const items = signups.map(s => {
+  const blocks = signups.map((s, i) => {
     const role = roleLabel(s.role_type);
     const date = fmtDate(s.sunday_date);
-    const url = cancelUrl(s.cancel_token);
-    const titleLine = s.title
-      ? `<br><span style="color:#a09890;font-size:0.85rem;">topic: ${escapeHtml(s.title)}</span>`
-      : '';
-    return `<li style="margin-bottom:18px;padding-left:0;">
-      <strong>${role} on ${date}</strong>${titleLine}<br>
-      <a href="${url}" style="color:#c4654a;">cancel this slot →</a>
-    </li>`;
-  }).join('');
-  const textLines = signups.map(s => {
-    const role = roleLabel(s.role_type);
-    const date = fmtDate(s.sunday_date);
-    return `${role} on ${date}${s.title ? ' — ' + s.title : ''}\n  cancel: ${cancelUrl(s.cancel_token)}\n`;
-  }).join('\n');
+    const titleLine = s.title ? `  topic: ${s.title}\n` : '';
+    return `${i + 1}. ${role} on ${date}\n${titleLine}   cancel code: ${s.cancel_token}\n   (or link: ${cancelUrl(s.cancel_token)})`;
+  }).join('\n\n');
   return {
     subject: `your active sundays at the creationship`,
-    html: shell(`
-      <p>here's everything you're currently signed up for. click "cancel" on any one you can't make:</p>
-      <ul style="list-style:none;padding-left:0;">${items}</ul>
-      <p style="font-size:0.85rem;color:#a09890;margin-top:24px;">if nothing here looks right, you may have signed up under a different email.</p>
-    `),
-    text: 'here\'s everything you\'re currently signed up for:\n\n' + textLines
+    text: `here's everything you're currently signed up for.
+
+to cancel any of these:
+  1. open https://creationship.vercel.app/calendar.html
+  2. scroll to "have your cancel code?"
+  3. paste the code for the slot you want to drop
+
+${blocks}
+
+if nothing here looks right, you may have signed up under a different email.
+`
   };
 }
 

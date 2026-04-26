@@ -39,7 +39,7 @@
   <main class="container">
 
     <section class="cal-header">
-      <h1 class="cal-header__title">sundays at the creationship</h1>
+      <h1 class="cal-header__title">volunteer for a sunday</h1>
       <p class="cal-header__subtitle">
         every sunday someone holds the room and someone teaches at the intersection of
         <em>forever-human</em> and <em>new tech</em>. drop your email below to claim a slot —
@@ -59,17 +59,33 @@
     </section>
     <section class="cal-list cal-list--past" id="cal-list-past" hidden></section>
 
-    <!-- Drop-out helper for anyone who lost the email link. -->
-    <details class="resend-links">
-      <summary class="resend-links__summary">need to drop out? lost the cancel link?</summary>
+    <!-- Direct cancel by token — primary drop-out path because email-link
+         clicks have to traverse Resend's broken click-tracker. -->
+    <details class="resend-links" id="cancel-by-token" open>
+      <summary class="resend-links__summary">have your cancel code? drop out here</summary>
       <div class="resend-links__body">
         <p class="resend-links__hint">
-          enter the email you signed up with — we'll re-send a single email
-          listing every sunday you're currently on, with cancel links for each.
+          paste the cancel code from your confirmation email. one slot per submit.
+        </p>
+        <form id="cancel-token-form" novalidate>
+          <input type="text" id="cancel-token-input" placeholder="paste code (looks like a long string of letters + numbers)" required style="font-family:ui-monospace,monospace;letter-spacing:0.02em;">
+          <button type="submit" class="btn btn--primary btn--sm" id="cancel-token-submit">drop out</button>
+        </form>
+        <div class="resend-links__msg" id="cancel-token-msg" hidden></div>
+      </div>
+    </details>
+
+    <!-- Lost the cancel code? Get a fresh email with all your active codes. -->
+    <details class="resend-links">
+      <summary class="resend-links__summary">lost your cancel code? email it to yourself</summary>
+      <div class="resend-links__body">
+        <p class="resend-links__hint">
+          enter the email you signed up with — we'll send one message listing
+          every sunday you're on, each with its cancel code.
         </p>
         <form id="resend-form" novalidate>
           <input type="email" id="resend-email" placeholder="you@example.com" required>
-          <button type="submit" class="btn btn--ghost btn--sm" id="resend-submit">resend my links</button>
+          <button type="submit" class="btn btn--ghost btn--sm" id="resend-submit">resend my codes</button>
         </form>
         <div class="resend-links__msg" id="resend-msg" hidden></div>
       </div>
@@ -167,6 +183,11 @@
       resendEmail: $('resend-email'),
       resendSubmit: $('resend-submit'),
       resendMsg: $('resend-msg'),
+
+      cancelTokenForm: $('cancel-token-form'),
+      cancelTokenInput: $('cancel-token-input'),
+      cancelTokenSubmit: $('cancel-token-submit'),
+      cancelTokenMsg: $('cancel-token-msg'),
 
       modalTeach: $('modal-teach'),
       teachForm: $('teach-form'),
@@ -496,6 +517,39 @@
       els.cancelBanner.textContent = msg;
       els.cancelBanner.hidden = false;
     }
+
+    // Direct cancel by token — primary drop-out path ----------------------
+    els.cancelTokenForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = els.cancelTokenInput.value.trim();
+      if (!token) return;
+      els.cancelTokenMsg.hidden = true;
+      els.cancelTokenSubmit.disabled = true;
+      els.cancelTokenSubmit.textContent = 'cancelling…';
+      try {
+        const resp = await fetch('/api/cancel-claim?token=' + encodeURIComponent(token));
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          els.cancelTokenMsg.className = 'resend-links__msg resend-links__msg--error';
+          els.cancelTokenMsg.textContent = friendly(json.error);
+        } else {
+          const role = json.role_type === 'teach' ? 'teaching' : 'MCing';
+          const date = formatSundayDate(json.sunday_date);
+          els.cancelTokenMsg.className = 'resend-links__msg resend-links__msg--ok';
+          els.cancelTokenMsg.textContent = "you've been dropped from " + role + ' on ' + date + '. thanks.';
+          els.cancelTokenForm.reset();
+          await refreshCalendar(); render();
+        }
+        els.cancelTokenMsg.hidden = false;
+      } catch (err) {
+        els.cancelTokenMsg.className = 'resend-links__msg resend-links__msg--error';
+        els.cancelTokenMsg.textContent = 'network error — try again.';
+        els.cancelTokenMsg.hidden = false;
+      } finally {
+        els.cancelTokenSubmit.disabled = false;
+        els.cancelTokenSubmit.textContent = 'drop out';
+      }
+    });
 
     // "Lost your cancel link" ----------------------------------------------
     els.resendForm.addEventListener('submit', async (e) => {
