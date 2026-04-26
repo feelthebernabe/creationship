@@ -4,7 +4,12 @@
 
 const { Resend } = require('resend');
 
-const FROM = 'the creationship <onboarding@resend.dev>';
+// Verified sender domain (mail.futureminds.ai). Can deliver to anyone.
+// Click tracking + open tracking are off by default on this domain,
+// so URLs in emails go directly to our real endpoints (no Resend
+// wrapper proxy). To revert to sandbox: change to onboarding@resend.dev
+// and remember it only delivers to the account holder's address.
+const FROM = 'the creationship <hello@mail.futureminds.ai>';
 const REPLY_TO = 'mailforbernabe@gmail.com';
 const SITE = 'https://creationship.vercel.app';
 
