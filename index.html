@@ -712,7 +712,7 @@
         var order = { company: 0, project: 1, seed: 2 };
         active.sort(function(a, b) { return (order[a.stage]||2) - (order[b.stage]||2); });
         var top6 = active.slice(0, 6);
-        if (top6.length === 0) { container.innerHTML = '<p style="color:var(--text-muted)">projects coming soon.</p>'; return; }
+        if (top6.length === 0) { container.innerHTML = ''; return; }
         container.innerHTML = top6.map(renderShowcaseCard).join('');
         container.querySelectorAll('.share-btn[data-copy-url]').forEach(function(btn) {
           btn.addEventListener('click', function(e) { e.stopPropagation(); navigator.clipboard.writeText(btn.dataset.copyUrl).then(function() { showToast('link copied ✓'); }); });

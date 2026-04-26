@@ -221,9 +221,9 @@ h4 {
 /* Two-column hero grid */
 .hero__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.3fr;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   min-height: 80vh;
   padding: 0 clamp(1.5rem, 5vw, 5rem);
@@ -265,14 +265,15 @@ h4 {
   z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  justify-content: flex-end;
+  margin-right: calc(clamp(1.5rem, 5vw, 5rem) * -1); /* Break out of grid padding on the right */
   mix-blend-mode: multiply;
 }
 
 .hero__art .section-art {
   width: 100%;
-  max-width: 520px;
+  max-width: 750px;
+  margin-right: -5%; /* Subtle off-screen bleed without transform conflict */
 }
 
 @media (max-width: 768px) {
@@ -284,10 +285,13 @@ h4 {
   .hero__art {
     order: -1;
     padding: 1rem 2rem 0;
+    margin-right: 0;
+    justify-content: center;
     max-height: 280px;
     overflow: hidden;
   }
   .hero__art .section-art {
+    width: 100%;
     max-width: 300px;
     margin: 0 auto;
   }
@@ -428,7 +432,7 @@ h4 {
   padding-right: var(--space-lg);
   position: relative;
   overflow: visible;
-  mix-blend-mode: multiply;
+  mix-blend-mode: darken;
 }
 
 /* Decorative section divider — gradient fade instead of boring 1px line */
