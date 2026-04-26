@@ -204,21 +204,19 @@
       }
       card.appendChild(header);
 
+      // Author line absorbs the team — when there's a team_members array,
+      // we render "by [name] and team" instead of listing individual chips.
+      const team = Array.isArray(idea.team_members) ? idea.team_members : [];
+      const hasTeam = team.some(m => m && m.name);
+
       const author = displayFor(idea);
       if (author) {
-        card.appendChild(el('div', 'project-card__author', 'by ' + author));
+        const label = hasTeam ? 'by ' + author + ' and team' : 'by ' + author;
+        card.appendChild(el('div', 'project-card__author', label));
       }
 
       if (idea.description) {
         card.appendChild(el('p', 'project-card__desc', idea.description));
-      }
-
-      const team = Array.isArray(idea.team_members) ? idea.team_members : [];
-      const teamNames = team.filter(m => m && m.name).map(m => m.name);
-      if (teamNames.length) {
-        const teamWrap = el('div', 'project-card__team');
-        teamNames.forEach(name => teamWrap.appendChild(el('span', 'project-chip', name)));
-        card.appendChild(teamWrap);
       }
 
       const linksWrap = el('div', 'project-card__links');
@@ -273,9 +271,14 @@
         modalBody.appendChild(el('div', 'project-modal__company', idea.company_name));
       }
 
+      // Author line absorbs the team — same convention as the card.
+      const team = Array.isArray(idea.team_members) ? idea.team_members : [];
+      const hasTeam = team.some(m => m && m.name);
+
       const author = displayFor(idea);
       if (author) {
-        modalBody.appendChild(el('div', 'project-modal__by', 'by ' + author));
+        const label = hasTeam ? 'by ' + author + ' and team' : 'by ' + author;
+        modalBody.appendChild(el('div', 'project-modal__by', label));
       }
 
       if (idea.description) {
@@ -301,17 +304,7 @@
       addLink(idea.github_url, '</>', 'see code');
       addLink(idea.demo_url, '▶', 'try demo');
       if (linksWrap.childNodes.length) modalBody.appendChild(linksWrap);
-
-      const team = Array.isArray(idea.team_members) ? idea.team_members : [];
-      const teamNames = team.filter(m => m && m.name).map(m => m.name);
-      if (teamNames.length) {
-        const teamWrap = el('div', 'project-modal__team');
-        teamWrap.appendChild(el('div', 'project-modal__team-label', 'team'));
-        const chips = el('div', 'project-modal__team-chips');
-        teamNames.forEach(name => chips.appendChild(el('span', 'project-chip', name)));
-        teamWrap.appendChild(chips);
-        modalBody.appendChild(teamWrap);
-      }
+      // (Team list removed — names are summarized via "and team" on the author line above.)
     }
 
     function openModal(idea, opts) {
@@ -415,7 +408,7 @@
     // ------------------------------------------------------------
     const SEED_PROJECTS = [
       { title: 'MBT Therapist Bot', author_name: 'Michelle', stage: 'seed', status: 'active', team_members: [],
-        description: "AI therapist trained on Mentalization-Based Therapy manuals. Relentlessly curious, deliberately not-knowing stance. Grounded in Bateman & Fonagy." },
+        description: "AI therapist trained to be relentlessly curious, deliberately not-knowing stance." },
       { title: 'Vibe Parties', author_name: 'Benjamin Von Wong', stage: 'project', status: 'active',
         website_url: 'https://vibe-parties.web.app', demo_url: 'https://vibe-parties.web.app/101',
         team_members: [{ name: 'Brandon Levy' }],
@@ -472,10 +465,6 @@
         website_url: 'https://cause-compass-silk.vercel.app/',
         team_members: [],
         description: "Volunteer matchmaker — chatbot intake builds a qualitative profile and matches people to causes. V1 prototype, buggy." },
-      { title: 'Earth Day Salon', author_name: 'Charlotte Binns', stage: 'company', status: 'active',
-        website_url: 'https://www.viewcy.com/event/earth_day_salon',
-        team_members: [{ name: 'Samantha Sweetwater' }, { name: 'Daniel Pinchbeck' }],
-        description: "Earth Day fireside salon on True Human, Gaia, protopic political imagination, embodied kinship consciousness." },
       { title: 'Demilitarise Education UX', author_name: 'Danielle Gauthier', stage: 'project', status: 'active',
         team_members: [],
         description: "UX design making the Demilitarise Education site easier to navigate; improving treaty/policy readability." },
