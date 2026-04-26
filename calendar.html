@@ -362,6 +362,28 @@
         el('span', 'sunday-card__date-rel', opts.past ? pastLabel(s.date) : relativeLabel(s.date))
       );
       head.append(dateBox);
+
+      // Slot-fill summary pill — at-a-glance how full this Sunday is.
+      // Counts: teacher (0 or 1) + mcs.length, out of 1 + ideal_mcs (we
+      // treat 2 MCs as a healthy default, so 1+2=3 total).
+      if (s.status !== 'cancelled' && !opts.past) {
+        const teacherFilled = s.teacher_signup_id ? 1 : 0;
+        const mcCount = (s.mc_signups || []).length;
+        const totalFilled = teacherFilled + mcCount;
+        const targetTotal = 3;
+        const fillClass = totalFilled === 0 ? 'fill-empty'
+                        : totalFilled >= targetTotal ? 'fill-full'
+                        : 'fill-partial';
+        const pill = el('div', 'sunday-card__fill ' + fillClass);
+        pill.append(el('span', 'sunday-card__fill-dot'));
+        pill.append(document.createTextNode(
+          totalFilled === 0 ? 'all open'
+          : totalFilled >= targetTotal ? 'fully booked'
+          : totalFilled + ' of ' + targetTotal + ' filled'
+        ));
+        head.append(pill);
+      }
+
       if (s.status === 'cancelled') {
         head.append(el('div', 'sunday-card__badge sunday-card__badge--cancel', 'cancelled'));
       } else if (s.status === 'completed') {
@@ -390,15 +412,21 @@
     }
 
     function buildTeacherSlot(s, isApproved) {
-      const slot = el('div', 'slot');
-      slot.append(el('div', 'slot__role', 'teacher'));
-      if (s.teacher_name) {
+      const isFilled = !!s.teacher_signup_id;
+      const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open'));
+
+      const roleRow = el('div', 'slot__role-row');
+      roleRow.append(el('span', 'slot__role-icon', isFilled ? '✓' : '+'));
+      roleRow.append(el('span', 'slot__role', 'teacher'));
+      slot.append(roleRow);
+
+      if (isFilled) {
         const filled = el('div', 'slot__filled');
         filled.append(el('span', 'slot__name', s.teacher_name));
         if (s.teacher_topic) filled.append(el('span', 'slot__topic', ' — ' + s.teacher_topic));
         slot.append(filled);
       } else {
-        slot.append(el('div', 'slot__open', 'open · claim to teach'));
+        slot.append(el('div', 'slot__open', 'open — claim to teach'));
       }
       if (isApproved) {
         const actions = el('div', 'slot__actions');
@@ -411,8 +439,8 @@
           const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
           drop.dataset.action = 'unclaim-teach'; drop.dataset.id = s.id;
           actions.append(drop);
-        } else if (!s.teacher_signup_id) {
-          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'teach');
+        } else if (!isFilled) {
+          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'teach this sunday →');
           claim.dataset.action = 'claim-teach'; claim.dataset.id = s.id;
           actions.append(claim);
         }
@@ -424,10 +452,16 @@
     function buildMCSlot(s, isApproved) {
       const mcs = s.mc_signups || [];
       const iAmMC = mcs.some(m => m.is_me);
-      const slot = el('div', 'slot');
-      slot.append(el('div', 'slot__role', 'mcs (' + mcs.length + ')'));
+      const isFilled = mcs.length > 0;
+      const slot = el('div', 'slot ' + (isFilled ? 'slot--filled' : 'slot--open'));
+
+      const roleRow = el('div', 'slot__role-row');
+      roleRow.append(el('span', 'slot__role-icon', isFilled ? '✓' : '+'));
+      roleRow.append(el('span', 'slot__role', 'mcs' + (isFilled ? ' (' + mcs.length + ')' : '')));
+      slot.append(roleRow);
+
       const filled = el('div', 'slot__filled');
-      if (mcs.length) {
+      if (isFilled) {
         mcs.forEach((m, i) => {
           if (i > 0) filled.append(document.createTextNode(', '));
           const span = el('span', 'slot__name', m.name);
@@ -435,7 +469,7 @@
           filled.append(span);
         });
       } else {
-        filled.append(el('span', 'slot__open', 'open'));
+        filled.append(el('span', 'slot__open', 'open — claim to host'));
       }
       slot.append(filled);
 
@@ -446,7 +480,7 @@
           drop.dataset.action = 'unclaim-mc'; drop.dataset.id = s.id;
           actions.append(drop);
         } else {
-          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'i\'ll mc');
+          const claim = el('button', 'btn btn--primary btn--sm cal-action', 'i\'ll mc →');
           claim.dataset.action = 'claim-mc'; claim.dataset.id = s.id;
           actions.append(claim);
         }
