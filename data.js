@@ -426,7 +426,7 @@ window.DB = {
   // ============================================================
   // MEMBERSHIP & CALENDAR
   // All mutations go through SECURITY DEFINER Postgres functions
-  // (see members-migration.sql). We just thinly wrap supabase.rpc.
+  // (see supabase/migrations/). We just thinly wrap supabase.rpc.
   // Errors thrown from the RPC carry the function's RAISE message
   // in error.message — surface that to the user.
   // ============================================================

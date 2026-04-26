@@ -281,6 +281,10 @@ Two registers stacked.
 - per-project shareable URLs are crawlable (modal contents are present in the rendered DOM after fetch)
 - semantic html5 structure throughout
 
+## contributing
+
+see [CONTRIBUTING.md](CONTRIBUTING.md) for setup, architecture map, and ground rules. issues + PRs welcome — small opinionated project for a specific gathering, so open an issue first if you're unsure of direction.
+
 ## next steps
 
 - [ ] custom domain setup (e.g. `creationship.co`)
