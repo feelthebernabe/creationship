@@ -230,9 +230,12 @@ vercel auto-deploys on push to `main`.
 │   ├── backfill-display-slug.sql    # update display_name + slug for already-imported rows
 │   └── display-and-slug-migration.sql  # add the two columns + unique index
 ├── logo.png                         # mandala logo
-├── favicon.svg
-├── og-image.png                     # open graph (home + projects)
-├── og-vault.png                     # open graph (vault)
+├── favicon.ico                      # multi-size legacy ico (16/32/48)
+├── favicon-32.png                   # modern browser tab
+├── favicon-180.png                  # apple-touch-icon
+├── favicon-192.png                  # android home / pwa
+├── favicon-512.png                  # android splash / pwa
+├── og-card.png                      # open graph (site-wide)
 ├── supabase-migration.sql           # core schema
 ├── ideas-migration.sql              # ideas v1
 ├── ideas-v2-migration.sql           # + links + team
@@ -276,7 +279,7 @@ Two registers stacked.
 ## seo
 
 - open graph + twitter card meta tags on every page
-- `favicon.svg` + `og-image.png` + `og-vault.png` assets
+- favicon set (`favicon.ico` + 32/180/192/512 PNGs) + `og-card.png` social card
 - descriptive `<title>` and `<meta name="description">` per page
 - per-project shareable URLs are crawlable (modal contents are present in the rendered DOM after fetch)
 - semantic html5 structure throughout
