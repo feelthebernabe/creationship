@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sundays — the creationship</title>
+  <meta name="description" content="sign up to host the room or to teach at the intersection of forever-human and new tech. sundays at the creationship.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="og-image.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="sundays — the creationship">
+  <meta property="og:description" content="sign up to host or teach at the creationship's weekly create-a-thon.">
+  <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; padding-bottom: var(--space-3xl); }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__brand"><span>the creationship</span></a>
+      <div class="site-nav__links">
+        <a href="index.html" class="site-nav__link">home</a>
+        <a href="calendar.html" class="site-nav__link active">sundays</a>
+        <a href="projects.html" class="site-nav__link">projects</a>
+        <a href="ideas.html" class="site-nav__link">vault</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="connection-error" id="connection-error">unable to connect — check your internet and refresh</div>
+
+  <main class="container">
+
+    <section class="cal-header">
+      <h1 class="cal-header__title">sundays at the creationship</h1>
+      <p class="cal-header__subtitle">
+        every sunday someone holds the room and someone teaches at the intersection of
+        <em>forever-human</em> and <em>new tech</em>. members can claim a slot below.
+      </p>
+      <div class="cal-status" id="cal-status" hidden></div>
+    </section>
+
+    <section class="member-panel" id="member-panel" hidden>
+      <div class="member-panel__row">
+        <div>
+          <div class="member-panel__label">your invites</div>
+          <div class="member-panel__count">
+            <span id="invites-remaining">0</span> remaining
+          </div>
+        </div>
+        <button class="btn btn--primary btn--sm" id="btn-mint-invite" disabled>mint a code</button>
+      </div>
+      <div class="invite-list" id="invite-list" hidden></div>
+    </section>
+
+    <section class="redeem-panel" id="redeem-panel" hidden>
+      <h3>you're signed in but not yet a member.</h3>
+      <p class="redeem-panel__hint">
+        paste an invite code below — either the shared launch code or one a member sent you.
+      </p>
+      <form id="redeem-form" novalidate>
+        <div class="form-group">
+          <input type="text" id="redeem-token" placeholder="ABCD-EFGH" autocomplete="off" required style="text-transform:uppercase;letter-spacing:0.1em;">
+        </div>
+        <button type="submit" class="btn btn--primary" id="btn-redeem">redeem code</button>
+      </form>
+      <div class="redeem-panel__error" id="redeem-error" hidden></div>
+    </section>
+
+    <section class="cal-list" id="cal-list" aria-busy="true">
+      <div class="cal-list__loading">loading sundays…</div>
+    </section>
+
+    <section class="anon-cta" id="anon-cta" hidden>
+      <h3>want to claim a slot?</h3>
+      <p class="anon-cta__hint">sign in with your email — we'll send a one-click link. you'll need an invite code to become a member.</p>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <input type="email" id="login-email" placeholder="you@example.com" required>
+        </div>
+        <button type="submit" class="btn btn--primary" id="btn-login">send magic link</button>
+      </form>
+      <div class="anon-cta__sent" id="login-sent" hidden>
+        check <strong id="login-sent-email"></strong> for a one-click link.
+      </div>
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" id="modal-teach">
+    <div class="modal">
+      <button class="modal__close" data-close-modal aria-label="close">×</button>
+      <h3>teach this sunday</h3>
+      <p class="modal__hint">at the intersection of forever-human and new tech. you can edit this anytime before the day.</p>
+      <form id="teach-form">
+        <div class="form-group">
+          <label for="teach-title">topic / title</label>
+          <input type="text" id="teach-title" placeholder="e.g. consent in synthetic realities" required>
+        </div>
+        <div class="form-group">
+          <label for="teach-desc">brief description <small>(optional)</small></label>
+          <textarea id="teach-desc" placeholder="what will you walk us through? what should people bring?" style="min-height:90px;"></textarea>
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">claim teach slot</button>
+        <div class="modal__error" id="teach-error" hidden></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-invite">
+    <div class="modal">
+      <button class="modal__close" data-close-modal aria-label="close">×</button>
+      <h3>your invite code</h3>
+      <p class="modal__hint">share this with one person. it expires in 30 days.</p>
+      <div class="invite-code" id="minted-code">—</div>
+      <button class="btn btn--ghost btn--full" id="btn-copy-invite">copy share link</button>
+      <div class="invite-share-url" id="minted-url"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    const $ = (id) => document.getElementById(id);
+
+    // Tiny DOM helper — equivalent of a JSX fragment but XSS-safe
+    function el(tag, className, text) {
+      const e = document.createElement(tag);
+      if (className) e.className = className;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    const els = {
+      status: $('cal-status'),
+      memberPanel: $('member-panel'),
+      invitesRemaining: $('invites-remaining'),
+      btnMintInvite: $('btn-mint-invite'),
+      inviteList: $('invite-list'),
+      redeemPanel: $('redeem-panel'),
+      redeemForm: $('redeem-form'),
+      redeemToken: $('redeem-token'),
+      redeemError: $('redeem-error'),
+      list: $('cal-list'),
+      anonCta: $('anon-cta'),
+      loginForm: $('login-form'),
+      loginEmail: $('login-email'),
+      loginSent: $('login-sent'),
+      loginSentEmail: $('login-sent-email'),
+      modalTeach: $('modal-teach'),
+      teachForm: $('teach-form'),
+      teachTitle: $('teach-title'),
+      teachDesc: $('teach-desc'),
+      teachError: $('teach-error'),
+      modalInvite: $('modal-invite'),
+      mintedCode: $('minted-code'),
+      mintedUrl: $('minted-url'),
+      btnCopyInvite: $('btn-copy-invite')
+    };
+
+    let state = {
+      session: null,
+      member: null,
+      calendar: [],
+      pendingTeachSundayId: null
+    };
+
+    const ERR = {
+      'invalid_or_expired': 'that code isn\'t valid (or has been turned off).',
+      'self_redemption': 'you can\'t redeem a code you minted yourself.',
+      'no_member_row': 'something went wrong linking your account — try refreshing.',
+      'not_approved': 'you need to be an approved member to do that.',
+      'no_quota': 'you\'re out of invite codes for now.',
+      'teach_slot_taken': 'someone else just claimed that teach slot. try another sunday.',
+      'past_sunday': 'that sunday has already happened.',
+      'too_late_to_unclaim': 'too close to the day to drop out — message a member instead.',
+      'not_your_slot': 'only the person who claimed it can change it.'
+    };
+    const friendly = (err) => ERR[err && err.message] || (err && err.message) || 'something went wrong.';
+
+    function formatSundayDate(isoDate) {
+      const d = new Date(isoDate + 'T12:00:00');
+      const month = d.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
+      return month + ' ' + d.getDate();
+    }
+    function relativeLabel(isoDate) {
+      const d = new Date(isoDate + 'T12:00:00');
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const diff = Math.round((d - today) / 86400000);
+      if (diff < 0) return 'past';
+      if (diff === 0) return 'today';
+      if (diff < 7) return 'this sunday';
+      if (diff < 14) return 'next sunday';
+      return Math.round(diff / 7) + ' weeks out';
+    }
+
+    async function init() {
+      const session = await window.DB.getSession();
+      state.session = session;
+      if (session) {
+        try { await window.DB.ensureMember(); } catch (e) { console.warn('ensureMember:', e.message); }
+        state.member = await window.DB.getMyMember();
+      }
+      await window.DB.ensureUpcomingSundays(8);
+      await refreshCalendar();
+      await refreshInviteList();
+      render();
+
+      const params = new URLSearchParams(window.location.search);
+      const codeFromUrl = params.get('code');
+      if (codeFromUrl) {
+        els.redeemToken.value = codeFromUrl.toUpperCase();
+        if (state.session && state.member && !state.member.approved_at) {
+          await onRedeem(new Event('auto'));
+        }
+      }
+    }
+
+    async function refreshCalendar() {
+      try { state.calendar = await window.DB.getCalendar(8); }
+      catch (e) { console.error('getCalendar:', e); state.calendar = []; }
+    }
+
+    async function refreshInviteList() {
+      if (!state.member || !state.member.approved_at) return;
+      try {
+        const invites = await window.DB.getMyInvitations();
+        renderInviteList(invites);
+      } catch (e) { console.warn('getMyInvitations:', e.message); }
+    }
+
+    function render() {
+      const isAuthed = !!state.session;
+      const isApproved = !!(state.member && state.member.approved_at);
+
+      els.status.replaceChildren();
+      if (isAuthed) {
+        els.status.hidden = false;
+        const dot = el('span'); dot.textContent = isApproved ? '●' : '○';
+        dot.style.color = isApproved ? 'var(--accent)' : 'var(--text-muted)';
+        els.status.append(dot, document.createTextNode(' signed in as '));
+        const strong = el('strong'); strong.textContent = state.session.user.email;
+        els.status.append(strong, document.createTextNode(
+          ' · ' + (isApproved ? 'member' : 'pending — needs invite code')
+        ));
+        const so = el('button', 'btn btn--ghost btn--sm', 'sign out');
+        so.style.marginLeft = 'auto';
+        so.addEventListener('click', async () => {
+          await window.DB.signOut();
+          window.location.reload();
+        });
+        els.status.append(so);
+      } else {
+        els.status.hidden = true;
+      }
+
+      els.memberPanel.hidden = !isApproved;
+      els.redeemPanel.hidden = !isAuthed || isApproved;
+      els.anonCta.hidden = isAuthed;
+
+      if (isApproved) {
+        const remaining = state.member.invites_remaining || 0;
+        els.invitesRemaining.textContent = remaining;
+        els.btnMintInvite.disabled = remaining <= 0;
+        els.btnMintInvite.textContent = remaining <= 0 ? 'no codes left' : 'mint a code';
+      }
+
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const isApproved = !!(state.member && state.member.approved_at);
+      els.list.removeAttribute('aria-busy');
+      els.list.replaceChildren();
+
+      if (!state.calendar.length) {
+        els.list.append(el('div', 'cal-list__loading', 'no upcoming sundays yet.'));
+        return;
+      }
+
+      state.calendar.forEach((s) => {
+        els.list.append(buildSundayCard(s, isApproved));
+      });
+    }
+
+    function buildSundayCard(s, isApproved) {
+      const article = el('article', 'sunday-card');
+      const head = el('header', 'sunday-card__head');
+      const dateBox = el('div', 'sunday-card__date');
+      dateBox.append(
+        el('span', 'sunday-card__date-num', formatSundayDate(s.date)),
+        el('span', 'sunday-card__date-rel', relativeLabel(s.date))
+      );
+      head.append(dateBox);
+      if (s.title) head.append(el('div', 'sunday-card__theme', s.title));
+      article.append(head);
+
+      const slots = el('div', 'sunday-card__slots');
+      slots.append(buildTeacherSlot(s, isApproved));
+      slots.append(buildMCSlot(s, isApproved));
+      article.append(slots);
+      return article;
+    }
+
+    function buildTeacherSlot(s, isApproved) {
+      const slot = el('div', 'slot');
+      slot.append(el('div', 'slot__role', 'teacher'));
+      if (s.teacher_name) {
+        const filled = el('div', 'slot__filled');
+        filled.append(el('span', 'slot__name', s.teacher_name));
+        if (s.teacher_topic) filled.append(el('span', 'slot__topic', ' — ' + s.teacher_topic));
+        slot.append(filled);
+      } else {
+        slot.append(el('div', 'slot__open', 'open · claim to teach'));
+      }
+      if (isApproved) {
+        const actions = el('div', 'slot__actions');
+        const taken = !!s.teacher_signup_id;
+        const btn = el('button', 'btn btn--sm cal-action ' + (taken ? 'btn--ghost' : 'btn--primary'),
+                       taken ? 'drop out' : 'teach');
+        btn.dataset.action = taken ? 'unclaim-teach' : 'claim-teach';
+        btn.dataset.id = s.id;
+        actions.append(btn);
+        slot.append(actions);
+      }
+      return slot;
+    }
+
+    function buildMCSlot(s, isApproved) {
+      const mcs = s.mc_signups || [];
+      const slot = el('div', 'slot');
+      slot.append(el('div', 'slot__role', 'mcs (' + mcs.length + ')'));
+      const filled = el('div', 'slot__filled');
+      if (mcs.length) {
+        mcs.forEach((m, i) => {
+          if (i > 0) filled.append(document.createTextNode(', '));
+          filled.append(el('span', 'slot__name', m.name));
+        });
+      } else {
+        filled.append(el('span', 'slot__open', 'open'));
+      }
+      slot.append(filled);
+
+      if (isApproved) {
+        const actions = el('div', 'slot__actions');
+        const claim = el('button', 'btn btn--ghost btn--sm cal-action', 'i\'ll mc');
+        claim.dataset.action = 'claim-mc'; claim.dataset.id = s.id;
+        const drop = el('button', 'btn btn--ghost btn--sm cal-action', 'drop out');
+        drop.dataset.action = 'unclaim-mc'; drop.dataset.id = s.id;
+        actions.append(claim, drop);
+        slot.append(actions);
+      }
+      return slot;
+    }
+
+    function renderInviteList(invites) {
+      els.inviteList.replaceChildren();
+      if (!invites || !invites.length) { els.inviteList.hidden = true; return; }
+      els.inviteList.hidden = false;
+      els.inviteList.append(el('div', 'invite-list__label', 'your codes:'));
+      invites.forEach(i => {
+        const row = el('div', 'invite-list__row');
+        const code = el('code'); code.textContent = i.token;
+        row.append(code, document.createTextNode(' · ' + (i.used_by_name ? 'claimed by ' + i.used_by_name : 'unused')));
+        els.inviteList.append(row);
+      });
+    }
+
+    els.list.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      try {
+        if (action === 'claim-teach') {
+          state.pendingTeachSundayId = id;
+          els.teachTitle.value = ''; els.teachDesc.value = '';
+          els.teachError.hidden = true;
+          openModal(els.modalTeach);
+          els.teachTitle.focus();
+        } else if (action === 'unclaim-teach') {
+          await window.DB.unclaimTeach(id);
+          await refreshCalendar(); renderCalendar();
+        } else if (action === 'claim-mc') {
+          await window.DB.claimMC(id);
+          await refreshCalendar(); renderCalendar();
+        } else if (action === 'unclaim-mc') {
+          await window.DB.unclaimMC(id);
+          await refreshCalendar(); renderCalendar();
+        }
+      } catch (err) {
+        alert(friendly(err));
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    els.teachForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!state.pendingTeachSundayId) return;
+      const title = els.teachTitle.value.trim();
+      const description = els.teachDesc.value.trim();
+      if (!title) return;
+      els.teachError.hidden = true;
+      const submitBtn = els.teachForm.querySelector('button[type=submit]');
+      submitBtn.disabled = true;
+      try {
+        await window.DB.claimTeach(state.pendingTeachSundayId, { title, description });
+        closeModal(els.modalTeach);
+        state.pendingTeachSundayId = null;
+        await refreshCalendar(); renderCalendar();
+      } catch (err) {
+        els.teachError.textContent = friendly(err);
+        els.teachError.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    els.loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = els.loginEmail.value.trim();
+      if (!email) return;
+      const btn = $('btn-login');
+      btn.disabled = true; btn.textContent = 'sending…';
+      try {
+        await window.DB.signInWithMagicLink(email, window.location.origin + '/calendar.html');
+        els.loginSentEmail.textContent = email;
+        els.loginSent.hidden = false;
+        els.loginForm.hidden = true;
+      } catch (err) {
+        alert(friendly(err));
+      } finally {
+        btn.disabled = false; btn.textContent = 'send magic link';
+      }
+    });
+
+    async function onRedeem(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const token = els.redeemToken.value.trim().toUpperCase();
+      if (!token) return;
+      els.redeemError.hidden = true;
+      const btn = $('btn-redeem');
+      btn.disabled = true;
+      try {
+        const member = await window.DB.redeemInvite(token);
+        state.member = member;
+        await refreshCalendar(); await refreshInviteList(); render();
+      } catch (err) {
+        els.redeemError.textContent = friendly(err);
+        els.redeemError.hidden = false;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    els.redeemForm.addEventListener('submit', onRedeem);
+
+    els.btnMintInvite.addEventListener('click', async () => {
+      els.btnMintInvite.disabled = true;
+      try {
+        const invite = await window.DB.mintInvite();
+        const url = window.location.origin + '/calendar.html?code=' + encodeURIComponent(invite.token);
+        els.mintedCode.textContent = invite.token;
+        els.mintedUrl.textContent = url;
+        els.mintedUrl.dataset.url = url;
+        openModal(els.modalInvite);
+        state.member = await window.DB.getMyMember();
+        await refreshInviteList(); render();
+      } catch (err) {
+        alert(friendly(err));
+      }
+    });
+
+    els.btnCopyInvite.addEventListener('click', async () => {
+      const url = els.mintedUrl.dataset.url;
+      if (!url) return;
+      try {
+        await navigator.clipboard.writeText(url);
+        els.btnCopyInvite.textContent = 'copied ✓';
+        setTimeout(() => { els.btnCopyInvite.textContent = 'copy share link'; }, 1500);
+      } catch (e) {
+        alert('copy failed — long-press to copy:\n\n' + url);
+      }
+    });
+
+    function openModal(modal) { modal.classList.add('active'); }
+    function closeModal(modal) { modal.classList.remove('active'); }
+    document.querySelectorAll('[data-close-modal]').forEach(btn =>
+      btn.addEventListener('click', () => closeModal(btn.closest('.modal-overlay'))));
+    document.querySelectorAll('.modal-overlay').forEach(overlay =>
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(overlay); }));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape')
+        document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m));
+    });
+
+    window.DB.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        state.session = session;
+        if (session) {
+          try { await window.DB.ensureMember(); } catch (e) {}
+          state.member = await window.DB.getMyMember();
+        } else {
+          state.member = null;
+        }
+        await refreshCalendar(); await refreshInviteList(); render();
+      }
+    });
+
+    init();
+  })();
+  </script>
+
+</body>
+</html>

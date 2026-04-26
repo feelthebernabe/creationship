@@ -34,7 +34,7 @@
       <div class="site-nav__links">
         <a href="index.html" class="site-nav__link active">home</a>
         <a href="#the-room" class="site-nav__link">about</a>
-        <a href="#this-sunday" class="site-nav__link">events</a>
+        <a href="calendar.html" class="site-nav__link">sundays</a>
         <a href="#made-here" class="site-nav__link">projects</a>
       </div>
     </div>
@@ -50,30 +50,18 @@
          ============================ -->
     <section id="view-landing" class="view active">
 
-      <header class="hero">
-
-        <!-- Organic gradient blobs -->
-        <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
-        <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
-        <div class="hero__blob hero__blob--3" aria-hidden="true"></div>
-
-        <!-- Floating ambient words -->
-        <div class="hero__ambient" aria-hidden="true">
-          <span class="hero__word hero__word--lg hero__word--terracotta" style="top:8%;left:58%;animation-delay:0s;">sensemaking</span>
-          <span class="hero__word hero__word--xl" style="top:22%;right:4%;animation-delay:1.5s;">embodiment</span>
-          <span class="hero__word hero__word--lg hero__word--sage" style="top:50%;left:2%;animation-delay:3s;">trust</span>
-          <span class="hero__word" style="top:68%;right:12%;animation-delay:0.8s;">craft</span>
-          <span class="hero__word hero__word--xl hero__word--lavender" style="top:82%;left:18%;animation-delay:2s;">synthetic realities</span>
-          <span class="hero__word hero__word--lg" style="top:38%;right:1%;animation-delay:4s;">ethics</span>
-          <span class="hero__word hero__word--terracotta" style="top:62%;left:45%;animation-delay:1s;">storytelling</span>
-          <span class="hero__word hero__word--sage" style="top:15%;left:30%;animation-delay:3.5s;">vibe coding</span>
-        </div>
+      <header class="hero" style="position: relative;">
+        <!-- Street Art Background -->
+        <img src="assets/tech_birdhouse.png" alt="" class="ambient-art ambient-art--hero" aria-hidden="true">
+        
+        <!-- Soft background gradient (simplified) -->
+        <div class="hero__blob" aria-hidden="true"></div>
 
         <!-- Headline + subtitle -->
         <div class="hero__content">
           <h1 class="hero__headline">
-            The Infinite<br>
-            <span class="accent">Create-a-thon</span>
+            the<br>
+            <span class="accent">creationship</span>
           </h1>
 
           <p class="hero__subtitle">
@@ -85,6 +73,7 @@
             <a href="https://lu.ma/calendar/cal-Cv4SfxulyNrsjTM" target="_blank" rel="noopener" class="btn btn--primary hero__cta" id="hero-cta-btn">
               join this sunday →
             </a>
+            <a href="calendar.html" class="btn btn--ghost hero__cta">host or teach →</a>
             <a href="#the-room" class="hero__scroll-link">learn more ↓</a>
           </div>
 
@@ -96,41 +85,13 @@
 
       </header>
 
-      <!-- Scrolling marquee ticker -->
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee__track">
-          <span>synthetic realities</span><span>·</span>
-          <span>ai agents</span><span>·</span>
-          <span>vibe coding</span><span>·</span>
-          <span>prompt craft</span><span>·</span>
-          <span>indigenous wisdom</span><span>·</span>
-          <span>embodiment</span><span>·</span>
-          <span>sensemaking</span><span>·</span>
-          <span>trust & consent</span><span>·</span>
-          <span>ethics</span><span>·</span>
-          <span>craftsmanship</span><span>·</span>
-          <span>storytelling</span><span>·</span>
-          <span>synthetic realities</span><span>·</span>
-          <span>ai agents</span><span>·</span>
-          <span>vibe coding</span><span>·</span>
-          <span>prompt craft</span><span>·</span>
-          <span>indigenous wisdom</span><span>·</span>
-          <span>embodiment</span><span>·</span>
-          <span>sensemaking</span><span>·</span>
-          <span>trust & consent</span><span>·</span>
-          <span>ethics</span><span>·</span>
-          <span>craftsmanship</span><span>·</span>
-          <span>storytelling</span><span>·</span>
-        </div>
-      </div>
-
-      <!-- Cursor glow -->
-      <div class="cursor-glow" id="cursor-glow"></div>
-
       <!-- ============================
            THE ROOM — ethos & narrative
            ============================ -->
-      <div class="landing-section reveal" id="the-room">
+      <div class="landing-section reveal" id="the-room" style="position: relative;">
+        <!-- Street Art Background -->
+        <img src="assets/planting_phones.png" alt="" class="ambient-art ambient-art--room" aria-hidden="true">
+        
         <div class="landing-section__label landing-section__label--tally">the room</div>
         <h2 class="landing-section__heading">we don't curate the guest list. the room takes the shape of <span class="swipe">whoever shows up</span>.</h2>
         <div class="landing-section__body">
@@ -182,7 +143,9 @@
       <!-- ============================
            HOW IT WORKS — compact schedule
            ============================ -->
-      <div class="landing-section reveal" id="how-it-works">
+      <div class="landing-section reveal" id="how-it-works" style="position: relative;">
+        <!-- Street Art Background -->
+        <img src="assets/phone_bouquet.png" alt="" class="ambient-art ambient-art--schedule" aria-hidden="true">
         <div class="landing-section__label landing-section__label--swipe">how a sunday goes</div>
         <h2 class="landing-section__heading">no experience required. no <span class="swipe">finish line</span>.</h2>
 
@@ -230,7 +193,9 @@
       <!-- ============================
            THIS SUNDAY — featured event + RSVP
            ============================ -->
-      <div class="landing-section reveal" id="this-sunday">
+      <div class="landing-section reveal" id="this-sunday" style="position: relative;">
+        <!-- Street Art Background -->
+        <img src="assets/vr_flowers.png" alt="" class="ambient-art ambient-art--events" aria-hidden="true">
         <div class="landing-section__label landing-section__label--copyright">this sunday</div>
 
         <!-- Featured Next Event (populated by JS) -->
@@ -278,7 +243,10 @@
       <!-- ============================
            WHAT'S COME OUT OF THIS ROOM — inline project showcase
            ============================ -->
-      <div class="landing-section reveal" id="made-here">
+      <div class="landing-section reveal" id="made-here" style="position: relative;">
+        <!-- Street Art Background -->
+        <img src="assets/feeding_pigeons.png" alt="" class="ambient-art ambient-art--showcase" aria-hidden="true">
+
         <div class="landing-section__label landing-section__label--tally">what's come out of this room</div>
         <h2 class="landing-section__heading">some weeks, this room makes a tool. some weeks, a <span class="swipe">friendship</span>.</h2>
         <p class="landing-section__body" style="margin-bottom: var(--space-xl);">
@@ -765,21 +733,6 @@
         }
       });
     });
-
-    // ============================================================
-    // CURSOR GLOW (desktop only)
-    // ============================================================
-    var glow = document.getElementById('cursor-glow');
-    if (glow && !('ontouchstart' in window)) {
-      document.addEventListener('mousemove', function(e) {
-        glow.style.left = e.clientX + 'px';
-        glow.style.top = e.clientY + 'px';
-        glow.style.opacity = '1';
-      });
-      document.addEventListener('mouseleave', function() {
-        glow.style.opacity = '0';
-      });
-    }
 
   </script>
 

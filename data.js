@@ -260,12 +260,11 @@ window.DB = {
 
   // --- Authentication (Magic Link) ---
 
-  async signInWithMagicLink(email) {
+  async signInWithMagicLink(email, redirectTo) {
+    const target = redirectTo || (window.location.origin + window.location.pathname);
     const { error } = await _supabaseClient.auth.signInWithOtp({
       email: email,
-      options: {
-        emailRedirectTo: window.location.origin + '/ideas.html'
-      }
+      options: { emailRedirectTo: target }
     });
     if (error) throw error;
     return true;
@@ -422,5 +421,155 @@ window.DB = {
       .delete()
       .eq('id', id);
     if (error) throw error;
+  },
+
+  // ============================================================
+  // MEMBERSHIP & CALENDAR
+  // All mutations go through SECURITY DEFINER Postgres functions
+  // (see members-migration.sql). We just thinly wrap supabase.rpc.
+  // Errors thrown from the RPC carry the function's RAISE message
+  // in error.message — surface that to the user.
+  // ============================================================
+
+  async ensureMember() {
+    const { data, error } = await _supabaseClient.rpc('ensure_member');
+    if (error) throw error;
+    return data;
+  },
+
+  async getMyMember() {
+    const { data, error } = await _supabaseClient.rpc('get_my_member');
+    if (error) return null;
+    return data;
+  },
+
+  async redeemInvite(token) {
+    const { data, error } = await _supabaseClient.rpc('redeem_invite', { p_token: token });
+    if (error) throw error;
+    return data;
+  },
+
+  async mintInvite() {
+    const { data, error } = await _supabaseClient.rpc('mint_invite');
+    if (error) throw error;
+    return data;
+  },
+
+  async getMyInvitations() {
+    const { data, error } = await _supabaseClient.rpc('get_my_invitations');
+    if (error) throw error;
+    return data || [];
+  },
+
+  // --- Sundays (calendar) ---
+
+  async getCalendar(weeks) {
+    const { data, error } = await _supabaseClient.rpc('get_upcoming_calendar', {
+      p_weeks: weeks || 8
+    });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async ensureUpcomingSundays(weeks) {
+    const { error } = await _supabaseClient.rpc('ensure_upcoming_sundays', {
+      p_weeks: weeks || 8
+    });
+    if (error) console.warn('ensureUpcomingSundays:', error.message);
+  },
+
+  async claimTeach(sundayId, { title, description }) {
+    const { data, error } = await _supabaseClient.rpc('claim_teach', {
+      p_sunday_id: sundayId,
+      p_title: title || '',
+      p_description: description || ''
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async claimMC(sundayId) {
+    const { data, error } = await _supabaseClient.rpc('claim_mc', {
+      p_sunday_id: sundayId
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async unclaimTeach(sundayId) {
+    const { data, error } = await _supabaseClient.rpc('unclaim_teach', {
+      p_sunday_id: sundayId
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async unclaimMC(sundayId) {
+    const { data, error } = await _supabaseClient.rpc('unclaim_mc', {
+      p_sunday_id: sundayId
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async updateSundayTheme(sundayId, { title, description, themes }) {
+    const { data, error } = await _supabaseClient.rpc('update_sunday_theme', {
+      p_sunday_id: sundayId,
+      p_title: title || '',
+      p_description: description || '',
+      p_themes: themes || null
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  // --- Admin helpers (admin.html) ---
+
+  async adminListMembers() {
+    const { data, error } = await _supabaseClient.rpc('admin_list_members');
+    if (error) throw error;
+    return data || [];
+  },
+
+  async adminSetMemberApproval(personId, approved, invites) {
+    const { data, error } = await _supabaseClient.rpc('admin_set_member_approval', {
+      p_person_id: personId,
+      p_approved: approved,
+      p_invites: invites == null ? 2 : invites
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async adminMintInvite() {
+    const { data, error } = await _supabaseClient.rpc('admin_mint_invite');
+    if (error) throw error;
+    return data;
+  },
+
+  async adminCreateMasterInvite({ token, label, maxUses, expiresAt } = {}) {
+    const { data, error } = await _supabaseClient.rpc('admin_create_master_invite', {
+      p_token: token || null,
+      p_label: label || 'master',
+      p_max_uses: maxUses == null ? null : maxUses,
+      p_expires_at: expiresAt || null
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async adminSetInviteActive(inviteId, active) {
+    const { data, error } = await _supabaseClient.rpc('admin_set_invite_active', {
+      p_invite_id: inviteId,
+      p_active: !!active
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async adminListInvites() {
+    const { data, error } = await _supabaseClient.rpc('admin_list_invites');
+    if (error) throw error;
+    return data || [];
   }
 };

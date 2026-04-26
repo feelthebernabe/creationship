@@ -56,6 +56,7 @@
           <button data-tab="signups" class="active">signups</button>
           <button data-tab="calendar">calendar</button>
           <button data-tab="people">people</button>
+          <button data-tab="members">members</button>
           <button data-tab="ideas">ideas</button>
         </nav>
       </div>
@@ -122,6 +123,63 @@
            ======================== -->
       <div id="tab-people" class="tab-panel">
         <div class="people-grid" id="people-grid"></div>
+      </div>
+
+      <!-- ========================
+           TAB: MEMBERS (auth + invites + master code)
+           ======================== -->
+      <div id="tab-members" class="tab-panel">
+
+        <!-- Sign-in nudge: admin needs to be signed in as a member to manage. -->
+        <div id="members-signin" class="member-signin-card" hidden>
+          <h3>sign in to your member account</h3>
+          <p>member management calls run under your own login (not the admin password).
+            sign in below — you'll be returned here.</p>
+          <form id="members-signin-form" novalidate>
+            <div class="form-group">
+              <input type="email" id="members-signin-email" placeholder="you@example.com" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--sm">send magic link</button>
+          </form>
+          <div id="members-signin-sent" hidden>check your email — we sent a one-click link.</div>
+        </div>
+
+        <div id="members-content" hidden>
+
+          <!-- Master code panel -->
+          <section class="admin-section">
+            <div class="admin-section__head">
+              <h3>shared launch code</h3>
+              <p class="admin-section__hint">one code anyone can redeem until you turn it off. use this to onboard the early circle. switch to per-member referrals later.</p>
+            </div>
+            <div id="master-code-card" class="master-code-card">
+              <div class="master-code-card__loading">loading…</div>
+            </div>
+          </section>
+
+          <!-- Members list -->
+          <section class="admin-section">
+            <div class="admin-section__head">
+              <h3>members</h3>
+              <p class="admin-section__hint">people who've signed in. toggle approve to grant calendar + invite access.</p>
+            </div>
+            <div id="members-list" class="members-list">
+              <div class="cal-list__loading">loading members…</div>
+            </div>
+          </section>
+
+          <!-- Invitations list -->
+          <section class="admin-section">
+            <div class="admin-section__head">
+              <h3>invitations</h3>
+              <button class="btn btn--ghost btn--sm" id="btn-admin-mint-invite">mint single-use code</button>
+            </div>
+            <div id="invites-list" class="invites-list">
+              <div class="cal-list__loading">loading invites…</div>
+            </div>
+          </section>
+
+        </div>
       </div>
 
       <!-- ========================
@@ -286,6 +344,7 @@
       if (activeTab === 'calendar') renderCalendar();
       if (activeTab === 'people') renderPeople();
       if (activeTab === 'signups') renderSignups();
+      if (activeTab === 'members') renderMembersTab();
     });
 
     // --- Filters ---
@@ -940,6 +999,211 @@
       const reader = new FileReader();
       reader.onload = () => { document.getElementById('bulk-text').value = String(reader.result || ''); };
       reader.readAsText(f);
+    });
+
+    // ============================================================
+    // MEMBERS TAB — manage approvals, invitations, master code.
+    // Calls SECURITY DEFINER RPCs that require the admin to also
+    // be signed in as an approved member (auth.uid() check).
+    // ============================================================
+
+    const _el = (tag, cls, txt) => {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (txt != null) e.textContent = txt;
+      return e;
+    };
+
+    async function renderMembersTab() {
+      const session = await DB.getSession();
+      const signinCard = document.getElementById('members-signin');
+      const content = document.getElementById('members-content');
+      if (!session) {
+        signinCard.hidden = false;
+        content.hidden = true;
+        return;
+      }
+      try { await DB.ensureMember(); } catch (e) {}
+      const me = await DB.getMyMember();
+      if (!me || !me.approved_at) {
+        signinCard.hidden = false;
+        content.hidden = true;
+        // surface a helpful note
+        signinCard.querySelector('p').textContent =
+          'you\'re signed in but not yet approved. ask another member to redeem you, or run an admin SQL update on your people row to bootstrap.';
+        return;
+      }
+      signinCard.hidden = true;
+      content.hidden = false;
+      await Promise.all([renderMasterCodeCard(), renderMembersList(), renderInvitesList()]);
+    }
+
+    document.getElementById('members-signin-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('members-signin-email').value.trim();
+      if (!email) return;
+      try {
+        await DB.signInWithMagicLink(email, window.location.origin + '/admin.html');
+        document.getElementById('members-signin-sent').hidden = false;
+      } catch (err) { showToast('error: ' + err.message); }
+    });
+
+    async function renderMasterCodeCard() {
+      const card = document.getElementById('master-code-card');
+      card.replaceChildren();
+      let invites = [];
+      try { invites = await DB.adminListInvites(); } catch (e) {
+        card.append(_el('div', 'cal-list__loading', 'error: ' + e.message));
+        return;
+      }
+      const masters = invites.filter(i => i.label === 'master' || (i.max_uses != 1));
+
+      if (!masters.length) {
+        card.append(_el('p', null, 'no shared code yet — create one to onboard the first wave.'));
+        const form = _el('div', 'master-code-card__form');
+        const input = _el('input');
+        input.type = 'text';
+        input.id = 'master-token-input';
+        input.placeholder = 'WELCOME-2026';
+        input.style.cssText = 'text-transform:uppercase;letter-spacing:0.08em;';
+        const btn = _el('button', 'btn btn--primary btn--sm', 'create');
+        btn.addEventListener('click', async () => {
+          btn.disabled = true;
+          try {
+            const token = (input.value || '').trim().toUpperCase() || null;
+            await DB.adminCreateMasterInvite({ token, label: 'master', maxUses: null });
+            await renderMasterCodeCard();
+            await renderInvitesList();
+          } catch (err) {
+            showToast('error: ' + err.message);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+        form.append(input, btn);
+        card.append(form);
+        return;
+      }
+
+      masters.forEach(m => {
+        const row = _el('div', 'master-code-card__active');
+        const code = _el('code', 'master-code-card__token', m.token);
+        const meta = _el('div', 'master-code-card__meta',
+          `${m.use_count} redeemed · ${m.max_uses == null ? 'unlimited' : 'cap ' + m.max_uses}`);
+        const status = _el('div', 'master-code-card__status ' + (m.is_active ? 'on' : 'off'),
+          m.is_active ? 'active' : 'turned off');
+        const toggle = _el('button', 'btn btn--ghost btn--sm', m.is_active ? 'turn off' : 'turn back on');
+        toggle.addEventListener('click', async () => {
+          toggle.disabled = true;
+          try {
+            await DB.adminSetInviteActive(m.id, !m.is_active);
+            await renderMasterCodeCard();
+            await renderInvitesList();
+          } catch (err) { showToast('error: ' + err.message); }
+          finally { toggle.disabled = false; }
+        });
+        row.append(code, meta, status, toggle);
+        card.append(row);
+      });
+    }
+
+    async function renderMembersList() {
+      const list = document.getElementById('members-list');
+      list.replaceChildren();
+      let members = [];
+      try { members = await DB.adminListMembers(); } catch (e) {
+        list.append(_el('div', 'cal-list__loading', 'error: ' + e.message));
+        return;
+      }
+      if (!members.length) {
+        list.append(_el('div', 'cal-list__loading', 'no members yet.'));
+        return;
+      }
+
+      members.forEach(m => {
+        const row = _el('div', 'member-row');
+        const info = _el('div', 'member-row__info');
+        info.append(_el('div', 'member-row__name', m.name || '(no name)'));
+        info.append(_el('div', 'member-row__email', m.email));
+        if (m.invited_by_name) {
+          info.append(_el('div', 'member-row__meta', 'invited by ' + m.invited_by_name));
+        }
+        row.append(info);
+
+        const controls = _el('div', 'member-row__controls');
+        const approveBtn = _el('button',
+          'btn btn--sm ' + (m.approved_at ? 'btn--ghost' : 'btn--primary'),
+          m.approved_at ? 'approved · revoke' : 'approve');
+        approveBtn.addEventListener('click', async () => {
+          approveBtn.disabled = true;
+          try {
+            await DB.adminSetMemberApproval(m.id, !m.approved_at, m.invites_remaining || 2);
+            await renderMembersList();
+          } catch (err) { showToast('error: ' + err.message); }
+          finally { approveBtn.disabled = false; }
+        });
+
+        const quotaWrap = _el('label', 'member-row__quota');
+        quotaWrap.append(document.createTextNode('quota: '));
+        const quotaInput = _el('input');
+        quotaInput.type = 'number';
+        quotaInput.min = '0';
+        quotaInput.max = '20';
+        quotaInput.value = m.invites_remaining ?? 0;
+        quotaInput.addEventListener('change', async () => {
+          try {
+            await DB.adminSetMemberApproval(m.id, !!m.approved_at, parseInt(quotaInput.value, 10) || 0);
+            await renderMembersList();
+          } catch (err) { showToast('error: ' + err.message); }
+        });
+        quotaWrap.append(quotaInput);
+
+        controls.append(quotaWrap, approveBtn);
+        row.append(controls);
+        list.append(row);
+      });
+    }
+
+    async function renderInvitesList() {
+      const list = document.getElementById('invites-list');
+      list.replaceChildren();
+      let invites = [];
+      try { invites = await DB.adminListInvites(); } catch (e) {
+        list.append(_el('div', 'cal-list__loading', 'error: ' + e.message));
+        return;
+      }
+      if (!invites.length) {
+        list.append(_el('div', 'cal-list__loading', 'no invites yet.'));
+        return;
+      }
+      invites.forEach(i => {
+        const row = _el('div', 'invite-row');
+        const code = _el('code', 'invite-row__token', i.token);
+        const meta = _el('div', 'invite-row__meta',
+          `${i.label || 'referral'} · ${i.use_count}/${i.max_uses == null ? '∞' : i.max_uses} · by ${i.created_by_name || '—'}`);
+        const status = _el('div', 'invite-row__status ' + (i.is_active ? 'on' : 'off'),
+          i.is_active ? 'active' : 'off');
+        const toggle = _el('button', 'btn btn--ghost btn--sm', i.is_active ? 'turn off' : 'turn on');
+        toggle.addEventListener('click', async () => {
+          toggle.disabled = true;
+          try {
+            await DB.adminSetInviteActive(i.id, !i.is_active);
+            await renderInvitesList();
+            await renderMasterCodeCard();
+          } catch (err) { showToast('error: ' + err.message); }
+          finally { toggle.disabled = false; }
+        });
+        row.append(code, meta, status, toggle);
+        list.append(row);
+      });
+    }
+
+    document.getElementById('btn-admin-mint-invite').addEventListener('click', async () => {
+      try {
+        const inv = await DB.adminMintInvite();
+        showToast('minted ' + inv.token);
+        await renderInvitesList();
+      } catch (err) { showToast('error: ' + err.message); }
     });
 
   </script>
