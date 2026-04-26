@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>projects — the creationship</title>
-  <meta name="description" content="what the creationship is making. seeds, projects, and companies from the weekly create-a-thon.">
+  <title>receipts — the creationship</title>
+  <meta name="description" content="the receipts. what the creationship has made. seeds, projects, and companies from the weekly create-a-thon.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="og-image.png">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="projects — the creationship">
-  <meta property="og:description" content="what the creationship is making. seeds, projects, and companies from the weekly create-a-thon.">
+  <meta property="og:title" content="receipts — the creationship">
+  <meta property="og:description" content="the receipts. what the creationship has made. seeds, projects, and companies from the weekly create-a-thon.">
   <meta property="og:image" content="https://creationship.vercel.app/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://creationship.vercel.app/og-image.png">
@@ -29,8 +29,9 @@
       <div class="site-nav__links">
         <a href="index.html" class="site-nav__link">home</a>
         <a href="calendar.html" class="site-nav__link">sundays</a>
-        <a href="members.html" class="site-nav__link">members</a>
-        <a href="projects.html" class="site-nav__link active">projects</a>
+        <!-- members tab hidden 2026-04-26 — page still lives at members.html; uncomment to restore -->
+        <!-- <a href="members.html" class="site-nav__link">members</a> -->
+        <a href="projects.html" class="site-nav__link active">receipts</a>
         <a href="ideas.html" class="site-nav__link">creations</a>
       </div>
     </div>
@@ -41,10 +42,10 @@
   <main class="container">
 
     <header class="projects-hero reveal">
-      <div class="landing-section__label">what we're making</div>
-      <h1 class="projects-hero__title">seeds, projects, and companies</h1>
+      <div class="landing-section__label">the receipts</div>
+      <h1 class="projects-hero__title">show me the <span class="swipe">receipts</span></h1>
       <p class="projects-hero__subtitle">
-        the room keeps producing. half-baked ideas, working prototypes, and real companies —
+        what the room has actually made. half-baked seeds, working prototypes, and real companies —
         all born from sunday create-a-thons.
       </p>
     </header>
@@ -406,6 +407,84 @@
     }
 
     // ------------------------------------------------------------
+    // SEED PROJECTS — 18 projects extracted from the Church of
+    // Creationship WhatsApp thread (Feb–Apr 2026, 65+ contributors).
+    // These always render, even if the Supabase ideas table is empty
+    // or unreachable. DB rows with the same title (case-insensitive)
+    // override the seed (DB is more authoritative for live edits).
+    // ------------------------------------------------------------
+    const SEED_PROJECTS = [
+      { title: 'MBT Therapist Bot', author_name: 'Michelle', stage: 'seed', status: 'active', team_members: [],
+        description: "AI therapist trained on Mentalization-Based Therapy manuals. Relentlessly curious, deliberately not-knowing stance. Grounded in Bateman & Fonagy." },
+      { title: 'Vibe Parties', author_name: 'Benjamin Von Wong', stage: 'project', status: 'active',
+        website_url: 'https://vibe-parties.web.app', demo_url: 'https://vibe-parties.web.app/101',
+        team_members: [{ name: 'Brandon Levy' }],
+        description: "A site for hosting vibe parties, shipped rapidly post-hackathon with a tutorial flow." },
+      { title: 'Caravan of Dreams Website', author_name: 'Benjamin Von Wong', stage: 'project', status: 'active',
+        website_url: 'https://caravan-of-dreams.vercel.app',
+        team_members: [{ name: 'Brandon Levy' }, { name: 'Angel' }],
+        description: "Demo site for Caravan of Dreams focused on nourishing mind and body — prototype for a living community restaurant/space." },
+      { title: 'Kula (Evolver Exchange)', author_name: 'Michelle', stage: 'project', status: 'active',
+        website_url: 'https://kula-ten.vercel.app/', demo_url: 'https://kula-ten.vercel.app/feed',
+        team_members: [{ name: 'Sal' }, { name: 'Daniel Pinchbeck' }, { name: 'Nikita' }, { name: 'Charlotte Binns' }, { name: 'Hope Endrenyi' }],
+        description: "A peer-to-peer reputation-based sharing network inspired by the Kula ring gift exchange. Disruptively independent p2p economy." },
+      { title: 'Hackathon Dynamics / Complexity Models', author_name: 'Sal', stage: 'project', status: 'active',
+        website_url: 'https://slvtrs.com/complexity/hackathon.html', demo_url: 'https://slvtrs.com/complexity',
+        team_members: [],
+        description: "Interactive models exploring what makes a 'deepening' hackathon different from a traditional tech hackathon." },
+      { title: 'Vibe Cadaver', author_name: 'Sal', stage: 'seed', status: 'active',
+        website_url: 'https://vibecadaver.slvtrs.com/',
+        team_members: [],
+        description: "A vibesite that rewrites itself with communal input, in the spirit of exquisite corpse." },
+      { title: 'Ocean Agentics', author_name: 'Aaron Roan', stage: 'project', status: 'active',
+        website_url: 'https://oceanagentics.com',
+        team_members: [],
+        description: "AI-generated hub on the High Seas Treaty / BBNJ. Ocean conservation × tech." },
+      { title: 'The Medical Collective', author_name: 'Hope Endrenyi', stage: 'project', status: 'active',
+        website_url: 'https://the-medical-collective.web.app/',
+        team_members: [],
+        description: "Platform for medical innovation / healthcare design — experience design coursework with product potential." },
+      { title: 'AI Doc Afterparty', author_name: 'Group Watch', stage: 'project', status: 'active',
+        website_url: 'https://the-ai-doc-nyc.web.app/',
+        team_members: [],
+        description: "Film/event about AI doctors — group planned watch party." },
+      { title: 'Speech Pathology AI', author_name: 'Vincent', stage: 'project', status: 'active',
+        website_url: 'https://speechpath.lovable.app/',
+        team_members: [],
+        description: "Locally-hosted LLM that coaches Parkinson's patients on speech exercises. Applicable beyond Parkinson's." },
+      { title: 'Recipe Engineer', author_name: 'Vincent', stage: 'project', status: 'active',
+        website_url: 'https://recipeengineer.lovable.app/',
+        team_members: [],
+        description: "Reverse-engineers cooking videos into recipes. Immediate use: a Caravan cookbook. Long-term: capturing familial recipes." },
+      { title: 'KittyShare / Kitty Fund', author_name: 'Michelle', stage: 'project', status: 'active',
+        website_url: 'https://kittyshare.pages.dev', demo_url: 'https://funfund-38f.pages.dev',
+        team_members: [{ name: 'Sahil' }],
+        description: "Community savings / mutual aid fund. Phase 1 web-accessible; Phase 2 adds social + mission-driven events." },
+      { title: 'First Thought Best Thought', author_name: 'Hannah Levinson', stage: 'project', status: 'active',
+        website_url: 'https://firstthoughtbestthought.netlify.app/',
+        team_members: [{ name: 'Maya' }],
+        description: "Mobile game inspired by Burroughs' 'first thought best thought' principle. TestFlight coming." },
+      { title: 'NotAmazon', author_name: 'Josh Y', stage: 'project', status: 'active',
+        demo_url: 'https://not-amazon-production.up.railway.app/', github_url: 'https://github.com/qix/not-amazon',
+        team_members: [{ name: 'Hannah Levinson' }, { name: 'Maya' }],
+        description: "Find the same goods Amazon sells at local stores/farmers markets. AI scans store shelves; paste your Amazon list to find local alternatives." },
+      { title: 'Cause Compass', author_name: 'Benjamin Von Wong', stage: 'seed', status: 'active',
+        website_url: 'https://cause-compass-silk.vercel.app/',
+        team_members: [],
+        description: "Volunteer matchmaker — chatbot intake builds a qualitative profile and matches people to causes. V1 prototype, buggy." },
+      { title: 'Earth Day Salon', author_name: 'Charlotte Binns', stage: 'company', status: 'active',
+        website_url: 'https://www.viewcy.com/event/earth_day_salon',
+        team_members: [{ name: 'Samantha Sweetwater' }, { name: 'Daniel Pinchbeck' }],
+        description: "Earth Day fireside salon on True Human, Gaia, protopic political imagination, embodied kinship consciousness." },
+      { title: 'Demilitarise Education UX', author_name: 'Danielle Gauthier', stage: 'project', status: 'active',
+        team_members: [],
+        description: "UX design making the Demilitarise Education site easier to navigate; improving treaty/policy readability." },
+      { title: 'Metagov Governance Visualization', author_name: 'Danielle Gauthier', stage: 'project', status: 'active',
+        team_members: [],
+        description: "Governance-gap visualization UI using sentiment research + ethnographic database for Metagov's knowledge organization software." },
+    ];
+
+    // ------------------------------------------------------------
     // Load + bind
     // ------------------------------------------------------------
 
@@ -415,9 +494,22 @@
       const loading = document.getElementById('projects-loading');
       const emptyAll = document.getElementById('projects-empty-all');
 
+      // Fetch from Supabase. If the call fails (offline, RLS issue, etc.)
+      // we still render the seed projects below — receipts are first-class
+      // content, not a fallback.
+      let fromDb = [];
       try {
         const ideas = await DB.getIdeas();
-        allIdeas = (ideas || []).filter(i => i.status === 'active');
+        fromDb = (ideas || []).filter(i => i.status === 'active');
+      } catch (err) {
+        console.warn('DB unavailable, rendering seed projects only:', err);
+      }
+
+      try {
+        // Merge: DB rows take precedence; seed rows fill in the gaps.
+        const seenTitles = new Set(fromDb.map(i => (i.title || '').toLowerCase().trim()));
+        const seedToShow = SEED_PROJECTS.filter(s => !seenTitles.has((s.title || '').toLowerCase().trim()));
+        allIdeas = [...fromDb, ...seedToShow];
 
         const buckets = { seed: [], project: [], company: [] };
         allIdeas.forEach(i => {

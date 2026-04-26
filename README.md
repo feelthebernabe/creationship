@@ -20,7 +20,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | **home** | `/index.html` | landing with manifesto, schedule, role signup, soundscape |
 | **sundays** | `/calendar.html` | member sign-up calendar — claim teach/MC, mint invite codes, edit topic |
 | **members** | `/members.html` | public directory of approved members |
-| **projects** | `/projects.html` | public showcase of community work with per-project detail modal and shareable permalink URLs |
+| **receipts** | `/projects.html` | public showcase of community work — per-project detail modal, shareable permalink URLs, falls back to a built-in static seed of 18 WhatsApp-extracted projects so the page is never empty (renamed from "projects" 2026-04-26; filename retained to avoid breaking links) |
 | **creations** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
 | **core team** | `/admin.html` | password-gated admin dashboard for signups, calendar, members, invitations, bulk-paste import |
 
@@ -53,13 +53,14 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - "the premise" — narrative explaining creationships, with strikethroughs on the things this isn't (e.g. "~~solo builders~~ or ~~siloed disciplines~~")
 - three currents: new tech · forever human · the bridge (`data-accordion` → collapses on mobile ≤640px)
 - sunday schedule timeline
-- proof section — past projects with a crown SVG marking shipped items, links out to `/projects.html` for the full gallery
+- proof section — past projects with a crown SVG marking shipped items, links out to the receipts page (`/projects.html`) for the full gallery
 - location card with next-sunday countdown
 - role signup flow (hold space / teach / brain trust) — hover swaps text "→" for the hero's orange arrow SVG
 - "new here?" callout with rough-edge torn-paper clip-path
 
-### projects showcase (public)
+### receipts (public showcase)
 - responsive grid of all `status='active'` ideas, grouped by stage (companies / projects / seeds)
+- 18 WhatsApp-extracted projects are baked into [projects.html](projects.html) as a `SEED_PROJECTS` array — they always render even if Supabase is unreachable. DB rows take precedence on title collision (case-insensitive), so live edits via the Vault override the seed
 - click any card → detail modal with bigger layout, labeled site / code / demo link pills, team chips
 - per-project permalink URLs: `/projects.html?p=<slug>` — back button works, deep links auto-open the matching modal on load
 - share actions in modal footer: copy link + tweet intent (no oauth flow, just `twitter.com/intent/tweet`)
