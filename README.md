@@ -18,7 +18,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | nav label | url | purpose |
 |-----------|-----|---------|
 | **home** | `/index.html` | landing — ambient-art hero, "the room" narrative, schedule, this-sunday Luma feed, "made here" projects preview, soundscape |
-| **volunteer** | `/calendar.html` | member sign-up calendar — claim teach/MC, mint invite codes, edit topic, past archive |
+| **volunteer** | `/calendar.html` | **zero-auth** sunday sign-up — anyone types name + email to claim a teach or MC slot; confirmation email arrives with a per-signup `cancel_token`; visiting `/calendar.html?cancel=<token>` drops the slot. Automated day-7 + day-1 reminder emails via Vercel cron. "Lost the cancel link?" recovery flow re-sends a single email listing every upcoming sunday the address is on. |
 | **projects** | `/projects.html` | public showcase of community work — per-project detail modal, shareable permalink URLs, falls back to a built-in static seed of 17 WhatsApp-extracted projects so the page is never empty. (Page hero reads "show me the receipts"; nav label kept as `projects` for clarity. Filename never renamed.) |
 | **submit** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault" / "creations") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
 | **ethics** | `/ethics.html` | how the room agrees to work — financial-exchange clarity + consent/credit principles. Static page, no data layer. |
@@ -31,6 +31,8 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - **data:** [supabase](https://supabase.com) (postgres + auth + RLS)
 - **hosting:** [vercel](https://vercel.com) — static deploy + 3 serverless functions under `/api/`
 - **AI:** [anthropic claude](https://anthropic.com) — haiku 4.5 for single-project extraction, sonnet 4.6 (with prompt caching) for bulk WhatsApp parsing
+- **email:** [resend](https://resend.com) — confirmations, day-7 / day-1 reminders, cancellation notices, "lost cancel link" recovery (free tier; from-address `onboarding@resend.dev`)
+- **scheduling:** vercel cron (`vercel.json` configures `/api/cron-reminders` daily at 14:00 UTC)
 - **analytics:** vercel web analytics (`/_vercel/insights/script.js`)
 - **fonts:** inter (display + body)
 - **design:** two-register system — editorial sans-serif base + Basquiat-inspired painterly hero (hand-drawn scrawls, crown, paint swipes, struck-through ©s)
@@ -81,11 +83,19 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 - ✨ "paste anything — we'll extract it" panel: paste a whatsapp message, tweet, or rough notes → POSTs to `/api/extract-project` → prefills the form fields
 - **full-edit modal** — click "edit" on your own card to change every field (title, description, links, team, stage, display name); delete also lives here
 
-### volunteer calendar (formerly "sundays")
+### volunteer calendar (formerly "sundays") — zero-auth + email reminders
+- **No magic-link gate.** Anyone can claim a teach or MC slot by entering name + email — no sign-in, no member approval. Replaced the prior auth-gated flow as of commit `c2599b8` (2026-04-26).
 - public read of the next 8 weeks; auto-extends each visit
-- claim teach or MC slot; edit your topic; drop out
-- mint per-member invite codes (codes still functional even though gating is dormant)
+- claim flow returns a per-signup `cancel_token` that lives only in the confirmation email — it never appears in the page DOM. Visiting `/calendar.html?cancel=<token>` cancels the slot without sign-in.
+- four email types via Resend (graceful no-op if `RESEND_API_KEY` is missing):
+  1. **confirmation** — fires from `/api/claim-slot` immediately after the claim succeeds
+  2. **day-7 reminder** — fires from the daily Vercel cron 7 days before
+  3. **day-1 reminder** — fires from the same cron the morning before
+  4. **cancellation** — fires from `/api/notify-cancellation` when admin marks a sunday cancelled
+- **emails are sending text-only**, not HTML. Resend's `onboarding@resend.dev` sandbox sender forces click-tracking, and the tracker domain (`us-east-1.resend-clicks.com`) had an SSL outage on 2026-04-27 that broke every wrapped cancel link. Plain-text URLs aren't wrapped, so we switched. To restore HTML: verify a custom Resend sender domain, disable click-tracking on it, then add `html: tpl.html` back to the payload in [api/_email.js](api/_email.js)
+- "**lost your cancel link?**" recovery — `<details>` panel asks for an email; `/api/resend-cancel-links` calls a service-role-only RPC and emails one summary listing every upcoming sunday that address is on, each with its cancel link. Endpoint always returns 200 so it doesn't leak whether an email is signed up.
 - past archive view + cancellation badges + 1-of-3-filled summary pill per Sunday card
+- old auth-required SQL functions (`claim_teach`, `claim_mc`, `unclaim_*`, `mint_invitation`, etc.) still exist in the DB but are no longer called from the UI — kept for future re-enablement of gated mode
 
 ### ethics
 - static `/ethics.html` — no data layer, just principles
@@ -114,6 +124,11 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 | `POST /api/extract-projects-bulk` | claude sonnet 4.6 | `ADMIN_SECRET` bearer | parse a WhatsApp export chunk into many project records; system prompt is `cache_control: ephemeral` so repeat runs are cheap |
 | `POST /api/admin-import-projects` | n/a | `ADMIN_SECRET` bearer | bulk-insert reviewed projects with `IMPORT_USER_ID` ownership; per-row slug collision retry |
 | `GET /api/luma-events` | n/a | public | parses the public luma iCal feed and returns upcoming creationship events (no API key needed); powers the home-page "this sunday" featured-event card |
+| `POST /api/claim-slot` | n/a | public (rate-limited per IP) | zero-auth slot claim — calls `claim_teach_open` / `claim_mc_open` RPC, then sends Resend confirmation email with the returned `cancel_token` |
+| `GET /api/cancel-claim` | n/a | public via opaque token | calls `cancel_with_token(<token>)` RPC; redirects to `/calendar.html` with a banner indicating success/expired |
+| `POST /api/resend-cancel-links` | n/a | public | uses service-role to call `get_my_active_signups(email)`, emails the caller a single summary with cancel links for every upcoming sunday they're on. Always 200 (don't leak signup state) |
+| `GET /api/cron-reminders` | n/a | `CRON_SECRET` bearer | Vercel cron (daily at 14:00 UTC, see `vercel.json`); calls `get_due_reminders()` → sends day-7 + day-1 emails → calls `mark_notified()` to dedupe |
+| `POST /api/notify-cancellation` | n/a | `ADMIN_SECRET` bearer | called from the admin calendar tab when a sunday is marked cancelled — emails everyone signed up for that date |
 
 ## sql migrations
 
@@ -138,13 +153,16 @@ set in **vercel → project settings → environment variables**, then redeploy:
 | `SUPABASE_SERVICE_ROLE_KEY` | bypasses RLS for server-side admin inserts |
 | `IMPORT_USER_ID` | `auth.users.id` UUID that owns admin-imported rows |
 | `ADMIN_SECRET` | bearer token for `/api/extract-projects-bulk` and `/api/admin-import-projects` — match the plaintext password used at `/admin.html` |
-| `RESEND_API_KEY` | placeholder — not yet wired to any endpoint. Reserved for future email notifications (signup confirmations, invite delivery). Free tier 3,000 emails/month; from-address `onboarding@resend.dev` works without domain verification. |
+| `RESEND_API_KEY` | required for the volunteer-calendar email flow (confirmations, day-7 / day-1 reminders, cancellations, "lost cancel link" recovery). If missing, `api/_email.js` no-ops gracefully — claims still succeed but no email goes out. Free tier 3,000 emails/month; from-address `onboarding@resend.dev` works without domain verification. |
+| `CRON_SECRET` | bearer token for `/api/cron-reminders` — locks the daily reminder cron to Vercel's cron caller (Vercel sets `Authorization: Bearer $CRON_SECRET` automatically when calling the configured cron path) |
 
 `.env.local` (gitignored) holds the same keys for local script use; copy from `.env.example`.
 
 ## auth setup
 
-for magic-link login (sundays calendar + creations submit/edit) to work, configure in supabase dashboard:
+The volunteer calendar (`/calendar.html`) is **zero-auth** as of `c2599b8` — no magic-link configuration needed for that page. Magic-link is still required for the **submit** page (`/ideas.html`) since members edit their own ideas there.
+
+For magic-link login on `/ideas.html` to work, configure in supabase dashboard:
 
 - **authentication → url configuration:**
   - site url: `https://creationship.vercel.app`
@@ -179,7 +197,7 @@ vercel auto-deploys on push to `main`.
 
 ```
 ├── index.html                       # landing — ambient art, hero CTAs, "the room", schedule, this-sunday Luma feed, soundscape
-├── calendar.html                    # volunteer calendar — claim slots, mint invite codes
+├── calendar.html                    # volunteer — zero-auth claim/cancel + lost-link recovery
 ├── projects.html                    # public projects showcase ("the receipts") — SEED_PROJECTS array + detail modal
 ├── ideas.html                       # submit — authenticated idea board + edit modal + paste-and-prefill
 ├── ethics.html                      # money + consent/credit principles (static)
@@ -191,9 +209,19 @@ vercel auto-deploys on push to `main`.
 ├── package.json                     # deps for serverless functions and scripts
 ├── api/
 │   ├── _shared.js                   # PROJECT_SCHEMA + system prompts + rate limit
+│   ├── _email.js                    # Resend client + 4 email templates (text-only mode)
 │   ├── extract-project.js           # Haiku — single-project text → JSON
 │   ├── extract-projects-bulk.js     # Sonnet (cached) — bulk parsing
-│   └── admin-import-projects.js     # service-role bulk insert with slug retry
+│   ├── admin-import-projects.js     # service-role bulk insert with slug retry
+│   ├── claim-slot.js                # zero-auth POST claim → confirmation email
+│   ├── cancel-claim.js              # GET cancel via opaque token from email
+│   ├── resend-cancel-links.js       # POST email-yourself-the-cancel-links recovery
+│   ├── cron-reminders.js            # GET (Vercel cron, 14:00 UTC) day-7 + day-1 reminders
+│   ├── notify-cancellation.js       # POST admin-bearer — emails when sunday is cancelled
+│   └── luma-events.js               # GET public iCal proxy for the home-page feed
+├── vercel.json                      # cron schedule for /api/cron-reminders
+├── supabase/
+│   └── migrations/                  # timestamped SQL migrations (members, zero-auth, RPC revokes)
 ├── scripts/
 │   ├── bulk-import-projects.js      # node script (alt to SQL path)
 │   ├── bulk-import-projects.sql     # one-shot SQL: 18 projects with display_name + slug
@@ -254,8 +282,8 @@ Two registers stacked.
 ## next steps
 
 - [ ] custom domain setup (e.g. `creationship.co`)
-- [ ] email notifications for new signups (resend or supabase edge functions)
-- [ ] invitation token enforcement (`/join?token=`)
+- [ ] verify a custom Resend sender domain so emails can switch from text-only back to HTML (currently blocked by the `onboarding@resend.dev` sandbox click-tracker SSL outage on 2026-04-27 — see [api/_email.js](api/_email.js))
+- [ ] decide whether to flip invite gating back on (calendar is now zero-auth, but `ensure_member()` could be reverted to enforce invite codes for the submit page if desired)
 - [ ] supabase auth for admin (replace client-side hashed password gate)
 - [ ] playlist suggestion moderation in admin dashboard
 - [ ] per-project og-image auto-generation (currently the projects page shares its single og-image)
