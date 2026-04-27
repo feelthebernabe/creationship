@@ -6,7 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parent.parent
 
 EXPECTED = {
-    "og-card.png":      {"size": (1200, 630), "mode_in": ("RGB", "RGBA")},
+    "og-card.jpg":      {"size": (1200, 630), "mode_in": ("RGB", "RGBA")},
     "favicon-32.png":   {"size": (32, 32),    "mode_in": ("RGBA",)},
     "favicon-180.png":  {"size": (180, 180),  "mode_in": ("RGBA",)},
     "favicon-192.png":  {"size": (192, 192),  "mode_in": ("RGBA",)},
@@ -59,12 +59,12 @@ for name in ("favicon-512.png",):
             failures.append(f"{name}: no transparent pixels (min alpha {alphas[0]}); alpha keying broken")
 
 # OG card must contain non-white content (i.e. the hero is actually embedded, not a blank canvas)
-ogc = ROOT / "og-card.png"
+ogc = ROOT / "og-card.jpg"
 if ogc.exists():
     im = Image.open(ogc).convert("RGB")
     extrema = im.getextrema()
     if all(lo == 255 for lo, _ in extrema):
-        failures.append("og-card.png: appears entirely white (hero image not embedded)")
+        failures.append("og-card.jpg: appears entirely white (hero image not embedded)")
 
 if failures:
     print("FAIL:")

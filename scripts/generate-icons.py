@@ -82,8 +82,10 @@ def main() -> None:
     print(f"wrote favicon.ico ({ICO_SIZES})")
 
     og = build_og_card()
-    og.save(ROOT / "og-card.png", "PNG", optimize=True)
-    print("wrote og-card.png")
+    # JPEG keeps the file under WhatsApp's 600 KB OG limit; quality=85 is visually
+    # indistinguishable from the source for this stencil-art content.
+    og.save(ROOT / "og-card.jpg", "JPEG", quality=85, optimize=True)
+    print("wrote og-card.jpg")
 
 
 if __name__ == "__main__":
