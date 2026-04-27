@@ -1,8 +1,8 @@
 # the creationship
 
-a weekly create-a-thon for moral imagination.  
-part weekly ritual, part build session — a place to create things that matter, irl together.  
-sundays at caravan of dreams, east village.
+sunday afternoons in the back room of a vegan restaurant on east 6th st.  
+people who share an interest in positive social change and new technology.  
+three hours later, we've built something together.
 
 **live:** [creationship.vercel.app](https://creationship.vercel.app)  
 **source:** [github.com/feelthebernabe/creationship](https://github.com/feelthebernabe/creationship)
@@ -17,7 +17,7 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 
 | nav label | url | purpose |
 |-----------|-----|---------|
-| **home** | `/index.html` | landing — ambient-art hero, "the room" narrative, schedule, this-sunday Luma feed, "made here" projects preview, soundscape |
+| **home** | `/index.html` | landing — ambient-art hero, "the room" narrative, "what we work on" territory framing, schedule, this-sunday Luma feed, "made here" projects preview, soundscape |
 | **volunteer** | `/calendar.html` | **zero-auth** sunday sign-up — anyone types name + email to claim a teach or MC slot. Confirmation email contains a per-signup `cancel_token`. Drop out by pasting the token into the in-page "have your cancel code?" form (primary path; works even when Resend's click-tracker is broken). Automated day-7 + day-1 reminder emails via Vercel cron. "Lost your cancel code?" recovery flow re-sends a single email listing every upcoming sunday the address is on. |
 | **projects** | `/projects.html` | public showcase of community work — per-project detail modal, shareable permalink URLs, falls back to a built-in static seed of 17 WhatsApp-extracted projects so the page is never empty. (Page hero reads "show me the receipts"; nav label kept as `projects` for clarity. Filename never renamed.) |
 | **submit** | `/ideas.html` | magic-link-authenticated submit + edit page (formerly "the vault" / "creations") — seed → project → company pipeline; includes "paste anything" extract panel and full edit modal |
@@ -53,7 +53,8 @@ the creationship is a signup, coordination, and idea-tracking system for a weekl
 
 ### landing page
 - **hero** — quiet two-line headline ("the / creationship") over an ambient stencil background (`assets/tech_birdhouse.png`); two CTAs: "join this sunday →" (Luma calendar) and "host or teach →" (volunteer page); subtitle, scroll cue, "sundays · noon · east village · come as you are" meta
-- **the room** (`#the-room`) — narrative on what creationships are, framed by a `we don't curate the guest list` heading with an orange swipe on "whoever shows up"; pull-quote on the finite-game outside vs. the room; territory tags (synthetic realities · ai agents · vibe coding · prompt craft · indigenous wisdom · embodiment · sensemaking · trust & consent · ethics · craftsmanship · storytelling)
+- **the room** (`#the-room`) — narrative on what creationships are, framed by a `we don't curate the guest list` heading with an orange swipe on "whoever shows up"; doula/prompt-engineer archetype line; vibecoding definition; pull-quote on the finite-game outside vs. the room; closes with the "creationships" naming + 9 AM eggs line
+- **what we work on** (`#what-we-work-on`) — territory framing where "what's forever human meets what's newly possible with ai"; territory tags (creativity · wisdom · embodiment · attention · craft · vibecoding · prompt craft · ai agents · synthetic realities · trust & consent · storytelling)
 - **how it works** (`#how-it-works`) — sunday schedule timeline with eyebrow tally and orange swipe on "finish line"
 - **this sunday** (`#this-sunday`) — featured Luma event card + upcoming events list pulled live from `/api/luma-events`
 - **made here** (`#made-here`) — tease of the projects gallery, links to `/projects.html` for the full set
