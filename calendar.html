@@ -170,6 +170,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="config.local.js"></script>
   <script src="data.js"></script>
   <script>
   (function () {
@@ -368,6 +370,20 @@
         el('span', 'sunday-card__date-rel', opts.past ? pastLabel(s.date) : relativeLabel(s.date))
       );
       head.append(dateBox);
+
+      // Cancelled Sundays get a special render: no slots, no pills, just
+      // a clear "NO CREATIONSHIP THIS WEEK" callout + the reason (title)
+      // and any extra detail (description). Returns early so the rest of
+      // the slot-rendering code doesn't run for cancelled rows.
+      if (s.status === 'cancelled') {
+        article.append(head);
+        const callout = el('div', 'sunday-card__cancelled-callout');
+        callout.append(el('div', 'sunday-card__cancelled-headline', 'NO CREATIONSHIP THIS WEEK'));
+        if (s.title) callout.append(el('div', 'sunday-card__cancelled-reason', s.title));
+        if (s.description) callout.append(el('div', 'sunday-card__cancelled-detail', s.description));
+        article.append(callout);
+        return article;
+      }
 
       // Fill summary pill — shows the role structure explicitly.
       if (s.status !== 'cancelled' && !opts.past) {

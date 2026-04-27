@@ -4264,14 +4264,40 @@ body.modal-open {
   background: rgba(160, 152, 144, 0.18);
   color: var(--text-dim);
 }
-.sunday-card--cancelled .sunday-card__date-num,
-.sunday-card--cancelled .sunday-card__theme {
-  text-decoration: line-through;
+.sunday-card--cancelled {
+  background: var(--bg);
+}
+.sunday-card--cancelled .sunday-card__date-num {
   color: var(--text-muted);
 }
-.sunday-card--cancelled .slot__filled,
-.sunday-card--cancelled .slot__open {
-  opacity: 0.5;
+
+/* Cancelled callout — replaces the slots area on cancelled Sundays */
+.sunday-card__cancelled-callout {
+  margin-top: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px dashed rgba(196, 101, 74, 0.35);
+  border-radius: var(--radius-md);
+  text-align: center;
+  background: rgba(196, 101, 74, 0.04);
+}
+.sunday-card__cancelled-headline {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--bg-accent);
+  text-transform: uppercase;
+}
+.sunday-card__cancelled-reason {
+  margin-top: var(--space-xs);
+  font-size: 0.95rem;
+  color: var(--text);
+  font-style: italic;
+}
+.sunday-card__cancelled-detail {
+  margin-top: var(--space-xs);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
 }
 .sunday-card--past {
   background: var(--bg);
